@@ -12,60 +12,29 @@ class FirebaseLocalConfig {
 
   final ConfigSource _localConfig = SharedPreferencesConfigSource();
 
-  Map<String, dynamic> _localValues = {};
+  Map<String, String> _values = {};
 
-  Future<void> initialize(Map<String, RemoteConfigValue> remoteValues) async {
+  Future<void> initialize(Map<String, RemoteConfigValue> values) async {
     await _localConfig.initialize();
 
-    _localValues = remoteValues.map((key, value) {
-      if (value.asBool() != RemoteConfigValue.defaultValueForBool) {
-        return MapEntry(key, value.asBool());
-      } else if (value.asInt() != RemoteConfigValue.defaultValueForInt) {
-        return MapEntry(key, value.asInt());
-      } else if (value.asDouble() != RemoteConfigValue.defaultValueForDouble) {
-        return MapEntry(key, value.asDouble());
-      } else if (value.asString() != RemoteConfigValue.defaultValueForString) {
-        return MapEntry(key, value.asString());
-      } else {
-        return MapEntry(key, null);
-      }
+    _values = values.map((key, value) {
+      return MapEntry(key, value.asString());
     });
-    _localValues.removeWhere((key, value) => value == null);
   }
 
   bool? getBool(String key) {
-    final localValue = _localValues[key];
-    if (localValue is bool) {
-      return localValue;
-    }
-
     return _localConfig.getBool(key);
   }
 
   int? getInt(String key) {
-    final localValue = _localValues[key];
-    if (localValue is int) {
-      return localValue;
-    }
-
     return _localConfig.getInt(key);
   }
 
   double? getDouble(String key) {
-    final localValue = _localValues[key];
-    if (localValue is double) {
-      return localValue;
-    }
-
     return _localConfig.getDouble(key);
   }
 
   String? getString(String key) {
-    final localValue = _localValues[key];
-    if (localValue is String) {
-      return localValue;
-    }
-
     return _localConfig.getString(key);
   }
 
@@ -86,14 +55,32 @@ class FirebaseLocalConfig {
   }
 
   Widget getLocalConfigScreen() {
-    final localConfigs = _localValues.entries.toList();
+    final localConfigs = _values.entries.toList();
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Firebase Local Config'),
+      ),
       body: ListView.builder(
-        itemCount: 5,
+        itemCount: localConfigs.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(localConfigs[index].key),
-            subtitle: Text(localConfigs[index].value),
+          final entry = localConfigs[index];
+
+          String type = 'String';
+          if (bool.tryParse(entry.value) != null) {
+            type = 'bool';
+          } else if (int.tryParse(entry.value) != null) {
+            type = 'int';
+          } else if (double.tryParse(entry.value) != null) {
+            type = 'double';
+          }
+
+          return InkWell(
+            child: ListTile(
+              title: Text(entry.key),
+              subtitle: Text(type),
+              trailing: Text(entry.value),
+            ),
+            onTap: () {},
           );
         },
       ),
