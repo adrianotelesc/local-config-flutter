@@ -1,5 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_local_config/firebase_local_config.dart';
+import 'package:firebase_local_config/local_config.dart';
 import 'package:firebase_local_config_sample/firebase_options.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +12,10 @@ void main() async {
   );
   await FirebaseRemoteConfig.instance.fetchAndActivate();
 
-  FirebaseLocalConfig.instance.setConfigs(FirebaseRemoteConfig.instance
+  final configs = FirebaseRemoteConfig.instance
       .getAll()
-      .map((key, value) => MapEntry(key, value.asString())));
+      .map((key, value) => MapEntry(key, value.asString()));
+  LocalConfig.instance.initialize(configs: configs);
 
   runApp(const MyApp());
 }
@@ -46,7 +47,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: FirebaseLocalConfig.instance.getSettingsScreen(),
+      home: LocalConfig.instance.getLocalConfigsScreen(),
     );
   }
 }
