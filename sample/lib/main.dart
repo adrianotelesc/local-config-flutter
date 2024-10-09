@@ -31,7 +31,7 @@ void main() async {
       valueType: ConfigValueType.string,
     ),
     'config_json': const ConfigValue(
-      value: '{}',
+      value: '''{"title": { "value": "teste"}}''',
       valueType: ConfigValueType.json,
     ),
   };
