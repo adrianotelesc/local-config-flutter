@@ -2,7 +2,12 @@ import 'dart:convert';
 
 import 'package:firebase_local_config/local_config.dart';
 import 'package:firebase_local_config/model/config_value.dart';
+import 'package:firebase_local_config/text/styleable_text_editing_controller.dart';
+import 'package:firebase_local_config/text/tab_shortcut.dart';
+import 'package:firebase_local_config/text/text_part_style_definition.dart';
+import 'package:firebase_local_config/text/text_part_style_definitions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class DataObjectConfigWidget extends StatefulWidget {
   const DataObjectConfigWidget({
@@ -20,7 +25,19 @@ class DataObjectConfigWidget extends StatefulWidget {
 
 class _DataObjectConfigWidgetState extends State<DataObjectConfigWidget> {
   final _formKey = GlobalKey<FormState>();
-  final _textController = TextEditingController();
+  final _textController = StyleableTextEditingController(
+      styles: TextPartStyleDefinitions(
+    definitionList: [
+      TextPartStyleDefinition(
+        pattern: '"[^"]*"',
+        style: const TextStyle(color: Colors.green),
+      ),
+      TextPartStyleDefinition(
+        pattern: '\\d+\\.?\\d*|\\.\\d+',
+        style: const TextStyle(color: Colors.deepOrange),
+      )
+    ],
+  ));
 
   String _value = '';
 
@@ -59,19 +76,28 @@ class _DataObjectConfigWidgetState extends State<DataObjectConfigWidget> {
               ),
               content: Form(
                 key: _formKey,
-                child: TextFormField(
-                  maxLines: null,
-                  controller: _textController,
-                  autovalidateMode: AutovalidateMode.always,
-                  validator: (value) {
-                    try {
-                      prettify(jsonDecode(_textController.text));
-                    } on FormatException catch (_) {
-                      return 'Invalid JSON.';
-                    }
+                child: Actions(
+                  actions: {InsertTabIntent: InsertTabAction()},
+                  child: Shortcuts(
+                    shortcuts: {
+                      LogicalKeySet(LogicalKeyboardKey.tab):
+                          InsertTabIntent(2, _textController)
+                    },
+                    child: TextFormField(
+                      maxLines: null,
+                      controller: _textController,
+                      autovalidateMode: AutovalidateMode.always,
+                      validator: (value) {
+                        try {
+                          prettify(jsonDecode(_textController.text));
+                        } on FormatException catch (_) {
+                          return 'Invalid JSON.';
+                        }
 
-                    return null;
-                  },
+                        return null;
+                      },
+                    ),
+                  ),
                 ),
               ),
               actions: [
