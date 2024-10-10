@@ -29,11 +29,11 @@ class _DataObjectConfigWidgetState extends State<DataObjectConfigWidget> {
       styles: TextPartStyleDefinitions(
     definitionList: [
       TextPartStyleDefinition(
-        pattern: '"[^"]*"',
+        pattern: r'"[^"]*"',
         style: const TextStyle(color: Colors.green),
       ),
       TextPartStyleDefinition(
-        pattern: '\\d+\\.?\\d*|\\.\\d+',
+        pattern: r'\d+\.?\d*|\.\d+|\btrue\b|\bfalse\b',
         style: const TextStyle(color: Colors.deepOrange),
       )
     ],
