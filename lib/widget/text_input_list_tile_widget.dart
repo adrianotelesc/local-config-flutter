@@ -41,7 +41,7 @@ class _TextInputListTileWidgetState extends State<TextInputListTileWidget> {
         leading: widget.isNumeric
             ? const Icon(Icons.onetwothree)
             : const Icon(Icons.abc),
-        trailing: Text(_value),
+        trailing: Text(_value.isNotEmpty ? _value : '(empty string)'),
       ),
       onTap: () {
         showDialog(

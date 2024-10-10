@@ -31,9 +31,14 @@ class _ToggleListTileWidgetState extends State<ToggleListTileWidget> {
       child: ListTile(
         title: Text(widget.title),
         leading: const Icon(Icons.toggle_on),
-        trailing: Switch(
-          value: _value,
-          onChanged: onChanged,
+        trailing: SizedBox(
+          width: 50,
+          height: 20,
+          child: Switch(
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            value: _value,
+            onChanged: onChanged,
+          ),
         ),
       ),
       onTap: () => onChanged(!_value),
