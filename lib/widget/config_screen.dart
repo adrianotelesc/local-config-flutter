@@ -1,8 +1,8 @@
+import 'package:firebase_local_config/widget/text_editor_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_local_config/local_config.dart';
 import 'package:firebase_local_config/model/config_value.dart';
 import 'package:firebase_local_config/widget/toggle_list_tile_widget.dart';
-import 'package:firebase_local_config/widget/data_object_config_widget.dart';
 import 'package:firebase_local_config/widget/text_input_list_tile_widget.dart';
 
 class LocalConfigScreen extends StatelessWidget {
@@ -34,9 +34,38 @@ class LocalConfigScreen extends StatelessWidget {
             case ConfigValueType.int:
             case ConfigValueType.double:
             case ConfigValueType.string:
+            case ConfigValueType.json:
+              final isNumeric =
+                  configEntry.value.valueType == ConfigValueType.int ||
+                      configEntry.value.valueType == ConfigValueType.double;
+              final isJson =
+                  configEntry.value.valueType == ConfigValueType.json;
               return TextInputListTileWidget(
                 title: configEntry.key,
+                subtitle: _getType(configEntry.value.valueType),
                 value: configEntry.value.asString() ?? '',
+                leadingIcon: isNumeric
+                    ? const Icon(Icons.onetwothree)
+                    : isJson
+                        ? const Icon(Icons.data_object)
+                        : const Icon(Icons.abc),
+                suffixIcon: configEntry.value.valueType ==
+                            ConfigValueType.json ||
+                        configEntry.value.valueType == ConfigValueType.string
+                    ? IconButton(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .push(new MaterialPageRoute<Null>(
+                                  builder: (BuildContext context) {
+                                    return TextEditorScreen(
+                                      value: configEntry.value.value,
+                                    );
+                                  },
+                                  fullscreenDialog: true));
+                        },
+                        icon: const Icon(Icons.open_in_full),
+                      )
+                    : null,
                 isNumeric: configEntry.value.isNumeric,
                 onChanged: (value) {
                   if (configEntry.value.valueType == ConfigValueType.int) {
@@ -76,15 +105,24 @@ class LocalConfigScreen extends StatelessWidget {
                   return null;
                 },
               );
-
-            case ConfigValueType.json:
-              return DataObjectConfigWidget(
-                configKey: configEntry.key,
-                configValue: configEntry.value,
-              );
           }
         },
       ),
     );
+  }
+
+  String _getType(ConfigValueType type) {
+    switch (type) {
+      case ConfigValueType.bool:
+        return 'bool';
+      case ConfigValueType.int:
+        return 'int';
+      case ConfigValueType.double:
+        return 'double';
+      case ConfigValueType.string:
+        return 'String';
+      case ConfigValueType.json:
+        return 'JSON';
+    }
   }
 }
