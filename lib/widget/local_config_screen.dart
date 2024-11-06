@@ -62,11 +62,13 @@ class LocalConfigScreen extends StatelessWidget {
           }
           index = index -= 1;
           final configEntry = configs[index];
+          final textController = TextEditingController();
 
           switch (configEntry.value.valueType) {
             case ConfigValueType.bool:
               return TextInputListTileWidget(
                 title: configEntry.key,
+                controller: textController,
                 subtitle: _getType(configEntry.value.valueType),
                 value: configEntry.value.value,
                 predefinedValues: const ['false', 'true'],
@@ -97,6 +99,7 @@ class LocalConfigScreen extends StatelessWidget {
                 title: configEntry.key,
                 subtitle: _getType(configEntry.value.valueType),
                 value: configEntry.value.asString() ?? '',
+                controller: textController,
                 textTypeIcon: isNumeric
                     ? const Icon(Icons.onetwothree)
                     : isJson
@@ -117,6 +120,9 @@ class LocalConfigScreen extends StatelessWidget {
                                             ? 'String'
                                             : 'JSON',
                                     value: configEntry.value.value,
+                                    onChanged: (value) {
+                                      textController.text = value;
+                                    },
                                   );
                                 },
                                 fullscreenDialog: true),

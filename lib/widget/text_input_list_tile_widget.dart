@@ -6,6 +6,7 @@ class TextInputListTileWidget extends StatefulWidget {
     required this.title,
     required this.subtitle,
     required this.value,
+    required this.controller,
     this.textTypeIcon,
     this.suffixIcon,
     this.onChanged,
@@ -21,6 +22,7 @@ class TextInputListTileWidget extends StatefulWidget {
   final Function(String value)? onChanged;
   final String? Function(String? value)? validator;
   final List<String> predefinedValues;
+  final TextEditingController controller;
 
   @override
   State<StatefulWidget> createState() => _TextInputListTileWidgetState();
@@ -28,7 +30,6 @@ class TextInputListTileWidget extends StatefulWidget {
 
 class _TextInputListTileWidgetState extends State<TextInputListTileWidget> {
   final _formKey = GlobalKey<FormState>();
-  final _textController = TextEditingController();
 
   String _value = '';
 
@@ -36,7 +37,7 @@ class _TextInputListTileWidgetState extends State<TextInputListTileWidget> {
   void initState() {
     super.initState();
     _value = widget.value;
-    _textController.text = _value;
+    widget.controller.text = _value;
   }
 
   @override
@@ -101,7 +102,7 @@ class _TextInputListTileWidgetState extends State<TextInputListTileWidget> {
                                         border: const OutlineInputBorder(),
                                         suffixIcon: widget.suffixIcon,
                                       ),
-                                      controller: _textController,
+                                      controller: widget.controller,
                                       autovalidateMode: AutovalidateMode.always,
                                       validator: widget.validator,
                                     )
@@ -128,7 +129,7 @@ class _TextInputListTileWidgetState extends State<TextInputListTileWidget> {
                                             }).toList(),
                                             value: _value,
                                             onChanged: (value) {
-                                              _textController.text =
+                                              widget.controller.text =
                                                   value ?? _value;
                                             }),
                                       ),
@@ -140,7 +141,7 @@ class _TextInputListTileWidgetState extends State<TextInputListTileWidget> {
                             children: [
                               TextButton(
                                 onPressed: () {
-                                  _textController.text = _value;
+                                  widget.controller.text = _value;
                                   Navigator.of(context).pop();
                                 },
                                 child: const Text('Cancel'),
@@ -152,7 +153,7 @@ class _TextInputListTileWidgetState extends State<TextInputListTileWidget> {
                                       false)) {
                                     return;
                                   }
-                                  onChanged(_textController.text);
+                                  onChanged(widget.controller.text);
                                   Navigator.of(context).pop();
                                 },
                                 child: const Text('Save'),
@@ -164,7 +165,7 @@ class _TextInputListTileWidgetState extends State<TextInputListTileWidget> {
                 );
               },
             ).whenComplete(() {
-              _textController.text = _value;
+              widget.controller.text = _value;
             });
           },
           icon: const Icon(Icons.edit),
@@ -181,6 +182,6 @@ class _TextInputListTileWidgetState extends State<TextInputListTileWidget> {
   @override
   void dispose() {
     super.dispose();
-    _textController.dispose();
+    widget.controller.dispose();
   }
 }
