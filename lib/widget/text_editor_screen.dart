@@ -40,6 +40,7 @@ class _TextEditorScreenState extends State<TextEditorScreen> {
   ));
 
   String _value = '';
+  int numLines = 1;
 
   @override
   void initState() {
@@ -47,6 +48,7 @@ class _TextEditorScreenState extends State<TextEditorScreen> {
     _value = widget.value;
     try {
       _textController.text = prettify(jsonDecode(_value));
+      numLines = '\n'.allMatches(_textController.text).length + 1;
     } on FormatException catch (_) {}
   }
 
@@ -65,21 +67,54 @@ class _TextEditorScreenState extends State<TextEditorScreen> {
               LogicalKeySet(LogicalKeyboardKey.tab):
                   InsertTabIntent(2, _textController)
             },
-            child: TextFormField(
-              maxLines: null,
-              decoration: const InputDecoration(border: InputBorder.none),
-              controller: _textController,
-              autovalidateMode: AutovalidateMode.always,
-              validator: (value) {
-                try {
-                  prettify(jsonDecode(_textController.text));
-                } on FormatException catch (_) {
-                  return 'Invalid JSON.';
-                }
+            child: SingleChildScrollView(
+                child: IntrinsicHeight(
+                    child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children:
+                        List<int>.generate(numLines, (i) => i + 1).map((value) {
+                      return Text(
+                        value.toString(),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(height: 1.7),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const VerticalDivider(),
+                Expanded(
+                  child: TextFormField(
+                    maxLines: null,
+                    decoration: const InputDecoration(border: InputBorder.none),
+                    controller: _textController,
+                    autovalidateMode: AutovalidateMode.always,
+                    onChanged: (value) {
+                      setState(() {
+                        numLines = '\n'.allMatches(value).length + 1;
+                      });
+                    },
+                    validator: (value) {
+                      try {
+                        prettify(jsonDecode(_textController.text));
+                      } on FormatException catch (_) {
+                        return 'Invalid JSON.';
+                      }
 
-                return null;
-              },
-            ),
+                      return null;
+                    },
+                  ),
+                ),
+              ],
+            ))),
           ),
         ),
       ),
