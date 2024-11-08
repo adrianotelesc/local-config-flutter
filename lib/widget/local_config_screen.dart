@@ -242,15 +242,17 @@ class _ConfigListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final valueText = _textForValue(value);
+    final typeIcon = _iconForType(value.type);
+
     return ListTile(
-      title: Text(name),
-      subtitle: Text(_getValueOrPlaceholder()),
-      leading: Icon(_getTypeIcon()),
       contentPadding: const EdgeInsets.only(left: 16, right: 8),
+      title: Text(name),
+      subtitle: Text(valueText),
+      leading: Icon(typeIcon),
       trailing: IconButton(
         onPressed: () async {
-          // ignore: unused_local_variable
-          final valueChanged = await showConfigForm(context);
+          await showConfigForm(context);
         },
         icon: const Icon(Icons.edit),
       ),
@@ -265,44 +267,41 @@ class _ConfigListTile extends StatelessWidget {
       builder: (context) {
         return _ConfigForm(
           name: name,
-          typeName: _getTypeLabel(),
-          typeIcon: Icon(_getTypeIcon()),
+          type: value.type,
           value: value.raw,
-          presetValues: _getPredefinedValues(),
+          presetValues: _presetValuesForType(value.type),
           inputAction: value.type.isText
               ? IconButton(
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute<Null>(
-                          builder: (BuildContext context) {
-                            return TextEditorScreen(
-                              valueTypeName: _getTypeLabel(),
-                              initialValue: value.raw,
-                            );
-                          },
-                          fullscreenDialog: true),
+                        fullscreenDialog: true,
+                        builder: (BuildContext context) {
+                          return TextEditorScreen(initialValue: value.raw);
+                        },
+                      ),
                     );
                   },
                   icon: const Icon(Icons.open_in_full),
                 )
               : null,
           onChanged: (value) {
-            if (this.value.type == ConfigValueType.intType) {
+            if (this.value.type == ConfigType.intType) {
               LocalConfig.instance.setInt(
                 name,
                 int.tryParse(value) ?? 0,
               );
             }
 
-            if (this.value.type == ConfigValueType.doubleType) {
+            if (this.value.type == ConfigType.doubleType) {
               LocalConfig.instance.setDouble(
                 name,
                 double.tryParse(value) ?? 0,
               );
             }
 
-            if (this.value.type == ConfigValueType.stringType ||
-                this.value.type == ConfigValueType.jsonType) {
+            if (this.value.type == ConfigType.stringType ||
+                this.value.type == ConfigType.jsonType) {
               LocalConfig.instance.setString(
                 name,
                 value,
@@ -310,13 +309,13 @@ class _ConfigListTile extends StatelessWidget {
             }
           },
           validator: (value) {
-            if (this.value.type == ConfigValueType.intType &&
+            if (this.value.type == ConfigType.intType &&
                 value != null &&
                 int.tryParse(value) == null) {
               return 'Invalid integer.';
             }
 
-            if (this.value.type == ConfigValueType.doubleType &&
+            if (this.value.type == ConfigType.doubleType &&
                 value != null &&
                 double.tryParse(value) == null) {
               return 'Invalid double.';
@@ -328,60 +327,12 @@ class _ConfigListTile extends StatelessWidget {
       },
     );
   }
-
-  String _getValueOrPlaceholder() {
-    switch (value.type) {
-      case ConfigValueType.stringType:
-        return value.raw.isNotEmpty ? value.raw : '(empty string)';
-      default:
-        return value.raw;
-    }
-  }
-
-  IconData _getTypeIcon() {
-    switch (value.type) {
-      case ConfigValueType.boolType:
-        return Icons.toggle_on;
-      case ConfigValueType.intType:
-      case ConfigValueType.doubleType:
-        return Icons.onetwothree;
-      case ConfigValueType.stringType:
-        return Icons.abc;
-      case ConfigValueType.jsonType:
-        return Icons.data_object;
-    }
-  }
-
-  String _getTypeLabel() {
-    switch (value.type) {
-      case ConfigValueType.boolType:
-        return 'bool';
-      case ConfigValueType.intType:
-        return 'int';
-      case ConfigValueType.doubleType:
-        return 'double';
-      case ConfigValueType.stringType:
-        return 'String';
-      case ConfigValueType.jsonType:
-        return 'JSON';
-    }
-  }
-
-  List<String> _getPredefinedValues() {
-    switch (value.type) {
-      case ConfigValueType.boolType:
-        return ['false', 'true'];
-      default:
-        return [];
-    }
-  }
 }
 
 class _ConfigForm extends StatefulWidget {
   const _ConfigForm({
     required this.name,
-    required this.typeName,
-    required this.typeIcon,
+    required this.type,
     required this.value,
     this.onChanged,
     this.inputAction,
@@ -390,8 +341,7 @@ class _ConfigForm extends StatefulWidget {
   });
 
   final String name;
-  final String typeName;
-  final Widget typeIcon;
+  final ConfigType type;
   final String value;
   final Widget? inputAction;
   final Function(String value)? onChanged;
@@ -437,10 +387,10 @@ class _ConfigFormState extends State<_ConfigForm> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  widget.typeIcon,
+                  Icon(_iconForType(widget.type)),
                   const SizedBox.square(dimension: 4),
                   Text(
-                    widget.typeName,
+                    _textForType(widget.type),
                     style: Theme.of(context).textTheme.bodyMedium,
                   )
                 ],
@@ -526,5 +476,52 @@ class _ConfigFormState extends State<_ConfigForm> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+}
+
+List<String> _presetValuesForType(ConfigType type) {
+  switch (type) {
+    case ConfigType.boolType:
+      return ['false', 'true'];
+    default:
+      return [];
+  }
+}
+
+String _textForValue(ConfigValue value) {
+  switch (value.type) {
+    case ConfigType.stringType:
+      return value.raw.isNotEmpty ? value.raw : '(empty string)';
+    default:
+      return value.raw;
+  }
+}
+
+String _textForType(ConfigType type) {
+  switch (type) {
+    case ConfigType.boolType:
+      return 'bool';
+    case ConfigType.intType:
+      return 'int';
+    case ConfigType.doubleType:
+      return 'double';
+    case ConfigType.stringType:
+      return 'String';
+    case ConfigType.jsonType:
+      return 'JSON';
+  }
+}
+
+IconData _iconForType(ConfigType type) {
+  switch (type) {
+    case ConfigType.boolType:
+      return Icons.toggle_on;
+    case ConfigType.intType:
+    case ConfigType.doubleType:
+      return Icons.onetwothree;
+    case ConfigType.stringType:
+      return Icons.abc;
+    case ConfigType.jsonType:
+      return Icons.data_object;
   }
 }

@@ -1,6 +1,6 @@
 class ConfigValue {
   final String raw;
-  final ConfigValueType type;
+  final ConfigType type;
 
   const ConfigValue({
     required this.raw,
@@ -13,7 +13,7 @@ class ConfigValue {
   String? get asString => raw;
 }
 
-enum ConfigValueType {
+enum ConfigType {
   boolType,
   intType,
   doubleType,
