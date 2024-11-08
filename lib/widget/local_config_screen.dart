@@ -47,9 +47,10 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
                 child: _ConfigSearchBar(onChanged: _onSearchTextChanged),
               ),
             ),
-            _ConfigListView(
-              configs: _configs,
-            )
+            if (_configs.isEmpty)
+              const _ConfigEmptyList()
+            else
+              _ConfigList(configs: _configs)
           ],
         ),
       ),
@@ -110,8 +111,35 @@ class _SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-class _ConfigListView extends StatelessWidget {
-  const _ConfigListView({this.configs = const []});
+class _ConfigEmptyList extends StatelessWidget {
+  const _ConfigEmptyList();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+        child: Column(
+          children: [
+            Text(
+              '(づ╥﹏╥)づ',
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
+            const SizedBox.square(dimension: 24),
+            Text(
+              'No results...',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ConfigList extends StatelessWidget {
+  const _ConfigList({this.configs = const []});
 
   final List<MapEntry<String, ConfigValue>> configs;
 
