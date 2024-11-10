@@ -15,24 +15,24 @@ void main() async {
 
   final configs = <String, ConfigValue>{
     'config_bool': const ConfigValue(
-      raw: 'true',
-      type: ConfigType.boolType,
+      'true',
+      ConfigValueType.boolType,
     ),
     'config_int': const ConfigValue(
-      raw: '0',
-      type: ConfigType.intType,
+      '0',
+      ConfigValueType.intType,
     ),
     'config_double': const ConfigValue(
-      raw: '0.0',
-      type: ConfigType.doubleType,
+      '0.0',
+      ConfigValueType.doubleType,
     ),
     'config_string': const ConfigValue(
-      raw: '',
-      type: ConfigType.stringType,
+      '',
+      ConfigValueType.stringType,
     ),
     'config_json': const ConfigValue(
-      raw: '''{"title": { "value": "teste"}}''',
-      type: ConfigType.jsonType,
+      '''{"title": { "value": "teste"}}''',
+      ConfigValueType.jsonType,
     ),
   };
   LocalConfig.instance.initialize(configs: configs);

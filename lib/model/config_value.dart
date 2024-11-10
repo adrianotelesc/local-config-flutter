@@ -1,19 +1,19 @@
 class ConfigValue {
-  final String raw;
-  final ConfigType type;
+  final String _value;
+  final ConfigValueType type;
 
-  const ConfigValue({
-    required this.raw,
-    required this.type,
-  });
+  const ConfigValue(
+    this._value,
+    this.type,
+  );
 
-  bool? get asBool => bool.tryParse(raw);
-  double? get asDouble => double.tryParse(raw);
-  int? get asInt => int.tryParse(raw);
-  String? get asString => raw;
+  bool? get asBool => bool.tryParse(_value);
+  double? get asDouble => double.tryParse(_value);
+  int? get asInt => int.tryParse(_value);
+  String get asString => _value;
 }
 
-enum ConfigType {
+enum ConfigValueType {
   boolType,
   intType,
   doubleType,

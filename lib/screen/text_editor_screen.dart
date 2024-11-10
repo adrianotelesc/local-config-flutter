@@ -9,11 +9,9 @@ class TextEditorScreen extends StatefulWidget {
   const TextEditorScreen({
     super.key,
     required this.initialValue,
-    this.onChanged,
   });
 
   final String initialValue;
-  final Function(String value)? onChanged;
 
   @override
   State<StatefulWidget> createState() => _TextEditorScreenState();
@@ -43,8 +41,7 @@ class _TextEditorScreenState extends State<TextEditorScreen> {
           IconButton(
             tooltip: 'Save',
             onPressed: () {
-              onChanged();
-              Navigator.maybePop(context);
+              Navigator.maybePop(context, jsonMinify(_controller.text));
             },
             icon: const Icon(Icons.check),
           )
@@ -121,10 +118,6 @@ class _TextEditorScreenState extends State<TextEditorScreen> {
         ],
       ),
     );
-  }
-
-  void onChanged() {
-    widget.onChanged?.call(jsonMinify(_controller.text));
   }
 
   String jsonPrettify(String jsonString) {

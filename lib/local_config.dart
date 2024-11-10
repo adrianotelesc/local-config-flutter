@@ -1,10 +1,12 @@
 library firebase_local_config;
 
+import 'dart:async';
+
 import 'package:firebase_local_config/model/config_value.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_local_config/preferences/preferences_delegate.dart';
 import 'package:firebase_local_config/preferences/shared_preferences_delegate.dart';
-import 'package:firebase_local_config/widget/local_config_screen.dart';
+import 'package:firebase_local_config/screen/local_config_screen.dart';
 
 class LocalConfig {
   LocalConfig._();
@@ -13,21 +15,26 @@ class LocalConfig {
 
   final PreferencesDelegate _preferencesDelegate = SharedPreferencesDelegate();
 
-  final Map<String, ConfigValue> _configs = {};
-
-  final Map<String, dynamic> _configsInPreferences = {};
+  final _configs = <String, ConfigValue>{};
+  final _configsStreamController = StreamController<Map<String, ConfigValue>>();
 
   Future<void> initialize({required Map<String, ConfigValue> configs}) async {
-    _configs.addAll(configs);
-
     var configsInPreferences = await _preferencesDelegate.getAll();
     for (final key in configsInPreferences.keys) {
-      if (!_configs.containsKey(key)) {
+      if (!configs.containsKey(key)) {
         await _preferencesDelegate.removePreference(key);
-        configsInPreferences.remove(key);
       }
     }
-    _configsInPreferences.addAll(configsInPreferences);
+
+    for (final config in configsInPreferences.entries) {
+      configs[config.key] = ConfigValue(
+        config.value.toString(),
+        configs[config.key]!.type,
+      );
+    }
+
+    _configs.addAll(configs);
+    _configsStreamController.add(_configs);
   }
 
   Future<bool?> getBool(String key) async {
@@ -48,8 +55,7 @@ class LocalConfig {
     return double.tryParse(config);
   }
 
-  Future<String?> getString(String key) async =>
-      _configsInPreferences[key] ?? _configs[key];
+  Future<String?> getString(String key) async => _configs[key]?.asString;
 
   Future<void> setBool(String key, bool value) async {
     setString(key, value.toString());
@@ -65,18 +71,13 @@ class LocalConfig {
 
   Future<void> setString(String key, String value) async {
     if (!_configs.containsKey(key)) return;
-    _configsInPreferences[key] = value;
+    _configs[key] = ConfigValue(value, _configs[key]!.type);
+    _configsStreamController.add(_configs);
     await _preferencesDelegate.setPreference(key, value);
   }
 
-  Widget getLocalConfigsScreen() {
-    final configs = <String, ConfigValue>{..._configs};
-    for (final config in _configsInPreferences.entries) {
-      configs[config.key] = ConfigValue(
-        raw: config.value.toString(),
-        type: configs[config.key]!.type,
-      );
-    }
-    return LocalConfigScreen(configs: configs.entries.toList());
-  }
+  Widget getLocalConfigsScreen() => const LocalConfigScreen();
+
+  Stream<Map<String, ConfigValue>> get configsStream =>
+      _configsStreamController.stream;
 }
