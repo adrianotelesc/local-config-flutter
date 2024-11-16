@@ -99,19 +99,49 @@ class _FormattingBar extends StatefulWidget {
 }
 
 class _FormattingBarState extends State<_FormattingBar> {
+  bool isValid = false;
+
+  Color get primaryColor {
+    return isValid ? Colors.greenAccent : Colors.orangeAccent;
+  }
+
+  Color get secondaryColor {
+    return isValid
+        ? const Color.fromARGB(37, 76, 175, 79)
+        : const Color.fromARGB(36, 175, 165, 76);
+  }
+
+  Color get actionColor {
+    return isValid ? Colors.greenAccent : Colors.grey;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    isValid = checkJson(widget.textController.text);
+    widget.textController.addListener(_updateValidState);
+  }
+
+  void _updateValidState() {
+    if (!context.mounted) return;
+    setState(() {
+      isValid = checkJson(widget.textController.text);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.greenAccent),
-        color: const Color.fromARGB(37, 76, 175, 79),
+        border: Border.all(color: primaryColor),
+        color: secondaryColor,
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.check_circle,
-            color: Colors.greenAccent,
+            color: primaryColor,
           ),
           const SizedBox.square(
             dimension: 8,
@@ -121,17 +151,19 @@ class _FormattingBarState extends State<_FormattingBar> {
             style: Theme.of(context)
                 .textTheme
                 .bodyMedium
-                ?.copyWith(color: Colors.greenAccent),
+                ?.copyWith(color: primaryColor),
           ),
           const Spacer(),
           TextButton(
-            onPressed: () {
-              widget.textController.text =
-                  jsonPrettify(widget.textController.text);
-            },
-            style: const ButtonStyle(
+            onPressed: isValid
+                ? () {
+                    widget.textController.text =
+                        jsonPrettify(widget.textController.text);
+                  }
+                : null,
+            style: ButtonStyle(
               foregroundColor: WidgetStatePropertyAll(
-                Colors.greenAccent,
+                actionColor,
               ),
             ),
             child: const Text('Format'),
@@ -139,6 +171,21 @@ class _FormattingBarState extends State<_FormattingBar> {
         ],
       ),
     );
+  }
+
+  bool checkJson(String jsonString) {
+    try {
+      jsonDecode(jsonString);
+      return true;
+    } on FormatException catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.textController.removeListener(_updateValidState);
+    super.dispose();
   }
 }
 
