@@ -226,7 +226,7 @@ class _Empty extends StatelessWidget {
     return SliverFillRemaining(
       hasScrollBody: false,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 128, horizontal: 8),
         child: Column(
           children: [
             Text(
