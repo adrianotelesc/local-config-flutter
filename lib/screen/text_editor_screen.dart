@@ -19,20 +19,39 @@ class TextEditorScreen extends StatefulWidget {
 
 class _TextEditorScreenState extends State<TextEditorScreen> {
   final _textController = CodeLineEditingController();
+  bool _isValid = false;
 
   @override
   void initState() {
     super.initState();
     _textController.text = jsonPrettify(widget.initialValue);
+    _textController.addListener(_updateValidState);
+    _isValid = checkJson(_textController.text);
+  }
+
+  void _updateValidState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {
+        _isValid = checkJson(_textController.text);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _AppBar(onCloseClick: pop, onSaveClick: popAndResult),
+      appBar: _AppBar(
+        onCloseClick: pop,
+        onSaveClick: _isValid ? popAndResult : null,
+      ),
       body: Column(
         children: [
-          _FormattingBar(textController: _textController),
+          _FormattingBar(
+            isValid: _isValid,
+            onFormatClick: () {
+              _textController.text = jsonPrettify(_textController.text);
+            },
+          ),
           _Editor(textController: _textController),
         ],
       ),
@@ -55,6 +74,7 @@ class _TextEditorScreenState extends State<TextEditorScreen> {
 
   @override
   void dispose() {
+    _textController.removeListener(_updateValidState);
     _textController.dispose();
     super.dispose();
   }
@@ -89,17 +109,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _FormattingBar extends StatefulWidget {
-  const _FormattingBar({required this.textController});
+class _FormattingBar extends StatelessWidget {
+  const _FormattingBar({required this.isValid, this.onFormatClick});
 
-  final CodeLineEditingController textController;
-
-  @override
-  State<StatefulWidget> createState() => _FormattingBarState();
-}
-
-class _FormattingBarState extends State<_FormattingBar> {
-  bool isValid = false;
+  final bool isValid;
+  final Function()? onFormatClick;
 
   Color get primaryColor {
     return isValid ? Colors.greenAccent : Colors.orangeAccent;
@@ -113,21 +127,6 @@ class _FormattingBarState extends State<_FormattingBar> {
 
   Color get actionColor {
     return isValid ? Colors.greenAccent : Colors.grey;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    isValid = checkJson(widget.textController.text);
-    widget.textController.addListener(_updateValidState);
-  }
-
-  void _updateValidState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        isValid = checkJson(widget.textController.text);
-      });
-    });
   }
 
   @override
@@ -156,12 +155,7 @@ class _FormattingBarState extends State<_FormattingBar> {
           ),
           const Spacer(),
           TextButton(
-            onPressed: isValid
-                ? () {
-                    widget.textController.text =
-                        jsonPrettify(widget.textController.text);
-                  }
-                : null,
+            onPressed: isValid ? onFormatClick : null,
             style: ButtonStyle(
               foregroundColor: WidgetStatePropertyAll(
                 actionColor,
@@ -172,21 +166,6 @@ class _FormattingBarState extends State<_FormattingBar> {
         ],
       ),
     );
-  }
-
-  bool checkJson(String jsonString) {
-    try {
-      jsonDecode(jsonString);
-      return true;
-    } on FormatException catch (_) {
-      return false;
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.textController.removeListener(_updateValidState);
-    super.dispose();
   }
 }
 
@@ -224,6 +203,15 @@ class _Editor extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+bool checkJson(String jsonString) {
+  try {
+    jsonDecode(jsonString);
+    return true;
+  } on FormatException catch (_) {
+    return false;
   }
 }
 
