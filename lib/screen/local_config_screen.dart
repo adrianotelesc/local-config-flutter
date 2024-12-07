@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:local_config/extension/config_value_extension.dart';
 import 'package:local_config/local_config.dart';
 import 'package:local_config/widget/config_form.dart';
-import 'package:flutter/material.dart';
 import 'package:local_config/model/config_value.dart';
+import 'package:local_config/widget/sliver_header_delegate.dart';
 
 class LocalConfigScreen extends StatefulWidget {
   const LocalConfigScreen({super.key});
@@ -138,7 +138,7 @@ class _SearchBarState extends State<_SearchBar> {
   Widget build(BuildContext context) {
     return SliverPersistentHeader(
       pinned: true,
-      delegate: _SliverHeaderDelegate(
+      delegate: SliverHeaderDelegate(
         minHeight: 80,
         maxHeight: 80,
         child: Padding(
@@ -176,35 +176,6 @@ class _SearchBarState extends State<_SearchBar> {
   }
 }
 
-class _SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _SliverHeaderDelegate({
-    required this.minHeight,
-    required this.maxHeight,
-    required this.child,
-  });
-  final double minHeight;
-  final double maxHeight;
-  final Widget child;
-
-  @override
-  double get minExtent => minHeight;
-  @override
-  double get maxExtent => max(maxHeight, minHeight);
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return SizedBox.expand(child: child);
-  }
-
-  @override
-  bool shouldRebuild(_SliverHeaderDelegate oldDelegate) {
-    return maxHeight != oldDelegate.maxHeight ||
-        minHeight != oldDelegate.minHeight ||
-        child != oldDelegate.child;
-  }
-}
-
 class _ConfigList extends StatelessWidget {
   const _ConfigList({this.configs = const []});
 
@@ -213,7 +184,7 @@ class _ConfigList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (configs.isEmpty) {
-      return const _Empty();
+      return const _EmptyState();
     }
 
     return SliverList.separated(
@@ -221,7 +192,6 @@ class _ConfigList extends StatelessWidget {
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (_, index) {
         final configEntry = configs[index];
-
         return _ConfigListTile(
           name: configEntry.key,
           value: configEntry.value,
@@ -231,8 +201,8 @@ class _ConfigList extends StatelessWidget {
   }
 }
 
-class _Empty extends StatelessWidget {
-  const _Empty();
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
 
   @override
   Widget build(BuildContext context) {
@@ -270,7 +240,10 @@ class _ConfigListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.only(left: 16, right: 8),
+      contentPadding: const EdgeInsets.only(
+        left: 16,
+        right: 8,
+      ),
       title: Text(name),
       subtitle: Text(
         value.displayText,
