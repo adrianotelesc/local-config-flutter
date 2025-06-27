@@ -197,7 +197,7 @@ class _ConfigValueDropdownButton extends StatelessWidget {
           itemHeight: 48,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.only(right: 4),
+            contentPadding: EdgeInsets.only(left: 16, right: 10),
           ),
           items: configValueType.presetValues.map((value) {
             return DropdownMenuItem<String>(
