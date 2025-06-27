@@ -4,16 +4,16 @@ version: 0.0.1
 homepage:
 
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+  sdk: ">=3.4.3 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
-  firebase_analytics: ^11.3.2
-  firebase_remote_config: ^5.1.2
   flutter:
     sdk: flutter
-  shared_preferences: ^2.3.2
-  re_editor: ^0.6.0
+  firebase_analytics: ^11.5.0
+  firebase_remote_config: ^5.4.5
+  shared_preferences: ^2.5.3
+  re_editor: ^0.7.0
   re_highlight: ^0.0.3
 
 dev_dependencies:
