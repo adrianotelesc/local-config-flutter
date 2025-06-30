@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:local_config/extension/config_value_extension.dart';
 import 'package:local_config/local_config.dart';
+import 'package:local_config/widget/callout.dart';
 import 'package:local_config/widget/config_form.dart';
 import 'package:local_config/model/config.dart';
 import 'package:local_config/widget/sliver_header_delegate.dart';
@@ -19,6 +20,7 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
 
   final _searchTextController = TextEditingController();
 
+  Map<String, Config> _configs = {};
   List<MapEntry<String, Config>> _allConfigs = [];
   List<MapEntry<String, Config>> _visibleConfigs = [];
 
@@ -27,12 +29,13 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
   @override
   void initState() {
     super.initState();
+    _configs = LocalConfig.instance.configs;
     _configsStreamSubscription = _subscribeToConfigsStream();
     _searchTextController.addListener(_handleSearchTextChange);
   }
 
   StreamSubscription _subscribeToConfigsStream() {
-    return LocalConfig.instance.configsStream.listen(_updateConfigsState);
+    return LocalConfig.instance.localConfigsStream.listen(_updateConfigsState);
   }
 
   void _updateConfigsState(Map<String, Config> allConfigs) {
@@ -84,7 +87,10 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
           slivers: [
             const _AppBar(),
             _SearchBar(controller: _searchTextController),
-            _ConfigList(configs: _visibleConfigs)
+            _ConfigList(
+              localConfigs: _visibleConfigs,
+              configs: _configs,
+            )
           ],
         ),
       ),
@@ -177,24 +183,32 @@ class _SearchBarState extends State<_SearchBar> {
 }
 
 class _ConfigList extends StatelessWidget {
-  const _ConfigList({this.configs = const []});
+  const _ConfigList({
+    this.configs = const {},
+    this.localConfigs = const [],
+  });
 
-  final List<MapEntry<String, Config>> configs;
+  final Map<String, Config> configs;
+  final List<MapEntry<String, Config>> localConfigs;
 
   @override
   Widget build(BuildContext context) {
-    if (configs.isEmpty) {
+    if (localConfigs.isEmpty) {
       return const _EmptyState();
     }
 
     return SliverList.separated(
-      itemCount: configs.length,
+      itemCount: localConfigs.length,
       separatorBuilder: (_, __) => const Divider(height: 1),
       itemBuilder: (_, index) {
-        final configEntry = configs[index];
+        final localConfigEntry = localConfigs[index];
+        final configEntry = configs[localConfigEntry.key];
+        final changed = configEntry != null &&
+            configEntry.value != localConfigEntry.value.value;
         return _ConfigListTile(
-          name: configEntry.key,
-          value: configEntry.value,
+          name: localConfigEntry.key,
+          value: localConfigEntry.value,
+          changed: changed,
         );
       },
     );
@@ -232,35 +246,63 @@ class _ConfigListTile extends StatelessWidget {
   const _ConfigListTile({
     required this.name,
     required this.value,
+    required this.changed,
   });
 
   final String name;
   final Config value;
+  final bool changed;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: const EdgeInsets.only(
-        left: 16,
-        right: 8,
-      ),
-      title: Text(name),
-      subtitle: Text(
-        value.displayText,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      leading: Icon(value.type.icon),
-      trailing: IconButton(
-        onPressed: () {
-          showConfigFormModal(
-            context: context,
-            name: name,
-            value: value,
-          );
-        },
-        icon: const Icon(Icons.edit),
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (changed)
+          Container(
+            color: const Color(0xFF322D23),
+            child: Padding(
+              padding: const EdgeInsetsGeometry.only(
+                top: 16,
+                left: 16,
+                right: 16,
+              ),
+              child: Callout(
+                isValid: false,
+                icon: Icons.error,
+                text: 'Changed',
+                actionText: 'Revert',
+                onActionTap: () {},
+              ),
+            ),
+          ),
+        ListTile(
+          tileColor: changed
+              ? const Color(0xFF322D23)
+              : ListTileTheme.of(context).tileColor,
+          contentPadding: const EdgeInsets.only(
+            left: 16,
+            right: 8,
+          ),
+          title: Text(name),
+          subtitle: Text(
+            value.displayText,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          leading: Icon(value.type.icon),
+          trailing: IconButton(
+            onPressed: () {
+              showConfigFormModal(
+                context: context,
+                name: name,
+                value: value,
+              );
+            },
+            icon: const Icon(Icons.edit),
+          ),
+        )
+      ],
     );
   }
 }

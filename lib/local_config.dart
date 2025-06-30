@@ -17,9 +17,14 @@ class LocalConfig {
   final PreferencesDelegate _preferencesDelegate = SharedPreferencesDelegate();
 
   final _configs = <String, Config>{};
-  final _configsStreamController = StreamController<Map<String, Config>>();
+  Map<String, Config> get configs => _configs;
+
+  final _localConfigs = <String, Config>{};
+  final _localConfigsStreamController = StreamController<Map<String, Config>>();
 
   Future<void> initialize({required Map<String, Config> configs}) async {
+    _configs.addAll(configs);
+
     var configsInPreferences = await _preferencesDelegate.getAll();
     for (final key in configsInPreferences.keys) {
       if (!configs.containsKey(key)) {
@@ -27,14 +32,12 @@ class LocalConfig {
       }
     }
 
-    // for (final config in configsInPreferences.entries) {
-    //   configs[config.key] = Config(
-    //     value: config.value,
-    //   );
-    // }
+    for (final config in configsInPreferences.entries) {
+      configs[config.key] = Config(value: config.value);
+    }
+    _localConfigs.addAll(configs);
 
-    _configs.addAll(configs);
-    _configsStreamController.add(_configs);
+    _localConfigsStreamController.add(_localConfigs);
   }
 
   Future<bool?> getBool(String key) async {
@@ -52,7 +55,7 @@ class LocalConfig {
     return config?.asDouble;
   }
 
-  Future<String?> getString(String key) async => _configs[key]?.value;
+  Future<String?> getString(String key) async => _localConfigs[key]?.value;
 
   Future<void> setBool(String key, bool value) async {
     setString(key, value.toString());
@@ -67,14 +70,14 @@ class LocalConfig {
   }
 
   Future<void> setString(String key, String value) async {
-    if (!_configs.containsKey(key)) return;
-    _configs[key] = Config(value: value);
-    _configsStreamController.add(_configs);
+    if (!_localConfigs.containsKey(key)) return;
+    _localConfigs[key] = Config(value: value);
+    _localConfigsStreamController.add(_localConfigs);
     await _preferencesDelegate.setPreference(key, value);
   }
 
   Widget getLocalConfigsScreen() => const LocalConfigScreen();
 
-  Stream<Map<String, Config>> get configsStream =>
-      _configsStreamController.stream;
+  Stream<Map<String, Config>> get localConfigsStream =>
+      _localConfigsStreamController.stream;
 }
