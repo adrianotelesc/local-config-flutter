@@ -108,6 +108,15 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
             ),
           ),
         ),
+        textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ),
         extensions: [
           CustomColors(
             warning: const Color(0XFFFFB300),
