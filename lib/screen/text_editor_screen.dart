@@ -219,6 +219,13 @@ class _Editor extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: CodeEditor(
+        wordWrap: false,
+        autocompleteSymbols: true,
+        sperator: Container(
+          width: 0.5,
+          color: Theme.of(context).colorScheme.surfaceBright,
+        ),
+        chunkAnalyzer: const DefaultCodeChunkAnalyzer(),
         shortcutsActivatorsBuilder:
             const DefaultCodeShortcutsActivatorsBuilder(),
         controller: textController,
