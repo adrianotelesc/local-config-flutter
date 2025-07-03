@@ -18,11 +18,9 @@ extension ConfigTypeExtension on ConfigType {
   String get displayName {
     switch (this) {
       case ConfigType.boolean:
-        return 'bool';
-      case ConfigType.integer:
-        return 'int';
-      case ConfigType.decimal:
-        return 'double';
+        return 'Boolean';
+      case ConfigType.number:
+        return 'Number';
       case ConfigType.string:
         return 'String';
       case ConfigType.json:
@@ -34,8 +32,7 @@ extension ConfigTypeExtension on ConfigType {
     switch (this) {
       case ConfigType.boolean:
         return Icons.toggle_on;
-      case ConfigType.integer:
-      case ConfigType.decimal:
+      case ConfigType.number:
         return Icons.onetwothree;
       case ConfigType.string:
         return Icons.abc;
@@ -51,14 +48,9 @@ extension ConfigTypeExtension on ConfigType {
           return 'Invalid bolean';
         }
         break;
-      case ConfigType.integer:
-        if (value?.asInt == null) {
-          return 'Invalid int';
-        }
-        break;
-      case ConfigType.decimal:
+      case ConfigType.number:
         if (value?.asDouble == null) {
-          return 'Invalid double';
+          return 'Invalid number';
         }
         break;
       case ConfigType.json:

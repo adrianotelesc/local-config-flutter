@@ -5,8 +5,7 @@ class Config {
 
   ConfigType get type {
     if (value.asBool != null) return ConfigType.boolean;
-    if (value.asInt != null) return ConfigType.integer;
-    if (value.asDouble != null) return ConfigType.decimal;
+    if (value.asDouble != null) return ConfigType.number;
     if (value.asJson != null) return ConfigType.json;
     return ConfigType.string;
   }
@@ -16,8 +15,7 @@ class Config {
 
 enum ConfigType {
   boolean,
-  integer,
-  decimal,
+  number,
   string,
   json;
 
