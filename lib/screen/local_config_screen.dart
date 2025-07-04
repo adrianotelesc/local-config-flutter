@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:local_config/custom_colors.dart';
+import 'package:local_config/theme/extended_color_scheme.dart';
 import 'package:local_config/extension/config_value_extension.dart';
 import 'package:local_config/local_config.dart';
 import 'package:local_config/widget/callout.dart';
@@ -118,11 +118,13 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
           ),
         ),
         extensions: [
-          CustomColors(
+          ExtendedColorScheme(
             warning: const Color(0XFFFFB300),
             warningContainer: const Color(0X14FFB300),
+            onWarning: const Color(0XFF000000),
             onWarningContainer: const Color(0X4DFFB300),
             success: const Color(0XFF6DD58C),
+            onSuccess: const Color(0XFF000000),
             successContainer: const Color(0X146DD58C),
             onSuccessContainer: const Color(0X4D6DD58C),
           ),
@@ -321,7 +323,7 @@ class _ConfigListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customColors = Theme.of(context).extension<CustomColors>();
+    final customColors = Theme.of(context).extension<ExtendedColorScheme>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

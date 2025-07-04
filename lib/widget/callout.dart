@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:local_config/custom_colors.dart';
+import 'package:local_config/theme/extended_color_scheme.dart';
 
 enum _CalloutVariant { success, warning }
 
@@ -42,7 +42,7 @@ class Callout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final customColors = Theme.of(context).extension<CustomColors>();
+    final customColors = Theme.of(context).extension<ExtendedColorScheme>();
     final backgroundColor = _variant == _CalloutVariant.success
         ? style?.backgroundColor ?? customColors!.successContainer
         : style?.backgroundColor ?? customColors!.warningContainer;
