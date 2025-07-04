@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:local_config/theme/extended_color_scheme.dart';
+import 'package:local_config/ui/theme/extended_color_scheme.dart';
 import 'package:local_config/extension/config_value_extension.dart';
 import 'package:local_config/local_config.dart';
-import 'package:local_config/widget/callout.dart';
-import 'package:local_config/widget/config_form.dart';
+import 'package:local_config/ui/widget/callout.dart';
+import 'package:local_config/ui/widget/config_form.dart';
 import 'package:local_config/model/config.dart';
-import 'package:local_config/widget/sliver_header_delegate.dart';
+import 'package:local_config/ui/widget/sliver_header_delegate.dart';
 
 class LocalConfigScreen extends StatefulWidget {
   const LocalConfigScreen({super.key});

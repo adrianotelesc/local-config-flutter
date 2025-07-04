@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:local_config/theme/extended_color_scheme.dart';
+import 'package:local_config/ui/theme/extended_color_scheme.dart';
 import 'package:local_config/delegate/editor_delegate.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';

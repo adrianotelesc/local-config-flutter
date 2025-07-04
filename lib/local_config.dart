@@ -7,7 +7,7 @@ import 'package:local_config/model/config.dart';
 import 'package:flutter/material.dart';
 import 'package:local_config/storage/key_value_store.dart';
 import 'package:local_config/storage/shared_preferences_store.dart';
-import 'package:local_config/screen/local_config_screen.dart';
+import 'package:local_config/ui/screen/local_config_screen.dart';
 
 class LocalConfig {
   LocalConfig._();
