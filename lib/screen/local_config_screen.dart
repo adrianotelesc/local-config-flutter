@@ -153,7 +153,7 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
                               onPressed: () {
                                 LocalConfig.instance.removeAll();
                               },
-                              child: const Text('Reset All'),
+                              child: const Text('Reset all'),
                             ),
                           )
                         ],
@@ -364,11 +364,20 @@ class _ConfigListTile extends StatelessWidget {
             left: 16,
             right: 8,
           ),
-          title: Text(name),
+          title: Text(
+            name,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: changed ? FontWeight.bold : null,
+                ),
+          ),
           subtitle: Text(
             value.displayText,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: changed ? FontWeight.bold : null,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
           ),
           leading: Icon(value.type.icon),
           trailing: IconButton(
