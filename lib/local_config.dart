@@ -25,7 +25,7 @@ class LocalConfig {
   Future<void> initialize({required Map<String, Config> configs}) async {
     _configs.addAll(configs);
 
-    var configsInPreferences = await _preferencesDelegate.all;
+    var configsInPreferences = await _preferencesDelegate.data;
     for (final key in configsInPreferences.keys) {
       if (!configs.containsKey(key)) {
         await _preferencesDelegate.remove(key);
