@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:local_config/delegate/editor_delegate.dart';
+import 'package:local_config/ui/screen/text_editor/controller/text_editor_controller.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
 import 'package:re_highlight/styles/atom-one-dark.dart';
 
-class JsonEditorDelegate implements EditorDelegate {
-  JsonEditorDelegate();
+class JsonEditorController implements TextEditorController {
+  JsonEditorController();
 
   @override
   CodeEditorStyle? editorStyle = CodeEditorStyle(
@@ -40,10 +40,7 @@ class JsonEditorDelegate implements EditorDelegate {
   }
 
   @override
-  bool shouldValidate = true;
-
-  @override
-  bool validate(String value) {
+  bool? validate(String value) {
     try {
       jsonDecode(value);
       return true;

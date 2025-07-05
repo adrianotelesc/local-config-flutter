@@ -1,6 +1,6 @@
 import 'package:local_config/local_config.dart';
 import 'package:flutter/material.dart';
-import 'package:local_config/ui/screen/text_editor_screen.dart';
+import 'package:local_config/ui/screen/text_editor/text_editor_screen.dart';
 import 'package:local_config/extension/config_display_extension.dart';
 import 'package:local_config/model/config.dart';
 
@@ -261,7 +261,7 @@ class _ConfigValueTextField extends StatelessWidget {
                       builder: (BuildContext context) {
                         return TextEditorScreen(
                           text: configValueTextController.text,
-                          delegate: configValueType.editorDelegate,
+                          controller: configValueType.editorDelegate,
                         );
                       },
                     ),

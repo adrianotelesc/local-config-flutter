@@ -1,11 +1,9 @@
 import 'package:re_editor/re_editor.dart';
 
-abstract class EditorDelegate {
+abstract class TextEditorController {
   String get title;
 
-  bool get shouldValidate;
-
-  bool validate(String value);
+  bool? validate(String value);
 
   String prettify(String value);
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_config/ui/theme/extended_color_scheme.dart';
-import 'package:local_config/delegate/editor_delegate.dart';
+import 'package:local_config/ui/screen/text_editor/controller/text_editor_controller.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
 import 'package:re_highlight/styles/atom-one-dark.dart';
@@ -9,11 +9,11 @@ class TextEditorScreen extends StatefulWidget {
   const TextEditorScreen({
     super.key,
     this.text = '',
-    required this.delegate,
+    required this.controller,
   });
 
   final String text;
-  final EditorDelegate delegate;
+  final TextEditorController controller;
 
   @override
   State<StatefulWidget> createState() => _TextEditorScreenState();
@@ -22,20 +22,20 @@ class TextEditorScreen extends StatefulWidget {
 class _TextEditorScreenState extends State<TextEditorScreen> {
   final _textController = CodeLineEditingController();
 
-  bool _isValid = false;
+  bool? _isValid;
 
   @override
   void initState() {
     super.initState();
-    _textController.text = widget.delegate.prettify(widget.text);
+    _textController.text = widget.controller.prettify(widget.text);
     _textController.addListener(_updateValidState);
-    _isValid = widget.delegate.validate(_textController.text);
+    _isValid = widget.controller.validate(_textController.text);
   }
 
   void _updateValidState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
-        _isValid = widget.delegate.validate(_textController.text);
+        _isValid = widget.controller.validate(_textController.text);
       });
     });
   }
@@ -75,18 +75,18 @@ class _TextEditorScreenState extends State<TextEditorScreen> {
       ),
       child: Scaffold(
         appBar: _AppBar(
-          title: widget.delegate.title,
+          title: widget.controller.title,
           onCloseClick: pop,
-          onSaveClick: _isValid ? popAndResult : null,
+          onSaveClick: _isValid ?? true ? popAndResult : null,
         ),
         body: Column(
           children: [
-            if (widget.delegate.shouldValidate)
+            if (_isValid != null)
               _FormattingBar(
-                isValid: _isValid,
+                isValid: _isValid ?? false,
                 onFormatClick: () {
                   _textController.text =
-                      widget.delegate.prettify(_textController.text);
+                      widget.controller.prettify(_textController.text);
                 },
               ),
             _Editor(textController: _textController),
@@ -106,7 +106,7 @@ class _TextEditorScreenState extends State<TextEditorScreen> {
   void popAndResult() {
     Navigator.maybePop(
       context,
-      widget.delegate.minify(_textController.text),
+      widget.controller.minify(_textController.text),
     );
   }
 

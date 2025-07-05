@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:local_config/delegate/editor_delegate.dart';
-import 'package:local_config/delegate/json_editor_delegate.dart';
-import 'package:local_config/delegate/string_editor_delegate.dart';
+import 'package:local_config/ui/screen/text_editor/controller/text_editor_controller.dart';
+import 'package:local_config/ui/screen/text_editor/controller/json_editor_controller.dart';
+import 'package:local_config/ui/screen/text_editor/controller/string_editor_controller.dart';
 import 'package:local_config/extension/string_parsing_extension.dart';
 import 'package:local_config/model/config.dart';
 
@@ -52,12 +52,12 @@ extension ConfigTypeDisplayExtension on ConfigType {
     return null;
   }
 
-  EditorDelegate get editorDelegate {
+  TextEditorController get editorDelegate {
     switch (this) {
       case ConfigType.json:
-        return JsonEditorDelegate();
+        return JsonEditorController();
       default:
-        return StringDelegate();
+        return StringEditorController();
     }
   }
 }
