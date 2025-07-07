@@ -2,9 +2,16 @@ import 'package:local_config/storage/key_value_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesStore extends KeyValueStore {
-  static const _namespace = 'local_config:';
+  static const _namespace = 'local_config';
 
   final _sharedPreferences = SharedPreferencesAsync();
+
+  final String _packageName;
+
+  SharedPreferencesStore({required String packageName})
+      : _packageName = packageName;
+
+  String get _internalKeyPrefix => '$_packageName.$_namespace:';
 
   @override
   Future<Map<String, dynamic>> get data async {
@@ -15,15 +22,16 @@ class SharedPreferencesStore extends KeyValueStore {
     return Map<String, dynamic>.fromEntries(entries);
   }
 
-  bool _isInternalKey(String key) => key.startsWith(_namespace);
+  bool _isInternalKey(String key) => key.startsWith(_internalKeyPrefix);
 
-  String _fromInternalKey(String key) => key.replaceFirst(_namespace, '');
+  String _fromInternalKey(String key) =>
+      key.replaceFirst(_internalKeyPrefix, '');
 
-  String _toInternalKey(String key) => '$_namespace$key';
+  String _toInternalKey(String key) => '$_internalKeyPrefix$key';
 
   @override
   Future<String?> get(String key) async {
-    return await _sharedPreferences.getString(_toInternalKey(key));
+    return _sharedPreferences.getString(_toInternalKey(key));
   }
 
   @override

@@ -8,13 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:local_config/storage/key_value_store.dart';
 import 'package:local_config/storage/shared_preferences_store.dart';
 import 'package:local_config/ui/screen/local_config_screen.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class LocalConfig {
   LocalConfig._();
 
   static final instance = LocalConfig._();
 
-  final KeyValueStore _preferencesDelegate = SharedPreferencesStore();
+  late final KeyValueStore _keyValueStore;
 
   final _configs = <String, Config>{};
   Map<String, Config> get configs => _configs;
@@ -23,12 +24,14 @@ class LocalConfig {
   final _localConfigsStreamController = StreamController<Map<String, Config>>();
 
   Future<void> initialize({required Map<String, Config> configs}) async {
+    await _initializeKeyValueStore();
+
     _configs.addAll(configs);
 
-    var configsInPreferences = await _preferencesDelegate.data;
+    var configsInPreferences = await _keyValueStore.data;
     for (final key in configsInPreferences.keys) {
       if (!configs.containsKey(key)) {
-        await _preferencesDelegate.remove(key);
+        await _keyValueStore.remove(key);
       }
     }
 
@@ -39,6 +42,13 @@ class LocalConfig {
     _localConfigs.addAll(localConfigs);
 
     _localConfigsStreamController.add(_localConfigs);
+  }
+
+  Future<void> _initializeKeyValueStore() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    _keyValueStore = SharedPreferencesStore(
+      packageName: packageInfo.packageName,
+    );
   }
 
   Future<bool?> getBool(String key) async {
@@ -73,20 +83,20 @@ class LocalConfig {
   Future<void> setString(String key, String value) async {
     _localConfigs[key] = Config(value: value);
     _localConfigsStreamController.add(_localConfigs);
-    await _preferencesDelegate.set(key, value);
+    await _keyValueStore.set(key, value);
   }
 
   Future<void> remove(String key) async {
     if (!_localConfigs.containsKey(key)) return;
     _localConfigs.remove(key);
     _localConfigsStreamController.add(_localConfigs);
-    await _preferencesDelegate.remove(key);
+    await _keyValueStore.remove(key);
   }
 
   Future<void> removeAll() async {
     _localConfigs.clear();
     _localConfigsStreamController.add(_localConfigs);
-    await _preferencesDelegate.clear();
+    await _keyValueStore.clear();
   }
 
   Widget getLocalConfigsScreen() => const LocalConfigScreen();
