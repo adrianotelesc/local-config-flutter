@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:local_config/di/service_locator.dart';
+import 'package:local_config/repository/config_repository.dart';
 import 'package:local_config/ui/theme/extended_color_scheme.dart';
 import 'package:local_config/extension/config_display_extension.dart';
-import 'package:local_config/local_config.dart';
 import 'package:local_config/ui/widget/callout.dart';
 import 'package:local_config/ui/widget/config_form.dart';
 import 'package:local_config/model/config.dart';
@@ -18,11 +19,8 @@ class LocalConfigScreen extends StatefulWidget {
 
 class _LocalConfigScreenState extends State<LocalConfigScreen> {
   final _scrollController = ScrollController();
-
-  final _searchTextController = TextEditingController();
-
-  Map<String, Config> _localConfigs = {};
-  List<MapEntry<String, Config>> _allConfigs = [];
+  final _textController = TextEditingController();
+  List<MapEntry<String, Config>> _configs = [];
   List<MapEntry<String, Config>> _visibleConfigs = [];
 
   StreamSubscription? _configsStreamSubscription;
@@ -30,30 +28,30 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
   @override
   void initState() {
     super.initState();
-    _allConfigs = LocalConfig.instance.configs.entries.toList();
+    _configs = ServiceLocator.get<ConfigRepository>().configs.entries.toList();
     _configsStreamSubscription = _subscribeToConfigsStream();
-    _searchTextController.addListener(_handleSearchTextChange);
+    _textController.addListener(_handleSearchTextChange);
   }
 
   StreamSubscription _subscribeToConfigsStream() {
-    return LocalConfig.instance.localConfigsStream.listen(_updateConfigsState);
+    return ServiceLocator.get<ConfigRepository>()
+        .stream
+        .listen(_updateConfigsState);
   }
 
   void _updateConfigsState(Map<String, Config> localConfigs) {
     setState(() {
-      _localConfigs = localConfigs;
-      _visibleConfigs = _filterConfigsBy(_searchTextController.text);
+      _configs = localConfigs.entries.toList();
+      _visibleConfigs = _filterConfigsBy(_textController.text);
     });
   }
 
   List<MapEntry<String, Config>> _filterConfigsBy(String text) {
-    return text.trim().isNotEmpty
-        ? _filterConfigsContaining(text)
-        : _allConfigs;
+    return text.trim().isNotEmpty ? _filterConfigsContaining(text) : _configs;
   }
 
   List<MapEntry<String, Config>> _filterConfigsContaining(String text) {
-    return _allConfigs
+    return _configs
         .where((config) => _caseInsensitiveContains(config.key, text))
         .toList();
   }
@@ -63,7 +61,7 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
   }
 
   void _handleSearchTextChange() {
-    final searchText = _searchTextController.text;
+    final searchText = _textController.text;
     _updateVisibleConfigsState(searchText);
   }
 
@@ -137,7 +135,9 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
               controller: _scrollController,
               slivers: [
                 const _AppBar(),
-                if (_localConfigs.isNotEmpty)
+                if (_configs
+                    .where((config) => config.value.changedValue != null)
+                    .isNotEmpty)
                   SliverPersistentHeader(
                     pinned: true,
                     delegate: SliverHeaderDelegate(
@@ -153,7 +153,8 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
                             text: 'Configs changed locally',
                             action: FilledButton(
                               onPressed: () {
-                                LocalConfig.instance.removeAll();
+                                ServiceLocator.get<ConfigRepository>()
+                                    .removeAll();
                               },
                               child: const Text('Reset all'),
                             ),
@@ -168,12 +169,12 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
                     horizontal: 16,
                   ),
                   sliver: SliverToBoxAdapter(
-                    child: _SearchBar(controller: _searchTextController),
+                    child: _SearchBar(controller: _textController),
                   ),
                 ),
                 _ConfigList(
                   configs: _visibleConfigs,
-                  localConfigs: _localConfigs,
+                  localConfigs: Map.fromEntries(_configs),
                 )
               ],
             ),
@@ -271,11 +272,10 @@ class _ConfigList extends StatelessWidget {
       itemBuilder: (_, index) {
         final configEntry = configs[index];
         final localConfig = localConfigs[configEntry.key];
-        final changed =
-            localConfig != null && localConfig.value != configEntry.value.value;
+        final changed = localConfig?.changedValue != null;
         return _ConfigListTile(
           name: configEntry.key,
-          value: localConfig ?? configEntry.value,
+          config: localConfig ?? configEntry.value,
           changed: changed,
         );
       },
@@ -313,12 +313,12 @@ class _EmptyState extends StatelessWidget {
 class _ConfigListTile extends StatelessWidget {
   const _ConfigListTile({
     required this.name,
-    required this.value,
+    required this.config,
     required this.changed,
   });
 
   final String name;
-  final Config value;
+  final Config config;
   final bool changed;
 
   @override
@@ -343,7 +343,7 @@ class _ConfigListTile extends StatelessWidget {
                 text: 'Locally changed',
                 action: TextButton(
                   onPressed: () {
-                    LocalConfig.instance.remove(name);
+                    ServiceLocator.get<ConfigRepository>().remove(name);
                   },
                   style: ButtonStyle(
                     overlayColor: WidgetStatePropertyAll(
@@ -373,7 +373,7 @@ class _ConfigListTile extends StatelessWidget {
                 ),
           ),
           subtitle: Text(
-            value.displayText,
+            config.displayText,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -381,13 +381,13 @@ class _ConfigListTile extends StatelessWidget {
                   color: Theme.of(context).colorScheme.onSurface,
                 ),
           ),
-          leading: Icon(value.type.icon),
+          leading: Icon(config.type.icon),
           trailing: IconButton(
             onPressed: () {
               showConfigFormModal(
                 context: context,
                 name: name,
-                value: value,
+                value: config,
               );
             },
             icon: const Icon(Icons.edit),

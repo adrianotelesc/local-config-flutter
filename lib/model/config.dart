@@ -2,6 +2,7 @@ import 'package:local_config/extension/string_parsing_extension.dart';
 
 class Config {
   final String value;
+  final String? changedValue;
 
   ConfigType get type {
     if (value.asBool != null) return ConfigType.boolean;
@@ -10,7 +11,20 @@ class Config {
     return ConfigType.string;
   }
 
-  const Config({required this.value});
+  const Config({
+    required this.value,
+    this.changedValue,
+  });
+
+  Config copyWith({
+    String? value,
+    String? changedValue,
+  }) {
+    return Config(
+      value: value ?? this.value,
+      changedValue: changedValue,
+    );
+  }
 }
 
 enum ConfigType {

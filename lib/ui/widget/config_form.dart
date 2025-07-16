@@ -1,5 +1,6 @@
-import 'package:local_config/local_config.dart';
+import 'package:local_config/di/service_locator.dart';
 import 'package:flutter/material.dart';
+import 'package:local_config/repository/config_repository.dart';
 import 'package:local_config/ui/screen/text_editor/text_editor_screen.dart';
 import 'package:local_config/extension/config_display_extension.dart';
 import 'package:local_config/model/config.dart';
@@ -342,7 +343,7 @@ class _FormActions extends StatelessWidget {
         FilledButton(
           onPressed: () {
             if (formKey.currentState?.validate() == false) return;
-            LocalConfig.instance.setString(
+            ServiceLocator.get<ConfigRepository>().set(
               configName,
               configValueTextController.text,
             );
