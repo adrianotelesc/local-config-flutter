@@ -3,10 +3,16 @@ import 'package:local_config/repository/config_repository.dart';
 
 class DummyConfigRepository implements ConfigRepository {
   @override
+  Map<String, Config> get configs => {};
+
+  @override
+  Stream<Map<String, Config>> get configsStream => const Stream.empty();
+
+  @override
   Future<Config?> get(String key) async => null;
 
   @override
-  Future<void> populate({required Map<String, String> all}) async {}
+  Future<void> populate(Map<String, String> configs) async {}
 
   @override
   Future<void> reset(String key) async {}
@@ -16,16 +22,4 @@ class DummyConfigRepository implements ConfigRepository {
 
   @override
   Future<void> set(String key, String value) async {}
-
-  @override
-  Map<String, Config> get configs => {};
-
-  @override
-  Stream<Map<String, Config>> get configsStream => const Stream.empty();
-
-  @override
-  PopulateStatus get populateStatus => PopulateStatus.notStarted;
-
-  @override
-  Stream<PopulateStatus> get populateStatusStream => const Stream.empty();
 }

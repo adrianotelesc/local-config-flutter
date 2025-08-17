@@ -8,12 +8,14 @@ import 'package:local_config/repository/config_repository.dart';
 import 'package:local_config/ui/theming/styles.dart';
 import 'package:local_config/extension/config_extension.dart';
 import 'package:local_config/ui/theming/theme.dart';
+import 'package:local_config/ui/widget/animated_floating_text.dart';
 import 'package:local_config/ui/widget/callout.dart';
 import 'package:local_config/ui/widget/config_form.dart';
 import 'package:local_config/model/config.dart';
 import 'package:local_config/ui/widget/extended_list_tile.dart';
 import 'package:local_config/ui/widget/clearable_search_bar.dart';
-import 'package:local_config/ui/widget/feedback_view.dart';
+import 'package:local_config/ui/widget/message.dart';
+import 'package:local_config/ui/widget/animated_jitter_text.dart';
 
 class LocalConfigScreen extends StatefulWidget {
   const LocalConfigScreen({super.key});
@@ -25,13 +27,9 @@ class LocalConfigScreen extends StatefulWidget {
 class _LocalConfigScreenState extends State<LocalConfigScreen> {
   final _controller = TextEditingController();
 
-  final _repo = ServiceLocator.get<ConfigRepository>();
+  final _repo = ServiceLocator.locate<ConfigRepository>();
 
-  StreamSubscription? _populateSub;
-
-  StreamSubscription? _configsSub;
-
-  var _populateStatus = PopulateStatus.notStarted;
+  StreamSubscription? _sub;
 
   var _configs = <String, Config>{};
 
@@ -42,20 +40,12 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
   @override
   void initState() {
     super.initState();
-    _populateStatus = _repo.populateStatus;
-    _applyConfigs(_repo.configs);
+    _updateConfigs(_repo.configs);
     _controller.addListener(_updateItems);
-    _populateSub = _repo.populateStatusStream.listen(_applyPopulateStatus);
-    _configsSub = _repo.configsStream.listen(_applyConfigs);
+    _sub = _repo.configsStream.listen(_updateConfigs);
   }
 
-  void _applyPopulateStatus(PopulateStatus populateStatus) {
-    setState(() {
-      _populateStatus = populateStatus;
-    });
-  }
-
-  void _applyConfigs(Map<String, Config> configs) {
+  void _updateConfigs(Map<String, Config> configs) {
     _configs = configs;
     _updateItems();
     _updateOverrides();
@@ -78,10 +68,8 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
 
   @override
   void dispose() {
-    _populateSub?.cancel();
-    _populateSub = null;
-    _configsSub?.cancel();
-    _configsSub = null;
+    _sub?.cancel();
+    _sub = null;
     _controller.removeListener(_updateItems);
     super.dispose();
   }
@@ -98,28 +86,12 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
                 hasOverrides: _hasOverrides,
                 repo: _repo,
               ),
-              _SearchBar(
-                controller: _controller,
-              ),
-              switch (_populateStatus) {
-                PopulateStatus.notStarted => const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: FeedbackView(
-                      title: '( ╹ -╹)',
-                      message: 'You have\'nt initialized.',
-                    ),
-                  ),
-                PopulateStatus.inProgress => const SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-                PopulateStatus.completed => _List(
-                    items: _items,
-                    repo: _repo,
-                  ),
-              }
+              if (_configs.isEmpty)
+                const _SetupMessage()
+              else ...[
+                _SearchBar(controller: _controller),
+                _List(items: _items, repo: _repo),
+              ],
             ],
           ),
         );
@@ -164,6 +136,37 @@ class _AppBar extends StatelessWidget {
   }
 }
 
+class _SetupMessage extends StatelessWidget {
+  const _SetupMessage();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Message(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 24,
+        ),
+        spacing: 24,
+        header: AnimatedJitterText(
+          'WHERE ARE THE CONFIGS!?',
+          style: Theme.of(context).textTheme.displaySmall,
+        ),
+        body: Text(
+          '''Hmm... this might be happening because:
+• Local Config SDK hasn’t been initialized yet.
+• Configs are still populating.''',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        footer: AnimatedFloatingText(
+          'If you\'ve been waiting a while, maybe your configs are... empty.',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+      ),
+    );
+  }
+}
+
 class _SearchBar extends StatelessWidget {
   final TextEditingController controller;
 
@@ -200,11 +203,16 @@ class _List extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const SliverFillRemaining(
+      return SliverFillRemaining(
         hasScrollBody: false,
-        child: FeedbackView(
-          title: '( ╹ -╹)',
-          message: 'There is nothing here.',
+        child: Message(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 24,
+          ),
+          body: AnimatedFloatingText(
+            'Uuuh... Nothing here... Just emptiness...',
+            style: Theme.of(context).textTheme.displaySmall,
+          ),
         ),
       );
     }

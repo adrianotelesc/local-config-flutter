@@ -12,7 +12,7 @@ void main() async {
     'feature_x_enabled': 'true',
     'max_items': '100',
   };
-  await LocalConfig.instance.initialize(configs: configs);
+  LocalConfig.instance.initialize(configs: configs);
   runApp(const ExampleApp());
 }
 
@@ -30,6 +30,7 @@ class ExampleApp extends StatelessWidget {
           seedColor: Colors.deepPurple,
         ),
       ),
+      debugShowCheckedModeBanner: false,
       home: const ExamplePage(title: title),
     );
   }

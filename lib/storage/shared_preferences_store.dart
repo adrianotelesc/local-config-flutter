@@ -41,6 +41,14 @@ class SharedPreferencesStore extends KeyValueStore {
     await Future.wait((await all).keys.map(remove));
   }
 
+  @override
+  Future<void> prune(Set<String> keysToRetain) async {
+    final existingKeys = (await all).keys;
+    final keysToRemove =
+        existingKeys.where((key) => !keysToRetain.contains(key));
+    await Future.wait(keysToRemove.map(remove));
+  }
+
   bool _isInternalKey(String key) => key.startsWith(_internalKeyPrefix);
 
   String _toInternalKey(String key) => '$_internalKeyPrefix$key';

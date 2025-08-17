@@ -359,7 +359,7 @@ class _FormActions extends StatelessWidget {
         FilledButton(
           onPressed: () {
             if (formKey.currentState?.validate() == false) return;
-            ServiceLocator.get<ConfigRepository>().set(
+            ServiceLocator.locate<ConfigRepository>().set(
               configName,
               configValueTextController.text,
             );
