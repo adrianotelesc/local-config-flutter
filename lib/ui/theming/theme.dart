@@ -15,6 +15,9 @@ final defaultTheme = ThemeData(
     backgroundColor: surface,
     surfaceTintColor: surface,
   ),
+  bottomSheetTheme: const BottomSheetThemeData(
+    shape: RoundedRectangleBorder(),
+  ),
   searchBarTheme: SearchBarThemeData(
     shadowColor: const WidgetStatePropertyAll(
       Colors.transparent,

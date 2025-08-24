@@ -32,7 +32,7 @@ extension ConfigTypeExtension on ConfigType {
       ConfigType.boolean => Icons.toggle_on,
       ConfigType.number => Icons.onetwothree,
       ConfigType.string => Icons.abc,
-      ConfigType.json => Icons.data_object
+      ConfigType.json => Icons.data_object,
     };
   }
 
@@ -54,5 +54,47 @@ extension ConfigTypeExtension on ConfigType {
       ConfigType.json => JsonEditorController(),
       _ => StringEditorController(),
     };
+  }
+
+  TextSpan help({String name = 'name'}) {
+    final suffixes = switch (this) {
+      ConfigType.boolean => ['Boolean'],
+      ConfigType.number => ['Int', 'Double'],
+      ConfigType.string || ConfigType.json => ['String'],
+    };
+
+    return TextSpan(
+      children: [
+        const TextSpan(
+          text:
+              "This is the key you'll pass to the Local Config SDK,\nfor example:\n",
+        ),
+        ...suffixes.map((suffix) {
+          return TextSpan(
+            children: [
+              TextSpan(
+                text: '\nconfig.get$suffix("',
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                ),
+              ),
+              TextSpan(
+                text: name,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const TextSpan(
+                text: '");',
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ],
+          );
+        }),
+      ],
+    );
   }
 }

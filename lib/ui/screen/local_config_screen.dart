@@ -10,7 +10,7 @@ import 'package:local_config/extension/config_extension.dart';
 import 'package:local_config/ui/theming/theme.dart';
 import 'package:local_config/ui/widget/animated_floating_text.dart';
 import 'package:local_config/ui/widget/callout.dart';
-import 'package:local_config/ui/widget/config_form.dart';
+import 'package:local_config/ui/screen/config_form_screen.dart';
 import 'package:local_config/model/config.dart';
 import 'package:local_config/ui/widget/extended_list_tile.dart';
 import 'package:local_config/ui/widget/clearable_search_bar.dart';
@@ -78,24 +78,31 @@ class _LocalConfigScreenState extends State<LocalConfigScreen> {
   Widget build(BuildContext context) {
     return Theme(
       data: defaultTheme,
-      child: Builder(builder: (context) {
-        return Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              _AppBar(
-                hasOverrides: _hasOverrides,
-                repo: _repo,
-              ),
-              if (_configs.isEmpty)
-                const _SetupMessage()
-              else ...[
-                _SearchBar(controller: _controller),
-                _List(items: _items, repo: _repo),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                _AppBar(
+                  hasOverrides: _hasOverrides,
+                  repo: _repo,
+                ),
+                if (_configs.isEmpty)
+                  const _SetupMessage()
+                else ...[
+                  _SearchBar(
+                    controller: _controller,
+                  ),
+                  _List(
+                    items: _items,
+                    repo: _repo,
+                  ),
+                ],
               ],
-            ],
-          ),
-        );
-      }),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -251,10 +258,15 @@ class _List extends StatelessWidget {
               : null,
           trailing: IconButton(
             onPressed: () {
-              ConfigForm.showAsBottomSheet(
-                context: context,
-                name: name,
-                value: config,
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  fullscreenDialog: true,
+                  builder: (_) {
+                    return ConfigFormScreen(
+                      name: name,
+                    );
+                  },
+                ),
               );
             },
             icon: const Icon(Icons.edit),
