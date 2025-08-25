@@ -9,7 +9,7 @@ import 'package:local_config/repository/default_config_repository.dart';
 import 'package:local_config/repository/dummy_config_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:local_config/storage/shared_preferences_store.dart';
-export 'package:local_config/ui/screen/local_config_screen.dart';
+export 'package:local_config/ui/screen/local_config_list_screen.dart';
 
 class LocalConfig {
   static final instance = LocalConfig._();
