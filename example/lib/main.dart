@@ -68,6 +68,21 @@ class _ExamplePageState extends State<ExamplePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        actionsPadding: EdgeInsets.all(8),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LocalConfigListScreen(),
+                ),
+              );
+            },
+            tooltip: 'Local Config',
+            icon: const Icon(Icons.settings),
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: _configs.length,
@@ -80,18 +95,6 @@ class _ExamplePageState extends State<ExamplePage> {
             subtitle: Text(value?.toString() ?? 'null'),
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const LocalConfigListScreen(),
-            ),
-          );
-        },
-        tooltip: 'Local Config',
-        child: const Icon(Icons.settings),
       ),
     );
   }
