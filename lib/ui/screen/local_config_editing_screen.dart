@@ -7,19 +7,19 @@ import 'package:local_config/ui/screen/text_editor/text_editor_screen.dart';
 import 'package:local_config/ui/theming/theme.dart';
 import 'package:local_config/ui/widget/input_form_field.dart';
 
-class ConfigFormScreen extends StatefulWidget {
+class LocalConfigEditingScreen extends StatefulWidget {
   final String name;
 
-  const ConfigFormScreen({
+  const LocalConfigEditingScreen({
     super.key,
     required this.name,
   });
 
   @override
-  State<StatefulWidget> createState() => _ConfigFormScreenState();
+  State<StatefulWidget> createState() => _LocalConfigEditingScreenState();
 }
 
-class _ConfigFormScreenState extends State<ConfigFormScreen> {
+class _LocalConfigEditingScreenState extends State<LocalConfigEditingScreen> {
   final _controller = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _repo = ServiceLocator.locate<ConfigRepository>();

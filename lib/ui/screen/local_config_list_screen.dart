@@ -10,21 +10,21 @@ import 'package:local_config/extension/config_extension.dart';
 import 'package:local_config/ui/theming/theme.dart';
 import 'package:local_config/ui/widget/animated_floating_text.dart';
 import 'package:local_config/ui/widget/callout.dart';
-import 'package:local_config/ui/screen/config_form_screen.dart';
+import 'package:local_config/ui/screen/local_config_editing_screen.dart';
 import 'package:local_config/model/config.dart';
 import 'package:local_config/ui/widget/extended_list_tile.dart';
 import 'package:local_config/ui/widget/clearable_search_bar.dart';
 import 'package:local_config/ui/widget/message.dart';
 import 'package:local_config/ui/widget/animated_jitter_text.dart';
 
-class LocalConfigScreen extends StatefulWidget {
-  const LocalConfigScreen({super.key});
+class LocalConfigListScreen extends StatefulWidget {
+  const LocalConfigListScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() => _LocalConfigScreenState();
+  State<StatefulWidget> createState() => _LocalConfigListScreenState();
 }
 
-class _LocalConfigScreenState extends State<LocalConfigScreen> {
+class _LocalConfigListScreenState extends State<LocalConfigListScreen> {
   final _controller = TextEditingController();
 
   final _repo = ServiceLocator.locate<ConfigRepository>();
@@ -262,7 +262,7 @@ class _List extends StatelessWidget {
                 MaterialPageRoute(
                   fullscreenDialog: true,
                   builder: (_) {
-                    return ConfigFormScreen(
+                    return LocalConfigEditingScreen(
                       name: name,
                     );
                   },
