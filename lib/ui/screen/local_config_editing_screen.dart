@@ -131,15 +131,10 @@ class _Form extends StatelessWidget {
                   text: name,
                 ),
                 label: Tooltip(
-                  preferBelow: false,
+                  preferBelow: true,
                   showDuration: const Duration(seconds: 5),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.inverseSurface,
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(8),
-                    ),
-                  ),
                   triggerMode: TooltipTriggerMode.tap,
+                  padding: const EdgeInsets.all(8),
                   richMessage: config.type.help(name: name),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
