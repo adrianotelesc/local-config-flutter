@@ -1,4 +1,4 @@
-abstract class KeyValueDataSource {
+abstract class ConfigDataSource {
   Future<Map<String, String>> get all;
 
   Future<String?> get(String key);

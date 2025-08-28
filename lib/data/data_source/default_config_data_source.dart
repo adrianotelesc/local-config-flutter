@@ -1,20 +1,20 @@
-import 'package:local_config/domain/data_source/key_value_data_source.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:local_config/core/storage/key_value_store.dart';
+import 'package:local_config/domain/data_source/config_data_source.dart';
 
-class SharedPreferencesDataSource extends KeyValueDataSource {
+class DefaultConfigDataSource extends ConfigDataSource {
   static const _namespace = 'local_config';
 
-  final SharedPreferencesAsync _sharedPreferencesAsync;
+  final KeyValueStore _keyValueStore;
 
-  SharedPreferencesDataSource({
-    required SharedPreferencesAsync sharedPreferencesAsync,
-  }) : _sharedPreferencesAsync = sharedPreferencesAsync;
+  DefaultConfigDataSource({
+    required KeyValueStore keyValueStore,
+  }) : _keyValueStore = keyValueStore;
 
   String get _internalKeyPrefix => '$_namespace:';
 
   @override
   Future<Map<String, String>> get all async {
-    final all = await _sharedPreferencesAsync.getAll();
+    final all = await _keyValueStore.all;
     final internalEntries = all.entries
         .where((e) => _isInternalKey(e.key))
         .map((e) => MapEntry(_fromInternalKey(e.key), e.value.toString()));
@@ -23,17 +23,17 @@ class SharedPreferencesDataSource extends KeyValueDataSource {
 
   @override
   Future<String?> get(String key) {
-    return _sharedPreferencesAsync.getString(_toInternalKey(key));
+    return _keyValueStore.getString(_toInternalKey(key));
   }
 
   @override
   Future<void> set(String key, String value) {
-    return _sharedPreferencesAsync.setString(_toInternalKey(key), value);
+    return _keyValueStore.setString(_toInternalKey(key), value);
   }
 
   @override
   Future<void> remove(String key) {
-    return _sharedPreferencesAsync.remove(_toInternalKey(key));
+    return _keyValueStore.remove(_toInternalKey(key));
   }
 
   @override

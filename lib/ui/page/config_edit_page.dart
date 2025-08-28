@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:local_config/core/service_locator/service_locator.dart';
+import 'package:local_config/core/di/service_locator.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
 import 'package:local_config/ui/extension/config_display_extension.dart';
 import 'package:local_config/domain/model/config.dart';
@@ -32,7 +32,7 @@ class _ConfigEditScreenState extends State<ConfigEditScreen> {
   @override
   void initState() {
     super.initState();
-    _repo = context.read<ServiceLocator>().locate<ConfigRepository>();
+    _repo = context.read<ServiceLocator>().get<ConfigRepository>();
     _config = _repo.configs[widget.name]!;
     _controller.text = _config.value;
   }

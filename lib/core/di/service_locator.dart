@@ -5,5 +5,5 @@ abstract class ServiceLocator {
 
   void unregister<T extends Object>();
 
-  T locate<T extends Object>();
+  T get<T extends Object>();
 }

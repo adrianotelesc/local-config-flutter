@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:local_config/domain/model/config.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
-import 'package:local_config/domain/data_source/key_value_data_source.dart';
+import 'package:local_config/domain/data_source/config_data_source.dart';
 
 class DefaultConfigRepository implements ConfigRepository {
-  final KeyValueDataSource _dataSource;
+  final ConfigDataSource _dataSource;
 
   final _configs = <String, Config>{};
 
   final _controller = StreamController<Map<String, Config>>.broadcast();
 
   DefaultConfigRepository({
-    required KeyValueDataSource dataSource,
+    required ConfigDataSource dataSource,
   }) : _dataSource = dataSource;
 
   @override

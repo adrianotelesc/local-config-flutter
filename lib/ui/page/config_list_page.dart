@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:local_config/common/extension/map_extension.dart';
 import 'package:local_config/common/extension/string_extension.dart';
-import 'package:local_config/core/service_locator/service_locator.dart';
+import 'package:local_config/core/di/service_locator.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
 import 'package:local_config/ui/local_config_routes.dart';
 import 'package:local_config/ui/theming/styles.dart';
@@ -41,7 +41,7 @@ class _ConfigListScreenState extends State<ConfigListScreen> {
   @override
   void initState() {
     super.initState();
-    _repo = context.read<ServiceLocator>().locate<ConfigRepository>();
+    _repo = context.read<ServiceLocator>().get<ConfigRepository>();
     _updateConfigs(_repo.configs);
     _controller.addListener(_updateItems);
     _sub = _repo.configsStream.listen(_updateConfigs);
