@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_config/ui/l10n/local_config_localizations.dart';
 import 'package:local_config/ui/widget/text_editor/controller/text_editor_controller.dart';
 import 'package:local_config/ui/widget/text_editor/controller/json_editor_controller.dart';
 import 'package:local_config/ui/widget/text_editor/controller/string_editor_controller.dart';
@@ -6,9 +7,9 @@ import 'package:local_config/common/extension/string_extension.dart';
 import 'package:local_config/domain/model/config.dart';
 
 extension ConfigDisplayExtension on Config {
-  String get displayText {
+  String getDisplayText(BuildContext context) {
     return type == ConfigType.string && value.isEmpty
-        ? '(empty string)'
+        ? LocalConfigLocalizations.of(context)!.emptyString
         : value;
   }
 }
@@ -18,10 +19,10 @@ extension ConfigTypeExtension on ConfigType {
     return this == ConfigType.boolean ? ['false', 'true'] : [];
   }
 
-  String get displayName {
+  String getDisplayName(BuildContext context) {
     return switch (this) {
-      ConfigType.boolean => 'Boolean',
-      ConfigType.number => 'Number',
+      ConfigType.boolean => LocalConfigLocalizations.of(context)!.boolean,
+      ConfigType.number => LocalConfigLocalizations.of(context)!.number,
       ConfigType.string => 'String',
       ConfigType.json => 'JSON',
     };
@@ -36,15 +37,15 @@ extension ConfigTypeExtension on ConfigType {
     };
   }
 
-  String? validator(String? value) {
+  String? validator(BuildContext context, String? value) {
     if (this == ConfigType.boolean && value?.asBool == null) {
-      return 'Invalid bolean';
+      return LocalConfigLocalizations.of(context)!.invalidBoolean;
     }
     if (this == ConfigType.number && value?.asDouble == null) {
-      return 'Invalid number';
+      return LocalConfigLocalizations.of(context)!.invalidNumber;
     }
     if (this == ConfigType.json && value?.asJson == null) {
-      return 'Invalid JSON';
+      return LocalConfigLocalizations.of(context)!.invalidJson;
     }
     return null;
   }
@@ -57,7 +58,7 @@ extension ConfigTypeExtension on ConfigType {
     };
   }
 
-  TextSpan help({String name = 'name'}) {
+  TextSpan help(BuildContext context, {String name = 'name'}) {
     final suffixes = switch (this) {
       ConfigType.boolean => ['Boolean'],
       ConfigType.number => ['Int', 'Double'],
@@ -66,9 +67,8 @@ extension ConfigTypeExtension on ConfigType {
 
     return TextSpan(
       children: [
-        const TextSpan(
-          text:
-              "This is the key you'll pass to the Local Config SDK,\nfor example:\n",
+        TextSpan(
+          text: LocalConfigLocalizations.of(context)!.help,
         ),
         ...suffixes.map((suffix) {
           return TextSpan(

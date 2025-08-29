@@ -5,6 +5,7 @@ import 'package:local_config/common/extension/map_extension.dart';
 import 'package:local_config/common/extension/string_extension.dart';
 import 'package:local_config/core/di/service_locator.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
+import 'package:local_config/ui/l10n/local_config_localizations.dart';
 import 'package:local_config/ui/local_config_routes.dart';
 import 'package:local_config/ui/theming/styles.dart';
 import 'package:local_config/ui/extension/config_display_extension.dart';
@@ -121,7 +122,7 @@ class _AppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      title: const Text('Local Config'),
+      title: Text(LocalConfigLocalizations.of(context)!.localConfig),
       centerTitle: false,
       floating: true,
       pinned: true,
@@ -132,11 +133,15 @@ class _AppBar extends StatelessWidget {
               ),
               child: Callout.warning(
                 icon: Icons.error,
-                text: 'Configs changed locally',
+                text: LocalConfigLocalizations.of(
+                  context,
+                )!.configsChangedLocally,
                 trailing: TextButton(
                   onPressed: repo.resetAll,
                   style: warningButtonStyle(context),
-                  child: const Text('Reset all'),
+                  child: Text(
+                    LocalConfigLocalizations.of(context)!.revertAll,
+                  ),
                 ),
               ),
             )
@@ -160,17 +165,15 @@ class _SetupMessage extends StatelessWidget {
         ),
         spacing: 24,
         header: AnimatedJitterText(
-          'WHERE ARE THE CONFIGS!?',
+          LocalConfigLocalizations.of(context)!.whatAreTheConfigs,
           style: Theme.of(context).textTheme.displaySmall,
         ),
         body: Text(
-          '''Hmm... this might be happening because:
-• Local Config SDK hasn’t been initialized yet.
-• Configs are still populating.''',
+          LocalConfigLocalizations.of(context)!.reasosForIssues,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         footer: AnimatedFloatingText(
-          'If you\'ve been waiting a while, maybe your configs are... empty.',
+          LocalConfigLocalizations.of(context)!.wait,
           style: Theme.of(context).textTheme.titleLarge,
         ),
       ),
@@ -195,7 +198,7 @@ class _SearchBar extends StatelessWidget {
         ),
         child: ClearableSearchBar(
           controller: controller,
-          hintText: 'Search',
+          hintText: LocalConfigLocalizations.of(context)!.search,
         ),
       ),
     );
@@ -222,7 +225,7 @@ class _List extends StatelessWidget {
             horizontal: 24,
           ),
           body: AnimatedFloatingText(
-            'Uuuh... Nothing here... Just emptiness...',
+            LocalConfigLocalizations.of(context)!.noResults,
             style: Theme.of(context).textTheme.displaySmall,
           ),
         ),
@@ -243,7 +246,7 @@ class _List extends StatelessWidget {
               : null,
           title: Text(name),
           subtitle: Text(
-            config.displayText,
+            config.getDisplayText(context),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -253,11 +256,11 @@ class _List extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   icon: Icons.error,
-                  text: 'Locally changed',
+                  text: LocalConfigLocalizations.of(context)!.changedLocally,
                   trailing: TextButton(
                     onPressed: () => repo.reset(name),
                     style: warningButtonStyle(context),
-                    child: const Text('Reset'),
+                    child: Text(LocalConfigLocalizations.of(context)!.revert),
                   ),
                 )
               : null,

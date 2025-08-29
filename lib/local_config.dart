@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:local_config/core/di/service_locator.dart';
 import 'package:local_config/core/storage/key_value_store.dart';
 import 'package:local_config/infra/storage/shared_preferences_store.dart';
-import 'package:local_config/ui/local_config_navigator.dart';
+import 'package:local_config/ui/local_config_entrypoint.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart'
     show SharedPreferencesAsync;
@@ -84,7 +84,7 @@ class LocalConfig {
   Widget get entrypoint {
     return Provider<ServiceLocator>(
       create: (_) => _serviceLocator,
-      child: const LocalConfigNavigator(),
+      child: const LocalConfigEntrypoint(),
     );
   }
 }

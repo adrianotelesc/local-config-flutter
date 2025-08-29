@@ -3,6 +3,7 @@ import 'package:local_config/core/di/service_locator.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
 import 'package:local_config/ui/extension/config_display_extension.dart';
 import 'package:local_config/domain/model/config.dart';
+import 'package:local_config/ui/l10n/local_config_localizations.dart';
 import 'package:local_config/ui/widget/text_editor/text_editor.dart';
 import 'package:local_config/ui/theming/theme.dart';
 import 'package:local_config/ui/widget/input_form_field.dart';
@@ -86,7 +87,7 @@ class _AppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      title: const Text('Edit parameter'),
+      title: Text(LocalConfigLocalizations.of(context)!.editParameter),
       actionsPadding: const EdgeInsets.all(8),
       actions: [
         TextButton(
@@ -95,7 +96,7 @@ class _AppBar extends StatelessWidget {
             repo.set(name, controller.text);
             Navigator.of(context).pop();
           },
-          child: const Text('Save'),
+          child: Text(LocalConfigLocalizations.of(context)!.save),
         ),
       ],
       centerTitle: false,
@@ -139,14 +140,14 @@ class _Form extends StatelessWidget {
                   showDuration: const Duration(seconds: 5),
                   triggerMode: TooltipTriggerMode.tap,
                   padding: const EdgeInsets.all(8),
-                  richMessage: config.type.help(name: name),
+                  richMessage: config.type.help(context, name: name),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     spacing: 8,
                     children: [
                       Text(
-                        'Parameter name (key)',
+                        LocalConfigLocalizations.of(context)!.parameterName,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const Icon(
@@ -160,19 +161,19 @@ class _Form extends StatelessWidget {
               ),
               InputFormField(
                 controller: TextEditingController(
-                  text: config.type.displayName,
+                  text: config.type.getDisplayName(context),
                 ),
                 entries: ConfigType.values.map((value) {
                   return DropdownMenuEntry(
-                    value: value.displayName,
-                    label: value.displayName,
+                    value: value.getDisplayName(context),
+                    label: value.getDisplayName(context),
                     leadingIcon: Icon(value.icon),
                   );
                 }).toList(),
-                validator: config.type.validator,
+                validator: (value) => config.type.validator(context, value),
                 enabled: false,
                 label: Text(
-                  'Data type',
+                  LocalConfigLocalizations.of(context)!.dataType,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
@@ -190,7 +191,7 @@ class _Form extends StatelessWidget {
                   repo.set(name, controller.text);
                   Navigator.of(context).pop();
                 },
-                validator: config.type.validator,
+                validator: (value) => config.type.validator(context, value),
                 textInputAction: TextInputAction.done,
                 suffixIcon: config.type.isText
                     ? IconButton(
@@ -209,10 +210,13 @@ class _Form extends StatelessWidget {
                           controller.text = changedText ?? '';
                         },
                         icon: const Icon(Icons.open_in_full),
+                        tooltip: LocalConfigLocalizations.of(
+                          context,
+                        )!.fullScreenEditor,
                       )
                     : null,
                 label: Text(
-                  'Value',
+                  LocalConfigLocalizations.of(context)!.value,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
