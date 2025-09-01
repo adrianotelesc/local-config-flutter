@@ -1,8 +1,8 @@
 {
     "localConfig": "Local Config",
     "search": "Search",
-    "configsChangedLocally": "Configs changed locally",
-    "changedLocally": "Locally changed",
+    "configsChangedLocally": "Changes applied",
+    "changedLocally": "Changed",
     "revertAll": "Revert all",
     "revert": "Revert",
     "editParameter": "Edit parameter",
@@ -22,8 +22,8 @@
     "invalidBoolean": "Invalid Boolean",
     "invalidNumber": "Invalid Number",
     "invalidJson": "Invalid JSON",
-    "help": "This is the key you'll pass to the Local Config SDK,\nfor example:\n",
     "validJson": "Valid JSON",
+    "help": "This is the key you'll pass to the Local Config SDK,\nfor example:\n",
     "format": "Format",
     "editorOf": "{type} Editor"
 }

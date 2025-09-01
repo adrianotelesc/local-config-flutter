@@ -9,16 +9,16 @@ class LocalConfigLocalizationsPt extends LocalConfigLocalizations {
   LocalConfigLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
-  String get localConfig => 'Local Config';
+  String get localConfig => 'Configuração Local';
 
   @override
   String get search => 'Buscar';
 
   @override
-  String get configsChangedLocally => 'Configurações alteradas localmente';
+  String get configsChangedLocally => 'Alterações aplicadas';
 
   @override
-  String get changedLocally => 'Alterado localmente';
+  String get changedLocally => 'Alterado';
 
   @override
   String get revertAll => 'Reverter tudo';
@@ -80,11 +80,11 @@ class LocalConfigLocalizationsPt extends LocalConfigLocalizations {
   String get invalidJson => 'JSON Inválido';
 
   @override
-  String get help =>
-      'This is the key you\'ll pass to the Local Config SDK,\nfor example:\n';
+  String get validJson => 'JSON Válido';
 
   @override
-  String get validJson => 'JSON Válido';
+  String get help =>
+      'Essa é a chave que você vai passar para o SDK da Configuração Local, por exemplo:\n';
 
   @override
   String get format => 'Formatar';

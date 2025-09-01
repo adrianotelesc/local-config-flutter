@@ -15,10 +15,10 @@ class LocalConfigLocalizationsEn extends LocalConfigLocalizations {
   String get search => 'Search';
 
   @override
-  String get configsChangedLocally => 'Configs changed locally';
+  String get configsChangedLocally => 'Changes applied';
 
   @override
-  String get changedLocally => 'Locally changed';
+  String get changedLocally => 'Changed';
 
   @override
   String get revertAll => 'Revert all';
@@ -80,11 +80,11 @@ class LocalConfigLocalizationsEn extends LocalConfigLocalizations {
   String get invalidJson => 'Invalid JSON';
 
   @override
-  String get help =>
-      'This is the key you\'ll pass to the Local Config SDK,\nfor example:\n';
+  String get validJson => 'Valid JSON';
 
   @override
-  String get validJson => 'Valid JSON';
+  String get help =>
+      'This is the key you\'ll pass to the Local Config SDK,\nfor example:\n';
 
   @override
   String get format => 'Format';

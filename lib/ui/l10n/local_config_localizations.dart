@@ -116,13 +116,13 @@ abstract class LocalConfigLocalizations {
   /// No description provided for @configsChangedLocally.
   ///
   /// In en, this message translates to:
-  /// **'Configs changed locally'**
+  /// **'Changes applied'**
   String get configsChangedLocally;
 
   /// No description provided for @changedLocally.
   ///
   /// In en, this message translates to:
-  /// **'Locally changed'**
+  /// **'Changed'**
   String get changedLocally;
 
   /// No description provided for @revertAll.
@@ -239,17 +239,17 @@ abstract class LocalConfigLocalizations {
   /// **'Invalid JSON'**
   String get invalidJson;
 
-  /// No description provided for @help.
-  ///
-  /// In en, this message translates to:
-  /// **'This is the key you\'ll pass to the Local Config SDK,\nfor example:\n'**
-  String get help;
-
   /// No description provided for @validJson.
   ///
   /// In en, this message translates to:
   /// **'Valid JSON'**
   String get validJson;
+
+  /// No description provided for @help.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the key you\'ll pass to the Local Config SDK,\nfor example:\n'**
+  String get help;
 
   /// No description provided for @format.
   ///

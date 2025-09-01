@@ -1,8 +1,8 @@
 {
-    "localConfig": "Local Config",
+    "localConfig": "Configuração Local",
     "search": "Buscar",
-    "configsChangedLocally": "Configurações alteradas localmente",
-    "changedLocally": "Alterado localmente",
+    "configsChangedLocally": "Alterações aplicadas",
+    "changedLocally": "Alterado",
     "revertAll": "Reverter tudo",
     "revert": "Reverter",
     "editParameter": "Editar parâmetro",
@@ -23,7 +23,7 @@
     "invalidNumber": "Número Inválido",
     "invalidJson": "JSON Inválido",
     "validJson": "JSON Válido",
-    "help": "This is the key you'll pass to the Local Config SDK,\nfor example:\n",
+    "help": "Essa é a chave que você vai passar para o SDK da Configuração Local, por exemplo:\n",
     "format": "Formatar",
     "editorOf": "Editor de {type}"
 }
