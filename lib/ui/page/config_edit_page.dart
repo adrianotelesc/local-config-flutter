@@ -9,19 +9,19 @@ import 'package:local_config/ui/theming/theme.dart';
 import 'package:local_config/ui/widget/input_form_field.dart';
 import 'package:provider/provider.dart';
 
-class ConfigEditScreen extends StatefulWidget {
+class ConfigEditPage extends StatefulWidget {
   final String name;
 
-  const ConfigEditScreen({
+  const ConfigEditPage({
     super.key,
     required this.name,
   });
 
   @override
-  State<StatefulWidget> createState() => _ConfigEditScreenState();
+  State<StatefulWidget> createState() => _ConfigEditPageState();
 }
 
-class _ConfigEditScreenState extends State<ConfigEditScreen> {
+class _ConfigEditPageState extends State<ConfigEditPage> {
   final _controller = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();

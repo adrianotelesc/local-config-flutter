@@ -18,14 +18,14 @@ import 'package:local_config/ui/widget/clearable_search_bar.dart';
 import 'package:local_config/ui/widget/animated_jitter_text.dart';
 import 'package:provider/provider.dart';
 
-class ConfigListScreen extends StatefulWidget {
-  const ConfigListScreen({super.key});
+class ConfigListPage extends StatefulWidget {
+  const ConfigListPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => _ConfigListScreenState();
+  State<StatefulWidget> createState() => _ConfigListPageState();
 }
 
-class _ConfigListScreenState extends State<ConfigListScreen> {
+class _ConfigListPageState extends State<ConfigListPage> {
   final _controller = TextEditingController();
 
   late final ConfigRepository _repo;

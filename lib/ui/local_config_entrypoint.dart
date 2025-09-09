@@ -25,12 +25,12 @@ class LocalConfigEntrypoint extends StatelessWidget {
         onGenerateRoute: (settings) {
           return switch (settings.name) {
             LocalConfigRoutes.configList => MaterialPageRoute(
-              builder: (_) => const ConfigListScreen(),
+              builder: (_) => const ConfigListPage(),
             ),
             LocalConfigRoutes.configEdit => MaterialPageRoute(
               fullscreenDialog: true,
               builder: (_) {
-                return ConfigEditScreen(
+                return ConfigEditPage(
                   name: settings.arguments.toString(),
                 );
               },
