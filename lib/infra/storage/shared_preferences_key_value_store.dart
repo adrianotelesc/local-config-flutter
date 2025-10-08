@@ -1,10 +1,10 @@
 import 'package:local_config/core/storage/key_value_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedPreferencesStore extends KeyValueStore {
+class SharedPreferencesKeyValueStore extends KeyValueStore {
   final SharedPreferencesAsync _sharedPreferencesAsync;
 
-  SharedPreferencesStore({
+  SharedPreferencesKeyValueStore({
     required SharedPreferencesAsync sharedPreferencesAsync,
   }) : _sharedPreferencesAsync = sharedPreferencesAsync;
 

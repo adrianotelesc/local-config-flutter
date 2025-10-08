@@ -1,16 +1,17 @@
 library local_config;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_config/core/di/service_locator.dart';
 import 'package:local_config/core/storage/key_value_store.dart';
-import 'package:local_config/infra/storage/shared_preferences_store.dart';
+import 'package:local_config/infra/storage/secure_storage_key_value_store.dart';
+import 'package:local_config/infra/storage/shared_preferences_key_value_store.dart';
 import 'package:local_config/ui/local_config_entrypoint.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart'
-    show SharedPreferencesAsync;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:local_config/data/data_source/default_config_data_source.dart';
 import 'package:local_config/data/repository/default_config_repository.dart';
-import 'package:local_config/data/repository/dummy_config_repository.dart';
+import 'package:local_config/data/repository/no_op_config_repository.dart';
 import 'package:local_config/domain/data_source/config_data_source.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
 import 'package:local_config/common/extension/string_extension.dart';
@@ -23,7 +24,7 @@ class LocalConfig {
 
   LocalConfig._() {
     _serviceLocator.registerLazySingleton<ConfigRepository>(
-      () => DummyConfigRepository(),
+      () => NoOpConfigRepository(),
     );
   }
 
@@ -34,27 +35,46 @@ class LocalConfig {
     });
   }
 
-  void initialize({required Map<String, String> configs}) {
-    _serviceLocator.registerFactory(
-      () => SharedPreferencesAsync(),
-    );
-    _serviceLocator.registerFactory<KeyValueStore>(
-      () => SharedPreferencesStore(
-        sharedPreferencesAsync: _serviceLocator.get(),
-      ),
-    );
-    _serviceLocator.registerFactory<ConfigDataSource>(
-      () => DefaultConfigDataSource(
-        keyValueStore: _serviceLocator.get(),
-      ),
-    );
+  void initialize({
+    required Map<String, String> configs,
+    bool secureStorageEnabled = false,
+  }) {
+    if (secureStorageEnabled) {
+      _serviceLocator
+        ..registerFactory(
+          () => const FlutterSecureStorage(
+            aOptions: AndroidOptions(encryptedSharedPreferences: true),
+          ),
+        )
+        ..registerFactory<KeyValueStore>(
+          () => SecureStorageKeyValueStore(
+            secureStorage: _serviceLocator.get(),
+          ),
+        );
+    } else {
+      _serviceLocator
+        ..registerFactory(
+          () => SharedPreferencesAsync(),
+        )
+        ..registerFactory<KeyValueStore>(
+          () => SharedPreferencesKeyValueStore(
+            sharedPreferencesAsync: _serviceLocator.get(),
+          ),
+        );
+    }
 
-    _serviceLocator.unregister<ConfigRepository>();
-    _serviceLocator.registerLazySingleton<ConfigRepository>(
-      () => DefaultConfigRepository(
-        dataSource: _serviceLocator.get(),
-      )..populate(configs),
-    );
+    _serviceLocator
+      ..registerFactory<ConfigDataSource>(
+        () => DefaultConfigDataSource(
+          keyValueStore: _serviceLocator.get(),
+        ),
+      )
+      ..unregister<ConfigRepository>()
+      ..registerLazySingleton<ConfigRepository>(
+        () => DefaultConfigRepository(
+          dataSource: _serviceLocator.get(),
+        )..populate(configs),
+      );
   }
 
   bool? getBool(String key) {

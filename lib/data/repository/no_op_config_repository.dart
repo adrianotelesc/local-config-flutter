@@ -1,7 +1,7 @@
 import 'package:local_config/domain/model/config.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
 
-class DummyConfigRepository implements ConfigRepository {
+class NoOpConfigRepository implements ConfigRepository {
   @override
   Map<String, Config> get configs => {};
 
