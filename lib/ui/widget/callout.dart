@@ -31,14 +31,14 @@ class Callout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final extendedColors = context.extendedColorScheme;
+    final extendedColorScheme = context.extendedColorScheme;
 
     final foregroundColor =
-        style?.foregroundColor ?? _variant.foregroundColor(extendedColors);
+        style?.foregroundColor ?? _variant.foregroundColor(extendedColorScheme);
     final borderColor =
-        style?.borderColor ?? _variant.borderColor(extendedColors);
+        style?.borderColor ?? _variant.borderColor(extendedColorScheme);
     final backgroundColor =
-        style?.backgroundColor ?? _variant.backgroundColor(extendedColors);
+        style?.backgroundColor ?? _variant.backgroundColor(extendedColorScheme);
 
     return Container(
       height: height,
@@ -63,10 +63,9 @@ class Callout extends StatelessWidget {
           const SizedBox.square(dimension: 8),
           Text(
             text,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: foregroundColor),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: foregroundColor),
           ),
           const Spacer(),
           trailing ?? const SizedBox.shrink(),
@@ -80,24 +79,24 @@ enum _CalloutVariant {
   success,
   warning;
 
-  Color foregroundColor(ExtendedColorScheme extendedColors) {
+  Color foregroundColor(ExtendedColorScheme extendedColorScheme) {
     return switch (this) {
-      success => extendedColors.success,
-      warning => extendedColors.warning,
+      success => extendedColorScheme.success,
+      warning => extendedColorScheme.warning,
     };
   }
 
-  Color backgroundColor(ExtendedColorScheme extendedColors) {
+  Color backgroundColor(ExtendedColorScheme extendedColorScheme) {
     return switch (this) {
-      success => extendedColors.successContainer,
-      warning => extendedColors.warningContainer,
+      success => extendedColorScheme.successContainer,
+      warning => extendedColorScheme.warningContainer,
     };
   }
 
-  Color borderColor(ExtendedColorScheme extendedColors) {
+  Color borderColor(ExtendedColorScheme extendedColorScheme) {
     return switch (this) {
-      success => extendedColors.onSuccessContainer,
-      warning => extendedColors.onWarningContainer,
+      success => extendedColorScheme.onSuccessContainer,
+      warning => extendedColorScheme.onWarningContainer,
     };
   }
 }
