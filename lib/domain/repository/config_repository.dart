@@ -1,11 +1,11 @@
-import 'package:local_config/domain/model/config.dart';
+import 'package:local_config/domain/entity/config.dart';
 
 abstract class ConfigRepository {
   Map<String, Config> get configs;
 
   Stream<Map<String, Config>> get configsStream;
 
-  Future<void> populate(Map<String, String> configs);
+  Future<void> populate(Map<String, String> defaults);
 
   Config? get(String key);
 

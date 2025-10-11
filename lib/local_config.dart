@@ -2,6 +2,8 @@ library local_config;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:local_config/data/store/config_store.dart';
+import 'package:local_config/data/store/default_config_store.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:local_config/common/extension/string_extension.dart';
@@ -10,7 +12,7 @@ import 'package:local_config/core/service/key_value_service.dart';
 import 'package:local_config/data/data_source/default_key_value_data_source.dart';
 import 'package:local_config/data/repository/default_config_repository.dart';
 import 'package:local_config/data/repository/no_op_config_repository.dart';
-import 'package:local_config/domain/data_source/key_value_data_source.dart';
+import 'package:local_config/data/data_source/key_value_data_source.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
 import 'package:local_config/infra/di/get_it_service_locator.dart';
 import 'package:local_config/infra/service/namespaced_key_value_service.dart';
@@ -33,7 +35,7 @@ class LocalConfig {
   }
 
   void initialize({
-    required Map<String, String> configs,
+    required Map<String, String> defaults,
     bool isSecureStorageEnabled = false,
   }) {
     _serviceLocator
@@ -58,11 +60,15 @@ class LocalConfig {
           service: _serviceLocator.get(),
         ),
       )
+      ..registerFactory<ConfigStore>(
+        () => DefaultConfigStore(),
+      )
       ..unregister<ConfigRepository>()
       ..registerLazySingleton<ConfigRepository>(
         () => DefaultConfigRepository(
           dataSource: _serviceLocator.get(),
-        )..populate(configs),
+          store: _serviceLocator.get(),
+        )..populate(defaults),
       );
   }
 

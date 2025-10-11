@@ -11,7 +11,7 @@ import 'package:local_config/ui/theming/styles.dart';
 import 'package:local_config/ui/extension/config_display_extension.dart';
 import 'package:local_config/ui/theming/theme.dart';
 import 'package:local_config/ui/widget/callout.dart';
-import 'package:local_config/domain/model/config.dart';
+import 'package:local_config/domain/entity/config.dart';
 import 'package:local_config/ui/widget/extended_list_tile.dart';
 import 'package:local_config/ui/widget/clearable_search_bar.dart';
 import 'package:provider/provider.dart';

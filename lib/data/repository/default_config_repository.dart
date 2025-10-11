@@ -1,86 +1,71 @@
 import 'dart:async';
 
-import 'package:local_config/domain/data_source/key_value_data_source.dart';
-import 'package:local_config/domain/model/config.dart';
+import 'package:local_config/data/data_source/key_value_data_source.dart';
+import 'package:local_config/data/store/config_store.dart';
+import 'package:local_config/domain/entity/config.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
 
 class DefaultConfigRepository implements ConfigRepository {
   final KeyValueDataSource _dataSource;
 
-  final _configs = <String, Config>{};
+  final ConfigStore _store;
 
   final _controller = StreamController<Map<String, Config>>.broadcast();
 
   DefaultConfigRepository({
     required KeyValueDataSource dataSource,
-  }) : _dataSource = dataSource;
+    required ConfigStore store,
+  }) : _dataSource = dataSource,
+       _store = store;
 
   @override
-  Map<String, Config> get configs => Map.unmodifiable(_configs);
+  Map<String, Config> get configs => _store.configs;
 
   @override
   Stream<Map<String, Config>> get configsStream => _controller.stream;
 
   @override
-  Config? get(String key) => _configs[key];
+  Config? get(String key) => _store.get(key);
 
   @override
-  Future<void> populate(Map<String, String> configs) async {
-    _populate(configs);
-    await _dataSource.prune(configs.keys.toSet());
+  Future<void> populate(Map<String, String> defaults) async {
+    final overrides = await _dataSource.all;
+
+    _store.populate(defaults, overrides);
+
+    await _dataSource.prune(defaults.keys.toSet());
+
+    _controller.add(configs);
   }
 
   @override
   Future<void> reset(String key) async {
-    _update(key, null);
+    _store.update(key, null);
+
     await _dataSource.remove(key);
+
+    _controller.add(configs);
   }
 
   @override
   Future<void> resetAll() async {
-    _updateAll();
+    _store.updateAll(null);
+
     await _dataSource.clear();
+
+    _controller.add(configs);
   }
 
   @override
   Future<void> set(String key, String value) async {
-    final updated = _update(key, value);
+    final updated = _store.update(key, value);
 
     if (!updated.isOverridden) {
       await _dataSource.remove(key);
     } else {
       await _dataSource.set(key, value);
     }
-  }
 
-  Future<void> _populate(Map<String, String> all) async {
-    final allStored = await _dataSource.all;
-    _configs.addAll(
-      all.map((key, value) {
-        return MapEntry(
-          key,
-          Config(
-            defaultValue: value,
-            overriddenValue: allStored[key],
-          ),
-        );
-      }),
-    );
-    _controller.add(configs);
-  }
-
-  Config _update(String key, String? value) {
-    final updated = _configs.update(key, (config) {
-      return config.copyWith(overriddenValue: value);
-    });
-    _controller.add(configs);
-    return updated;
-  }
-
-  void _updateAll() {
-    _configs.updateAll((_, value) {
-      return value.copyWith(overriddenValue: null);
-    });
     _controller.add(configs);
   }
 }

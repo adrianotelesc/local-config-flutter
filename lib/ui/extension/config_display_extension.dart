@@ -4,7 +4,7 @@ import 'package:local_config/ui/widget/text_editor/controller/text_editor_contro
 import 'package:local_config/ui/widget/text_editor/controller/json_editor_controller.dart';
 import 'package:local_config/ui/widget/text_editor/controller/string_editor_controller.dart';
 import 'package:local_config/common/extension/string_extension.dart';
-import 'package:local_config/domain/model/config.dart';
+import 'package:local_config/domain/entity/config.dart';
 
 extension ConfigDisplayExtension on Config {
   String getDisplayText(BuildContext context) {

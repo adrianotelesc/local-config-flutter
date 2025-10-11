@@ -1,4 +1,4 @@
-import 'package:local_config/domain/model/config.dart';
+import 'package:local_config/domain/entity/config.dart';
 import 'package:local_config/domain/repository/config_repository.dart';
 
 class NoOpConfigRepository implements ConfigRepository {
@@ -12,7 +12,7 @@ class NoOpConfigRepository implements ConfigRepository {
   Config? get(String key) => null;
 
   @override
-  Future<void> populate(Map<String, String> configs) async {}
+  Future<void> populate(Map<String, String> defaults) async {}
 
   @override
   Future<void> reset(String key) async {}

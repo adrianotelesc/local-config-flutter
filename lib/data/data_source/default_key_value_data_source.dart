@@ -1,5 +1,5 @@
 import 'package:local_config/core/service/key_value_service.dart';
-import 'package:local_config/domain/data_source/key_value_data_source.dart';
+import 'package:local_config/data/data_source/key_value_data_source.dart';
 
 class DefaultKeyValueDataSource extends KeyValueDataSource {
   final KeyValueService _service;

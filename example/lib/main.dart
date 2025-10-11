@@ -11,7 +11,7 @@ void main() async {
     'config_boolean': 'false',
     'config_json': '{}',
   };
-  LocalConfig.instance.initialize(configs: configs);
+  LocalConfig.instance.initialize(defaults: configs);
   runApp(const ExampleApp());
 }
 
