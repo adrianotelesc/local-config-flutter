@@ -1,7 +1,7 @@
 name: local_config
-description: "A new Flutter package project."
+description: A Flutter package to manage local configs in your app.
 version: 0.0.1
-homepage:
+repository: https://github.com/adrianotelesc/local-config
 
 environment:
   sdk: ^3.9.0
