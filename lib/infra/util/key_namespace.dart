@@ -13,9 +13,9 @@ class KeyNamespace {
 
   get _keyPrefix => '$_namespace$_separator';
 
-  bool matches(String key) => key.startsWith(_keyPrefix);
-
   String apply(String key) => '$_keyPrefix$key';
+
+  bool matches(String key) => key.startsWith(_keyPrefix);
 
   String strip(String key) => key.replaceFirst(_keyPrefix, '');
 }

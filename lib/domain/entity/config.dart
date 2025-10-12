@@ -5,7 +5,13 @@ class Config {
 
   final String? overriddenValue;
 
-  String get value => overriddenValue ?? defaultValue;
+  const Config({
+    required this.defaultValue,
+    this.overriddenValue,
+  });
+
+  @override
+  int get hashCode => Object.hash(defaultValue, overriddenValue);
 
   bool get isDefault =>
       overriddenValue == null || overriddenValue == defaultValue;
@@ -20,10 +26,14 @@ class Config {
     return ConfigType.string;
   }
 
-  const Config({
-    required this.defaultValue,
-    this.overriddenValue,
-  });
+  String get value => overriddenValue ?? defaultValue;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Config &&
+          defaultValue == other.defaultValue &&
+          overriddenValue == other.overriddenValue;
 
   Config copyWith({
     String? overriddenValue,
@@ -33,16 +43,6 @@ class Config {
       overriddenValue: overriddenValue,
     );
   }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Config &&
-          defaultValue == other.defaultValue &&
-          overriddenValue == other.overriddenValue;
-
-  @override
-  int get hashCode => Object.hash(defaultValue, overriddenValue);
 
   @override
   String toString() =>

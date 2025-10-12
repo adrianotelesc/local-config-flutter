@@ -15,9 +15,9 @@ class SharedPreferencesKeyValueService extends KeyValueService {
   Future<String?> getString(String key) => _sharedPreferences.getString(key);
 
   @override
-  Future<void> setString(String key, String value) =>
-      _sharedPreferences.setString(key, value);
+  Future<void> remove(String key) => _sharedPreferences.remove(key);
 
   @override
-  Future<void> remove(String key) => _sharedPreferences.remove(key);
+  Future<void> setString(String key, String value) =>
+      _sharedPreferences.setString(key, value);
 }

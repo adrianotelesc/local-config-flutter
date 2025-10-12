@@ -5,13 +5,13 @@ abstract class ConfigRepository {
 
   Stream<Map<String, Config>> get configsStream;
 
-  Future<void> populate(Map<String, String> defaults);
-
   Config? get(String key);
 
-  Future<void> set(String key, String value);
+  Future<void> populate(Map<String, String> defaults);
 
   Future<void> reset(String key);
 
   Future<void> resetAll();
+
+  Future<void> set(String key, String value);
 }
