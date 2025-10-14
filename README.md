@@ -1,10 +1,10 @@
 # Local Config
 
-> 🧩 A Flutter package for managing **local configs** — just like Remote Config, but offline.
+Make changes to your app's default behavior and appearance by changing parameter values — just like Firebase Remote Config, but locally. It’s designed for developers who want flexibility during **development**, **testing**, and **staging** workflows where they can override parameter values, test feature flags, or simulate Remote Config behavior directly on your device.
 
 ---
 
-## ✨ Features
+## Features
 
 The main goal is to provide the ability to manage configs locally for any purpose during development, testing, and even staging workflows.
 
@@ -14,7 +14,7 @@ The main goal is to provide the ability to manage configs locally for any purpos
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 #### Add dependency
 
@@ -106,14 +106,7 @@ For a full demo, check the [`example`](https://github.com/adrianotelesc/local-co
 
 ---
 
-<!-- 
-## 🧪 Coverage
-...
----  
--->
+## Additional Information
 
-## 📦 Additional Information
-
-- 🐛 Report issues or request features in the [GitHub Issues](https://github.com/yourusername/local_config/issues)  
-- 💬 Contributions are welcome! Feel free to open pull requests.  
-- 🧾 Licensed under MIT  
+- Report issues or request features in the [GitHub Issues](https://github.com/adrianotelesc/local-config/issues)  
+- Contributions are welcome! Feel free to open pull requests.
