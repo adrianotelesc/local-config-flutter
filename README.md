@@ -71,15 +71,16 @@ void main() async {
 #### Navigate to built-in entrypoint widget
 
 ```dart
-FilledButton(
+IconButton(
   onPressed: () {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => LocalConfigEntrypoint(),
+        builder: (_) => LocalConfig.instance.entrypoint,
       ),
     );
   },
-  child: const Text('Local Config'),
+  tooltip: 'Local Config',
+  icon: const Icon(Icons.settings),
 )
 ```
 
