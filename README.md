@@ -6,11 +6,11 @@
 
 ## ✨ Features
 
-- Manage app configuration values locally  
-- Use a familiar API inspired by **Firebase Remote Config**  
-- Easily initialize from a simple `Map`.
-- Access configs at runtime anywhere in your app  
-- Built-in entrypoint screen for viewing/editing local configs  
+The main goal is to provide the ability to manage configs locally for any purpose during development, testing, and even staging workflows.
+
+- Familiar API inspired by **Firebase Remote Config** (`getBool`, `getString`, etc)
+- Built-in widget also inspired by **Firebase Remote Config** for viewing/editing parameter values
+- Persistent parameter value overrides
 
 ---
 
@@ -68,7 +68,7 @@ void main() async {
 }
 ```
 
-#### Navigate to entrypoint widget
+#### Navigate to built-in entrypoint widget
 
 ```dart
 FilledButton(
@@ -93,7 +93,7 @@ final animatinoSpeed = LocalConfig.instance.getDouble('animation_speed');
 final theme = LocalConfig.instance.getString('theme');
 ```
 
-#### Or listen for updates in real time
+#### Or listen for updates (if your implementation supports it)
 
 ```dart
 LocalConfig.instance.onConfigUpdated.listen((configs) {
@@ -105,14 +105,11 @@ For a full demo, check the [`example`](https://github.com/adrianotelesc/local-co
 
 ---
 
-## 🧠 Why Local Config?
-
-Use this package when you:
-- Want to replicate Remote Config behavior **without needing a backend**  
-- Need **local overrides** for testing or staging  
-- Prefer to keep configuration values bundled with the app  
-
----
+<!-- 
+## 🧪 Coverage
+...
+---  
+-->
 
 ## 📦 Additional Information
 
