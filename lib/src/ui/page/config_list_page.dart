@@ -25,6 +25,8 @@ class ConfigListPage extends StatefulWidget {
 }
 
 class _ConfigListPageState extends State<ConfigListPage> {
+  final _focusNode = FocusNode();
+
   final _controller = TextEditingController();
 
   late final ConfigRepository _repo;
@@ -88,7 +90,7 @@ class _ConfigListPageState extends State<ConfigListPage> {
                 if (_configs.isEmpty)
                   const _PendingStatusNotice()
                 else ...[
-                  _SearchBar(controller: _controller),
+                  _SearchBar(controller: _controller, focusNode: _focusNode),
                   _List(items: _items, repo: _repo),
                 ],
               ],
@@ -248,9 +250,10 @@ class _PendingStatusNotice extends StatelessWidget {
 }
 
 class _SearchBar extends StatelessWidget {
+  final FocusNode focusNode;
   final TextEditingController controller;
 
-  const _SearchBar({required this.controller});
+  const _SearchBar({required this.controller, required this.focusNode});
 
   @override
   Widget build(BuildContext context) {
@@ -259,6 +262,7 @@ class _SearchBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: ClearableSearchBar(
           controller: controller,
+          focusNode: focusNode,
           hintText: LocalConfigLocalizations.of(context)!.search,
         ),
       ),

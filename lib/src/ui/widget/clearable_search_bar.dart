@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class ClearableSearchBar extends StatefulWidget {
   final TextEditingController? controller;
   final String? hintText;
+  final FocusNode? focusNode;
 
   const ClearableSearchBar({
     super.key,
     this.controller,
     this.hintText,
+    this.focusNode,
   });
 
   @override
@@ -45,6 +47,7 @@ class _SearchBarState extends State<ClearableSearchBar> {
     return SearchBar(
       controller: _controller,
       hintText: widget.hintText,
+      focusNode: widget.focusNode,
       trailing: [
         if (_showClearButton)
           Tooltip(
@@ -55,12 +58,10 @@ class _SearchBarState extends State<ClearableSearchBar> {
             ),
           ),
       ],
+      onTapOutside: (event) => widget.focusNode?.unfocus(),
       leading: const Icon(Icons.search),
       padding: const WidgetStatePropertyAll(
-        EdgeInsets.only(
-          left: 16,
-          right: 4,
-        ),
+        EdgeInsets.only(left: 16, right: 4),
       ),
     );
   }
