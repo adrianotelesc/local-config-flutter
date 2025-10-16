@@ -6,7 +6,6 @@ import 'package:local_config/src/domain/entity/config.dart';
 import 'package:local_config/src/ui/l10n/local_config_localizations.dart';
 import 'package:local_config/src/ui/widget/root_aware_sliver_app_bar.dart';
 import 'package:local_config/src/ui/widget/text_editor/text_editor.dart';
-import 'package:local_config/src/ui/theming/theme.dart';
 import 'package:local_config/src/ui/widget/input_form_field.dart';
 import 'package:provider/provider.dart';
 
@@ -38,26 +37,23 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: defaultTheme,
-      child: Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            _AppBar(
-              formKey: _formKey,
-              name: widget.name,
-              controller: _controller,
-              repo: _repo,
-            ),
-            _Form(
-              formKey: _formKey,
-              name: widget.name,
-              config: _config,
-              controller: _controller,
-              repo: _repo,
-            ),
-          ],
-        ),
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          _AppBar(
+            formKey: _formKey,
+            name: widget.name,
+            controller: _controller,
+            repo: _repo,
+          ),
+          _Form(
+            formKey: _formKey,
+            name: widget.name,
+            config: _config,
+            controller: _controller,
+            repo: _repo,
+          ),
+        ],
       ),
     );
   }

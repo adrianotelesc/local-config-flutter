@@ -9,7 +9,6 @@ import 'package:local_config/src/ui/l10n/local_config_localizations.dart';
 import 'package:local_config/src/ui/local_config_routes.dart';
 import 'package:local_config/src/ui/theming/styles.dart';
 import 'package:local_config/src/ui/extension/config_display_extension.dart';
-import 'package:local_config/src/ui/theming/theme.dart';
 import 'package:local_config/src/ui/widget/callout.dart';
 import 'package:local_config/src/domain/entity/config.dart';
 import 'package:local_config/src/ui/widget/extended_list_tile.dart';
@@ -84,43 +83,36 @@ class _ConfigListPageState extends State<ConfigListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: defaultTheme,
-      child: Builder(
-        builder: (context) {
-          return Scaffold(
-            body: CustomScrollView(
-              slivers: [
-                _AppBar(hasOverrides: _hasOverrides, repo: _repo),
-                if (_configs.isEmpty)
-                  const _PendingStatusNotice()
-                else ...[
-                  SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
-                  _SearchBar(controller: _controller, focusNode: _focusNode),
-                  SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
-                  SliverToBoxAdapter(
-                    child: SwitchListTile(
-                      title: Text(
-                        LocalConfigLocalizations.of(context)!.showChangesOnly,
-                      ),
-                      value: showOnlyChanged,
-                      onChanged: (value) {
-                        setState(() {
-                          showOnlyChanged = value;
-                        });
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          _AppBar(hasOverrides: _hasOverrides, repo: _repo),
+          if (_configs.isEmpty)
+            const _PendingStatusNotice()
+          else ...[
+            SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
+            _SearchBar(controller: _controller, focusNode: _focusNode),
+            SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
+            SliverToBoxAdapter(
+              child: SwitchListTile(
+                title: Text(
+                  LocalConfigLocalizations.of(context)!.showChangesOnly,
+                ),
+                value: showOnlyChanged,
+                onChanged: (value) {
+                  setState(() {
+                    showOnlyChanged = value;
+                  });
 
-                        _updateItems();
-                      },
-                    ),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
-                  _List(items: _items, repo: _repo),
-                  SliverToBoxAdapter(child: SizedBox.square(dimension: 32)),
-                ],
-              ],
+                  _updateItems();
+                },
+              ),
             ),
-          );
-        },
+            SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
+            _List(items: _items, repo: _repo),
+            SliverToBoxAdapter(child: SizedBox.square(dimension: 32)),
+          ],
+        ],
       ),
     );
   }

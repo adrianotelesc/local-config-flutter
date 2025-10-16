@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:local_config/src/ui/theming/theme.dart';
 import 'package:local_config/src/ui/widget/text_editor/controller/text_editor_controller.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
@@ -46,44 +45,35 @@ class _TextEditorState extends State<TextEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: defaultTheme,
-      child: Scaffold(
-        appBar: _AppBar(
-          title: widget.title,
-          onCloseClick: pop,
-          onSaveClick: _isValid ?? true ? popAndResult : null,
-        ),
-        body: Column(
-          children: [
-            if (_isValid != null)
-              _FormattingBar(
-                isValid: _isValid ?? false,
-                onFormatClick: () {
-                  _textController.text = widget.controller.prettify(
-                    _textController.text,
-                  );
-                },
-              ),
-            _Editor(textController: _textController),
-          ],
-        ),
+    return Scaffold(
+      appBar: _AppBar(
+        title: widget.title,
+        onCloseClick: pop,
+        onSaveClick: _isValid ?? true ? popAndResult : null,
+      ),
+      body: Column(
+        children: [
+          if (_isValid != null)
+            _FormattingBar(
+              isValid: _isValid ?? false,
+              onFormatClick: () {
+                _textController.text = widget.controller.prettify(
+                  _textController.text,
+                );
+              },
+            ),
+          _Editor(textController: _textController),
+        ],
       ),
     );
   }
 
   void pop() {
-    Navigator.maybePop(
-      context,
-      widget.value,
-    );
+    Navigator.maybePop(context, widget.value);
   }
 
   void popAndResult() {
-    Navigator.maybePop(
-      context,
-      widget.controller.minify(_textController.text),
-    );
+    Navigator.maybePop(context, widget.controller.minify(_textController.text));
   }
 
   @override
@@ -95,11 +85,7 @@ class _TextEditorState extends State<TextEditor> {
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar({
-    required this.title,
-    this.onCloseClick,
-    this.onSaveClick,
-  });
+  const _AppBar({required this.title, this.onCloseClick, this.onSaveClick});
 
   final String title;
   final void Function()? onCloseClick;
@@ -158,13 +144,8 @@ class _FormattingBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            isValid ? Icons.check_circle : Icons.error,
-            color: primaryColor,
-          ),
-          const SizedBox.square(
-            dimension: 8,
-          ),
+          Icon(isValid ? Icons.check_circle : Icons.error, color: primaryColor),
+          const SizedBox.square(dimension: 8),
           Text(
             isValid ? 'Valid JSON' : 'Invalid JSON',
             style: Theme.of(
@@ -175,9 +156,7 @@ class _FormattingBar extends StatelessWidget {
           TextButton(
             onPressed: isValid ? onFormatClick : null,
             style: ButtonStyle(
-              foregroundColor: WidgetStatePropertyAll(
-                actionColor,
-              ),
+              foregroundColor: WidgetStatePropertyAll(actionColor),
             ),
             child: isValid ? const Text('Format') : const SizedBox.shrink(),
           ),
