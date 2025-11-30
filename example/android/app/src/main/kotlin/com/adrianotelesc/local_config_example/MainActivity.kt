@@ -1,4 +1,4 @@
-package com.adrianotelesc.local_config_example
+package com.adrianotelesc.localconfigexample
 
 import io.flutter.embedding.android.FlutterActivity
 
