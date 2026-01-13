@@ -42,12 +42,7 @@ class Callout extends StatelessWidget {
 
     return Container(
       height: height,
-      padding: const EdgeInsets.only(
-        left: 16,
-        top: 4,
-        right: 8,
-        bottom: 4,
-      ),
+      padding: const EdgeInsets.only(left: 16, top: 4, right: 8, bottom: 4),
       decoration: BoxDecoration(
         border: Border.all(color: borderColor),
         color: backgroundColor,
@@ -55,11 +50,7 @@ class Callout extends StatelessWidget {
       ),
       child: Row(
         children: [
-          if (icon != null)
-            Icon(
-              icon,
-              color: foregroundColor,
-            ),
+          if (icon != null) Icon(icon, color: foregroundColor),
           const SizedBox.square(dimension: 8),
           Text(
             text,

@@ -17,34 +17,24 @@ final defaultTheme = ThemeData(
     backgroundColor: surface,
     surfaceTintColor: surface,
   ),
-  bottomSheetTheme: const BottomSheetThemeData(
-    shape: RoundedRectangleBorder(),
-  ),
+  bottomSheetTheme: const BottomSheetThemeData(shape: RoundedRectangleBorder()),
   searchBarTheme: SearchBarThemeData(
-    shadowColor: const WidgetStatePropertyAll(
-      Colors.transparent,
-    ),
+    shadowColor: const WidgetStatePropertyAll(Colors.transparent),
     shape: WidgetStatePropertyAll(
-      RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
   ),
   filledButtonTheme: FilledButtonThemeData(
     style: ButtonStyle(
       shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
   ),
   textButtonTheme: TextButtonThemeData(
     style: ButtonStyle(
       shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
   ),

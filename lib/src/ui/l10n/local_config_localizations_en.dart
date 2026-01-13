@@ -48,7 +48,8 @@ class LocalConfigLocalizationsEn extends LocalConfigLocalizations {
   String get fullScreenEditor => 'Full screen editor';
 
   @override
-  String get noResults => 'No parameters, values, or conditions matched your search criteria.';
+  String get noResults =>
+      'No parameters, values, or conditions matched your search criteria.';
 
   @override
   String get showChangesOnly => 'Show changes only';
@@ -63,22 +64,26 @@ class LocalConfigLocalizationsEn extends LocalConfigLocalizations {
   String get uninitializedTitle => '• The initialization wasn\'t done.';
 
   @override
-  String get uninitializedDescription => 'Are you sure you initialized the lib the right way?';
+  String get uninitializedDescription =>
+      'Are you sure you initialized the lib the right way?';
 
   @override
   String get emptyConfigsTitle => '• The configs are empty.';
 
   @override
-  String get emptyConfigsDescription => 'You might have passed empty configs in the initialization.';
+  String get emptyConfigsDescription =>
+      'You might have passed empty configs in the initialization.';
 
   @override
   String get loadingConfigsTitle => '• The configs haven\'t arrived yet.';
 
   @override
-  String get loadingConfigsDescription => 'It\'s rare, but depending on the initialization, there might be a small delay.';
+  String get loadingConfigsDescription =>
+      'It\'s rare, but depending on the initialization, there might be a small delay.';
 
   @override
-  String get openGitHubIssue => 'If nothing works, open a GitHub issue that we\'ll help you.';
+  String get openGitHubIssue =>
+      'If nothing works, open a GitHub issue that we\'ll help you.';
 
   @override
   String get emptyString => '(empty string)';
@@ -102,7 +107,8 @@ class LocalConfigLocalizationsEn extends LocalConfigLocalizations {
   String get validJson => 'Valid JSON';
 
   @override
-  String get help => 'This is the key you\'ll pass to the Local Config SDK,\nfor example:\n';
+  String get help =>
+      'This is the key you\'ll pass to the Local Config SDK,\nfor example:\n';
 
   @override
   String get format => 'Format';

@@ -26,11 +26,7 @@ class ExtendedListTile extends StatelessWidget {
       children: [
         if (top != null)
           Container(
-            padding: const EdgeInsets.only(
-              top: 16,
-              left: 16,
-              right: 16,
-            ),
+            padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
             color: tileColor,
             child: top,
           ),
@@ -41,11 +37,9 @@ class ExtendedListTile extends StatelessWidget {
           subtitle: subtitle,
           subtitleTextStyle: style?.subtitleTextStyle,
           trailing: trailing,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
           tileColor: tileColor,
-        )
+        ),
       ],
     );
   }
