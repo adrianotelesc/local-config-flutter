@@ -5,10 +5,10 @@ final class LocalConfig {
 
   static final instance = LocalConfig._();
 
-  final _locator = GetItServiceLocator();
+  final _serviceLocator = GetItServiceLocator();
 
   LocalConfig._() {
-    _locator.registerLazySingleton<ConfigRepository>(
+    _serviceLocator.registerLazySingleton<ConfigRepository>(
       () => NoOpConfigRepository(),
     );
   }
@@ -17,7 +17,7 @@ final class LocalConfig {
     required Map<String, dynamic> parameters,
     KeyValueStore? keyValueStore,
   }) {
-    _locator
+    _serviceLocator
       ..registerFactory<KeyValueStore>(
         () => NamespacedKeyValueStore(
           namespace: KeyNamespace(namespace: _namespace),
@@ -29,52 +29,52 @@ final class LocalConfig {
         ),
       )
       ..registerFactory<KeyValueDataSource>(
-        () => DefaultKeyValueDataSource(service: _locator.get()),
+        () => DefaultKeyValueDataSource(store: _serviceLocator.get()),
       )
       ..registerFactory<ConfigStore>(() => DefaultConfigStore())
       ..unregister<ConfigRepository>()
       ..registerLazySingleton<ConfigRepository>(
         () => DefaultConfigRepository(
-          dataSource: _locator.get(),
-          store: _locator.get(),
+          dataSource: _serviceLocator.get(),
+          store: _serviceLocator.get(),
         )..populate(parameters),
       );
   }
 
   Widget get entrypoint {
     return MultiProvider(
-      providers: [Provider<ServiceLocator>(create: (_) => _locator)],
+      providers: [Provider<ServiceLocator>(create: (_) => _serviceLocator)],
       child: const LocalConfigEntrypoint(),
     );
   }
 
   Stream<Map<String, dynamic>> get onConfigUpdated {
-    final repo = _locator.get<ConfigRepository>();
+    final repo = _serviceLocator.get<ConfigRepository>();
     return repo.configsStream.map((configs) {
       return configs.map((key, config) => MapEntry(key, config.value));
     });
   }
 
   bool? getBool(String key) {
-    final repo = _locator.get<ConfigRepository>();
+    final repo = _serviceLocator.get<ConfigRepository>();
     final config = repo.get(key);
     return config?.value.asBoolOrNull;
   }
 
   double? getDouble(String key) {
-    final repo = _locator.get<ConfigRepository>();
+    final repo = _serviceLocator.get<ConfigRepository>();
     final config = repo.get(key);
     return config?.value.asDoubleOrNull;
   }
 
   int? getInt(String key) {
-    final repo = _locator.get<ConfigRepository>();
+    final repo = _serviceLocator.get<ConfigRepository>();
     final config = repo.get(key);
     return config?.value.asIntOrNull;
   }
 
   String? getString(String key) {
-    final repo = _locator.get<ConfigRepository>();
+    final repo = _serviceLocator.get<ConfigRepository>();
     final config = repo.get(key);
     return config?.value;
   }

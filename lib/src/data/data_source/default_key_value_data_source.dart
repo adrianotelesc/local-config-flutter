@@ -6,8 +6,7 @@ import 'package:local_config/src/data/data_source/key_value_data_source.dart';
 class DefaultKeyValueDataSource extends KeyValueDataSource {
   final KeyValueStore _store;
 
-  DefaultKeyValueDataSource({required KeyValueStore service})
-    : _store = service;
+  DefaultKeyValueDataSource({required KeyValueStore store}) : _store = store;
 
   @override
   Future<Map<String, dynamic>> get all async {
