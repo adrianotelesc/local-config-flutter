@@ -7,4 +7,8 @@ extension MapExtension<K, V> on Map<K, V> {
       entries.map((entry) => (entry.key, entry.value)).toList();
 
   bool anyValue(bool Function(V) test) => values.any((value) => test(value));
+
+  Map<String, String> stringify() => map(
+    (key, value) => MapEntry(key?.toString() ?? '', value?.toString() ?? ''),
+  ).where((key, value) => key.isNotEmpty && value.isNotEmpty);
 }

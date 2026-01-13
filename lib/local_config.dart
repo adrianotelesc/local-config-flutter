@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_config/src/common/extension/map_extension.dart';
 import 'package:local_config/src/data/manager/config_manager.dart';
 import 'package:local_config/src/data/manager/default_config_manager.dart';
 import 'package:provider/provider.dart';
