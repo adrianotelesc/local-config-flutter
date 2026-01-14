@@ -38,13 +38,13 @@ extension ConfigTypeExtension on ConfigType {
   }
 
   String? validator(BuildContext context, String? value) {
-    if (this == ConfigType.boolean && value?.asBoolOrNull == null) {
+    if (this == ConfigType.boolean && value?.toBoolOrNull() == null) {
       return LocalConfigLocalizations.of(context)!.invalidBoolean;
     }
-    if (this == ConfigType.number && value?.asDoubleOrNull == null) {
+    if (this == ConfigType.number && value?.toDoubleOrNull() == null) {
       return LocalConfigLocalizations.of(context)!.invalidNumber;
     }
-    if (this == ConfigType.json && value?.asMapOrNull == null) {
+    if (this == ConfigType.json && value?.toMapOrNull() == null) {
       return LocalConfigLocalizations.of(context)!.invalidJson;
     }
     return null;

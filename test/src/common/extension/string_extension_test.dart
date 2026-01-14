@@ -2,11 +2,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:local_config/src/common/extension/string_extension.dart';
 
 void main() {
-  group('StringExtension.asMapOrNull', () {
+  group('StringExtension.toMapOrNull()', () {
     test('returns Map when string is valid JSON', () {
       const string = '{"a":1,"b":2}';
 
-      final result = string.asMapOrNull;
+      final result = string.toMapOrNull();
 
       expect(result, isA<Map<String, dynamic>>());
       expect(result?['a'], 1);
@@ -16,7 +16,7 @@ void main() {
     test('returns null when string is not valid JSON', () {
       const string = 'not a json';
 
-      final result = string.asMapOrNull;
+      final result = string.toMapOrNull();
 
       expect(result, isNull);
     });
@@ -24,18 +24,18 @@ void main() {
     test('returns Map when string is empty JSON', () {
       const string = '{}';
 
-      final result = string.asMapOrNull;
+      final result = string.toMapOrNull();
 
       expect(result, isA<Map<String, dynamic>>());
       expect(result, isEmpty);
     });
   });
 
-  group('StringExtension.asBoolOrNull', () {
+  group('StringExtension.toBoolOrNull()', () {
     test('returns true when string is "true"', () {
       const string = 'true';
 
-      final result = string.asBoolOrNull;
+      final result = string.toBoolOrNull();
 
       expect(result, isTrue);
     });
@@ -43,7 +43,7 @@ void main() {
     test('returns false when string is "false"', () {
       const string = 'false';
 
-      final result = string.asBoolOrNull;
+      final result = string.toBoolOrNull();
 
       expect(result, isFalse);
     });
@@ -51,17 +51,17 @@ void main() {
     test('returns null when string is invalid boolean', () {
       const string = 'not a boolean';
 
-      final result = string.asBoolOrNull;
+      final result = string.toBoolOrNull();
 
       expect(result, isNull);
     });
   });
 
-  group('StringExtension.asDoubleOrNull', () {
+  group('StringExtension.toDoubleOrNull()', () {
     test('returns double when string is valid double', () {
       const string = '3.14';
 
-      final result = string.asDoubleOrNull;
+      final result = string.toDoubleOrNull();
 
       expect(result, 3.14);
     });
@@ -69,21 +69,21 @@ void main() {
     test('returns double when string is valid integer', () {
       const string = '42';
 
-      final result = string.asDoubleOrNull;
+      final result = string.toDoubleOrNull();
 
       expect(result, 42.0);
     });
 
     test('returns null when string is invalid double', () {
-      expect('abc'.asDoubleOrNull, isNull);
+      expect('abc'.toDoubleOrNull(), isNull);
     });
   });
 
-  group('StringExtension.asIntOrNull', () {
+  group('StringExtension.toIntOrNull()', () {
     test('returns integer when string is valid integer', () {
       const string = '123';
 
-      final result = string.asIntOrNull;
+      final result = string.toIntOrNull();
 
       expect(result, 123);
     });
@@ -91,7 +91,7 @@ void main() {
     test('returns null when string is valid double', () {
       const string = '3.14';
 
-      final result = string.asIntOrNull;
+      final result = string.toIntOrNull();
 
       expect(result, isNull);
     });
@@ -99,7 +99,7 @@ void main() {
     test('returns null when string is invalid integer', () {
       const string = 'not a integer';
 
-      final result = string.asIntOrNull;
+      final result = string.toIntOrNull();
 
       expect(result, isNull);
     });
