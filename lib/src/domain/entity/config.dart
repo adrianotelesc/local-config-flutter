@@ -28,7 +28,7 @@ class ConfigValue {
 
   ConfigType _inferTypeFromString(String value) {
     if (value.toBoolOrNull() != null) return ConfigType.boolean;
-    if (value.toDoubleOrNull() != null) return ConfigType.number;
+    if (value.toStrictDoubleOrNull() != null) return ConfigType.number;
     if (value.toMapOrNull() != null) return ConfigType.json;
     return ConfigType.string;
   }

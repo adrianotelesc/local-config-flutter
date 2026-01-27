@@ -11,9 +11,13 @@ extension StringExtension on String {
 
   bool? toBoolOrNull() => bool.tryParse(this);
 
-  double? toDoubleOrNull() => double.tryParse(this);
+  double? toStrictDoubleOrNull() {
+    if (RegExp(r'^0\d+(\.\d+)?$').hasMatch(this)) {
+      return null;
+    }
 
-  int? toIntOrNull() => int.tryParse(this);
+    return double.tryParse(this);
+  }
 
   bool containsInsensitive(String other) =>
       toLowerCase().contains(other.toLowerCase());

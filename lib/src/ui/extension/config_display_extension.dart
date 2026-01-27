@@ -41,7 +41,7 @@ extension ConfigTypeExtension on ConfigType {
     if (this == ConfigType.boolean && value?.toBoolOrNull() == null) {
       return LocalConfigLocalizations.of(context)!.invalidBoolean;
     }
-    if (this == ConfigType.number && value?.toDoubleOrNull() == null) {
+    if (this == ConfigType.number && value?.toStrictDoubleOrNull() == null) {
       return LocalConfigLocalizations.of(context)!.invalidNumber;
     }
     if (this == ConfigType.json && value?.toMapOrNull() == null) {

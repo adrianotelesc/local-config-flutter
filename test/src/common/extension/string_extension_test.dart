@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:local_config/src/common/extension/string_extension.dart';
 
 void main() {
-  group('StringExtension.toMapOrNull()', () {
+  group('StringExtension.toMapOrNull', () {
     test('returns Map when string is valid JSON', () {
       const string = '{"a":1,"b":2}';
 
@@ -31,7 +31,7 @@ void main() {
     });
   });
 
-  group('StringExtension.toBoolOrNull()', () {
+  group('StringExtension.toBoolOrNull', () {
     test('returns true when string is "true"', () {
       const string = 'true';
 
@@ -57,11 +57,11 @@ void main() {
     });
   });
 
-  group('StringExtension.toDoubleOrNull()', () {
+  group('StringExtension.toStrictDoubleOrNull', () {
     test('returns double when string is valid double', () {
       const string = '3.14';
 
-      final result = string.toDoubleOrNull();
+      final result = string.toStrictDoubleOrNull();
 
       expect(result, 3.14);
     });
@@ -69,39 +69,27 @@ void main() {
     test('returns double when string is valid integer', () {
       const string = '42';
 
-      final result = string.toDoubleOrNull();
+      final result = string.toStrictDoubleOrNull();
 
       expect(result, 42.0);
     });
 
+    test('returns null when string has leading zeros', () {
+      const string1 = '05';
+      const string2 = '00.5';
+      const string3 = '01.5';
+
+      final result1 = string1.toStrictDoubleOrNull();
+      final result2 = string2.toStrictDoubleOrNull();
+      final result3 = string3.toStrictDoubleOrNull();
+
+      expect(result1, isNull);
+      expect(result2, isNull);
+      expect(result3, isNull);
+    });
+
     test('returns null when string is invalid double', () {
-      expect('abc'.toDoubleOrNull(), isNull);
-    });
-  });
-
-  group('StringExtension.toIntOrNull()', () {
-    test('returns integer when string is valid integer', () {
-      const string = '123';
-
-      final result = string.toIntOrNull();
-
-      expect(result, 123);
-    });
-
-    test('returns null when string is valid double', () {
-      const string = '3.14';
-
-      final result = string.toIntOrNull();
-
-      expect(result, isNull);
-    });
-
-    test('returns null when string is invalid integer', () {
-      const string = 'not a integer';
-
-      final result = string.toIntOrNull();
-
-      expect(result, isNull);
+      expect('abc'.toStrictDoubleOrNull(), isNull);
     });
   });
 
