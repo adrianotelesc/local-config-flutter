@@ -58,19 +58,19 @@ final class LocalConfig {
   bool? getBool(String key) {
     final repo = _serviceLocator.get<ConfigRepository>();
     final config = repo.get(key);
-    return config?.value.asBoolOrNull;
+    return config?.value.toBoolOrNull();
   }
 
   double? getDouble(String key) {
     final repo = _serviceLocator.get<ConfigRepository>();
     final config = repo.get(key);
-    return config?.value.asDoubleOrNull;
+    return config?.value.toStrictDoubleOrNull();
   }
 
   int? getInt(String key) {
     final repo = _serviceLocator.get<ConfigRepository>();
     final config = repo.get(key);
-    return config?.value.asIntOrNull;
+    return config?.value.toStrictIntOrNull();
   }
 
   String? getString(String key) {

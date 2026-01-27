@@ -11,6 +11,14 @@ extension StringExtension on String {
 
   bool? toBoolOrNull() => bool.tryParse(this);
 
+  int? toStrictIntOrNull() {
+    if (RegExp(r'^0\d+$').hasMatch(this)) {
+      return null;
+    }
+
+    return int.tryParse(this);
+  }
+
   double? toStrictDoubleOrNull() {
     if (RegExp(r'^0\d+(\.\d+)?$').hasMatch(this)) {
       return null;

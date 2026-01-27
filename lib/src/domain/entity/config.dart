@@ -1,9 +1,9 @@
 import 'package:local_config/src/common/extension/string_extension.dart';
 
 class ConfigValue {
-  final dynamic defaultValue;
+  final String defaultValue;
 
-  final dynamic overriddenValue;
+  final String? overriddenValue;
 
   const ConfigValue({required this.defaultValue, this.overriddenValue});
 
@@ -16,24 +16,9 @@ class ConfigValue {
   bool get isOverridden =>
       overriddenValue != null && overriddenValue != defaultValue;
 
-  ConfigType get type {
-    return switch (defaultValue) {
-      bool() => ConfigType.boolean,
-      num() => ConfigType.number,
-      Map() => ConfigType.json,
-      String() => _inferTypeFromString(defaultValue),
-      _ => throw Exception('Unsupported type: ${defaultValue.runtimeType}'),
-    };
-  }
+  ConfigType get type => ConfigType.inferFromValue(defaultValue);
 
-  ConfigType _inferTypeFromString(String value) {
-    if (value.toBoolOrNull() != null) return ConfigType.boolean;
-    if (value.toStrictDoubleOrNull() != null) return ConfigType.number;
-    if (value.toMapOrNull() != null) return ConfigType.json;
-    return ConfigType.string;
-  }
-
-  dynamic get value => overriddenValue ?? defaultValue;
+  String get value => overriddenValue ?? defaultValue;
 
   @override
   bool operator ==(Object other) =>
@@ -61,4 +46,11 @@ enum ConfigType {
   json;
 
   bool get isText => this == ConfigType.string || this == ConfigType.json;
+
+  static ConfigType inferFromValue(String source) {
+    if (source.toBoolOrNull() != null) return ConfigType.boolean;
+    if (source.toStrictDoubleOrNull() != null) return ConfigType.number;
+    if (source.toMapOrNull() != null) return ConfigType.json;
+    return ConfigType.string;
+  }
 }

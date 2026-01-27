@@ -4,10 +4,7 @@ import 'package:local_config/src/common/util/key_namespace.dart';
 void main() {
   group('KeyNamespace', () {
     test('throws assertion error when namespace is empty', () {
-      expect(
-        () => KeyNamespace(namespace: ''),
-        throwsA(isA<AssertionError>()),
-      );
+      expect(() => KeyNamespace(namespace: ''), throwsA(isA<AssertionError>()));
     });
 
     test('throws assertion error when separator is empty', () {

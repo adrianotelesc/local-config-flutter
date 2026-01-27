@@ -57,6 +57,43 @@ void main() {
     });
   });
 
+  group('StringExtension.toIntOrNull()', () {
+    test('returns integer when string is valid integer', () {
+      const string = '123';
+
+      final result = string.toStrictIntOrNull();
+
+      expect(result, 123);
+    });
+
+    test('returns null when string is valid double', () {
+      const string = '3.14';
+
+      final result = string.toStrictIntOrNull();
+
+      expect(result, isNull);
+    });
+
+    test('returns null when string has leading zeros', () {
+      const string1 = '05';
+      const string2 = '005';
+
+      final result1 = string1.toStrictIntOrNull();
+      final result2 = string2.toStrictIntOrNull();
+
+      expect(result1, isNull);
+      expect(result2, isNull);
+    });
+
+    test('returns null when string is invalid integer', () {
+      const string = 'not a integer';
+
+      final result = string.toStrictIntOrNull();
+
+      expect(result, isNull);
+    });
+  });
+
   group('StringExtension.toStrictDoubleOrNull', () {
     test('returns double when string is valid double', () {
       const string = '3.14';
