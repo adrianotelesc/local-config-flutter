@@ -10,6 +10,7 @@ class RootAwareSliverAppBar extends StatelessWidget
   final EdgeInsetsGeometry? actionsPadding;
   final List<Widget>? actions;
   final PreferredSizeWidget? bottom;
+  final double? titleSpacing;
 
   const RootAwareSliverAppBar({
     super.key,
@@ -21,6 +22,7 @@ class RootAwareSliverAppBar extends StatelessWidget
     this.actions,
     this.actionsPadding,
     this.bottom,
+    this.titleSpacing,
   });
 
   @override
@@ -44,6 +46,7 @@ class RootAwareSliverAppBar extends StatelessWidget
       automaticallyImplyLeading: false,
       leading: leading,
       title: title,
+      titleSpacing: titleSpacing,
       centerTitle: centerTitle,
       floating: floating,
       pinned: pinned,
