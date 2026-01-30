@@ -45,11 +45,24 @@ void main() async {
 
   await LocalConfig.instance.initialize(
     parameters: {
-        'feature_enabled': 'true',
-        'api_base_url': 'https://api.myapp.com/v1',
-        'retry_attempts': '3',
-        'animation_speed': '1.25',
-        'theme': '{"seedColor": "#2196F3", "darkMode": false}',
+      'social_login_enabled': false,
+      'timeout_ms': 8000,
+      'animation_speed': 1.25,
+      'api_base_url': 'https://api.myapp.com/v1',
+      "checkout": {
+        "payment_methods": {
+          "allowed": ["credit_card", "pix", "boleto"],
+          "default": "credit_card",
+        },
+        "installments": {
+          "enabled": false,
+          "rules": [
+            {"max_installments": 3, "min_order_value": 0},
+            {"max_installments": 6, "min_order_value": 100},
+            {"max_installments": 10, "min_order_value": 300},
+          ],
+        },
+      },
     },
   );
 
@@ -98,11 +111,11 @@ IconButton(
 #### Get parameter values
 
 ```dart
-final featureEnabled = LocalConfig.instance.getBool('feature_enabled');
-final apiBaseUrl = LocalConfig.instance.getString('api_base_url');
-final retryAttempts = LocalConfig.instance.getInt('retry_attempts');
+final socialLoginEnabled = LocalConfig.instance.getBool('social_login_enabled');
+final timeoutMs = LocalConfig.instance.getInt('timeout_ms');
 final animatinoSpeed = LocalConfig.instance.getDouble('animation_speed');
-final theme = LocalConfig.instance.getString('theme');
+final apiBaseUrl = LocalConfig.instance.getString('api_base_url');
+final checkout = LocalConfig.instance.getString('checkout');
 ```
 
 #### Or listen for updates (if your implementation supports it)

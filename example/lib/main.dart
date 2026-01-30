@@ -9,16 +9,24 @@ void main() async {
 
   LocalConfig.instance.initialize(
     parameters: {
-      'feature_enabled': true,
-      'api_base_url': 'https://api.myapp.com/v1',
-      'retry_attempts': 3,
+      'social_login_enabled': false,
+      'timeout_ms': 8000,
       'animation_speed': 1.25,
-      'theme': {"seedColor": "#2196F3", "darkMode": false},
-      'feature_enabled_string': 'true',
-      'api_base_url_string': 'https://api.myapp.com/v1',
-      'retry_attempts_string': '3',
-      'animation_speed_string': '1.25',
-      'theme_string': '{"seedColor": "#2196F3", "darkMode": false}',
+      'api_base_url': 'https://api.myapp.com/v1',
+      "checkout": {
+        "payment_methods": {
+          "allowed": ["credit_card", "pix", "boleto"],
+          "default": "credit_card",
+        },
+        "installments": {
+          "enabled": false,
+          "rules": [
+            {"max_installments": 3, "min_order_value": 0},
+            {"max_installments": 6, "min_order_value": 100},
+            {"max_installments": 10, "min_order_value": 300},
+          ],
+        },
+      },
     },
     keyValueStore: SecureStorageKeyValueStore(
       secureStorage: const FlutterSecureStorage(
