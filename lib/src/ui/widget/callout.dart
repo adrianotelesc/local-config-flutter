@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:local_config/src/ui/theming/extended_color_scheme.dart';
+import 'package:local_config/src/ui/theme/extended_color_scheme.dart';
 
 class Callout extends StatelessWidget {
   static const double defaultHeight = 58;

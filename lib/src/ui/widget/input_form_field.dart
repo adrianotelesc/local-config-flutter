@@ -103,6 +103,14 @@ class _DropdownMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownMenu(
       enabled: enabled,
+      textStyle: Theme.of(context).dropdownMenuTheme.textStyle?.copyWith(
+        color:
+            enabled
+                ? null
+                : Theme.of(
+                  context,
+                ).dropdownMenuTheme.textStyle?.color?.withAlpha(87),
+      ),
       leadingIcon:
           entries
               .where((item) => item.value == controller.text)

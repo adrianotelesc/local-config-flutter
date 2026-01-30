@@ -40,7 +40,6 @@ class ExtendedListTile extends StatelessWidget {
             subtitleTextStyle: style?.subtitleTextStyle,
             trailing: trailing,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            tileColor: tileColor,
           ),
         ),
       ],

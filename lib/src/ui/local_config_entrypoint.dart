@@ -4,7 +4,7 @@ import 'package:local_config/src/ui/l10n/local_config_localizations.dart';
 import 'package:local_config/src/ui/local_config_routes.dart';
 import 'package:local_config/src/ui/page/config_edit_page.dart';
 import 'package:local_config/src/ui/page/config_list_page.dart';
-import 'package:local_config/src/ui/theming/theme.dart';
+import 'package:local_config/src/ui/theme/local_config_theme.dart';
 
 class LocalConfigEntrypoint extends StatelessWidget {
   const LocalConfigEntrypoint({super.key});
@@ -20,7 +20,7 @@ class LocalConfigEntrypoint extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       child: Theme(
-        data: defaultTheme,
+        data: LocalConfigTheme.data,
         child: Navigator(
           initialRoute: LocalConfigRoutes.configList,
           onGenerateRoute: (settings) {
