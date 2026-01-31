@@ -28,20 +28,17 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version-file: pubspec.yaml
+          channel: stable
           cache: true
-
-      - name: Setup Melos
-        run: dart pub global activate melos
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Verify formatting
-        run: melos format --output=none --set-exit-if-changed
+        run: dart format --output=none --set-exit-if-changed
 
       - name: Analyze project source
-        run: melos run analyze
+        run: flutter analyze
 
   test:
     name: Test
@@ -53,26 +50,23 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
+          distribution: "temurin"
           java-version-file: .java-version
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version-file: pubspec.yaml
+          channel: stable
           cache: true
-
-      - name: Setup Melos
-        run: dart pub global activate melos
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Run tests
-        run: melos run test
+        run: dart test
 
       - name: Upload coverage
         uses: codecov/codecov-action@v5
         with:
-            token: ${{ secrets.CODECOV_TOKEN }}
-            verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
