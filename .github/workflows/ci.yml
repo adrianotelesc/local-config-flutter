@@ -38,7 +38,7 @@ jobs:
         run: dart format --output=none --set-exit-if-changed
 
       - name: Analyze project source
-        run: flutter analyze
+        run: flutter analyze --fatal-infos --fatal-warnings
 
   test:
     name: Test
@@ -63,7 +63,7 @@ jobs:
         run: flutter pub get
 
       - name: Run tests
-        run: dart test
+        run: flutter test --fail-fast --coverage
 
       - name: Upload coverage
         uses: codecov/codecov-action@v5
