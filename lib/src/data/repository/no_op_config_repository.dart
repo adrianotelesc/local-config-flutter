@@ -15,10 +15,10 @@ class NoOpConfigRepository implements ConfigRepository {
   Future<void> populate(Map<String, dynamic> defaults) async {}
 
   @override
-  Future<void> reset(String key) async {}
+  Future<void> remove(String key) async {}
 
   @override
-  Future<void> resetAll() async {}
+  Future<void> clear() async {}
 
   @override
   Future<void> set(String key, dynamic value) async {}

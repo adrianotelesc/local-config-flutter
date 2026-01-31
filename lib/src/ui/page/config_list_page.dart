@@ -152,7 +152,7 @@ class _AppBar extends StatelessWidget {
                     ),
                     text: LocalConfigLocalizations.of(context)!.changesApplied,
                     trailing: TextButton(
-                      onPressed: repo.resetAll,
+                      onPressed: repo.clear,
                       style: warningButtonStyle(context),
                       child: Text(
                         LocalConfigLocalizations.of(context)!.revertAll,
@@ -357,7 +357,7 @@ class _List extends StatelessWidget {
                               text:
                                   LocalConfigLocalizations.of(context)!.changed,
                               trailing: TextButton(
-                                onPressed: () => repo.reset(name),
+                                onPressed: () => repo.remove(name),
                                 style: warningButtonStyle(context),
                                 child: Text(
                                   LocalConfigLocalizations.of(context)!.revert,

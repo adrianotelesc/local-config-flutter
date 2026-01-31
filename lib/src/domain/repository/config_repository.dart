@@ -9,9 +9,9 @@ abstract class ConfigRepository {
 
   Future<void> populate(Map<String, String> defaults);
 
-  Future<void> reset(String key);
+  Future<void> remove(String key);
 
-  Future<void> resetAll();
+  Future<void> clear();
 
   Future<void> set(String key, String value);
 }

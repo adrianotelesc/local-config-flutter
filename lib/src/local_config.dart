@@ -101,4 +101,9 @@ final class LocalConfig {
     if (configValue == null) return null;
     return configValue.raw;
   }
+
+  Future<void> clear() async {
+    final repo = _serviceLocator.get<ConfigRepository>();
+    await repo.clear();
+  }
 }

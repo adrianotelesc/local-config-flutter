@@ -39,7 +39,7 @@ class DefaultConfigRepository implements ConfigRepository {
   }
 
   @override
-  Future<void> reset(String key) async {
+  Future<void> remove(String key) async {
     _manager.update(key, null);
 
     await _dataSource.remove(key);
@@ -48,7 +48,7 @@ class DefaultConfigRepository implements ConfigRepository {
   }
 
   @override
-  Future<void> resetAll() async {
+  Future<void> clear() async {
     _manager.updateAll(null);
 
     await _dataSource.clear();
