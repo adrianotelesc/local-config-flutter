@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://pub.dev/packages/local_config"><img src="https://img.shields.io/pub/v/local_config.svg" alt="Pub"></a>
-  <a href="https://github.com/adrianotelesc/local-config/actions"><img src="https://github.com/adrianotelesc/local-config/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/adrianotelesc/local-config/actions"><img src="https://github.com/adrianotelesc/local-config/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://codecov.io/gh/adrianotelesc/local-config"><img src="https://codecov.io/gh/adrianotelesc/local-config/graph/badge.svg?token=SM8RpYH49p"/></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
 </p>
