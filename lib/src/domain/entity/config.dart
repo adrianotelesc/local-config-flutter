@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:local_config/src/common/util/json_safe_convert.dart';
 
 class ConfigValue {
@@ -19,6 +21,15 @@ class ConfigValue {
   ConfigType get type => ConfigType.inferFromValue(defaultValue);
 
   String get raw => overriddenValue ?? defaultValue;
+
+  Object get parsed {
+    return switch (type) {
+      ConfigType.boolean => bool.parse(raw),
+      ConfigType.number => num.parse(raw),
+      ConfigType.string => raw,
+      ConfigType.json => jsonDecode(raw),
+    };
+  }
 
   @override
   bool operator ==(Object other) =>

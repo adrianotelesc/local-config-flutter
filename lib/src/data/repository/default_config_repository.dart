@@ -29,11 +29,11 @@ class DefaultConfigRepository implements ConfigRepository {
 
   @override
   Future<void> populate(Map<String, String> defaults) async {
+    await _dataSource.prune(defaults.keys.toSet());
+
     final overrides = await _dataSource.all;
 
     _manager.populate(defaults, overrides);
-
-    await _dataSource.prune(defaults.keys.toSet());
 
     _controller.add(configs);
   }

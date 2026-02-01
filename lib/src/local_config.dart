@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:local_config/src/common/extension/map_extension.dart';
-import 'package:local_config/src/data/manager/config_manager.dart';
-import 'package:local_config/src/data/manager/default_config_manager.dart';
-import 'package:local_config/src/domain/entity/config.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:local_config/src/common/extension/map_extension.dart';
+import 'package:local_config/src/common/util/key_namespace.dart';
+import 'package:local_config/src/common/util/stringify.dart';
 import 'package:local_config/src/core/di/service_locator.dart';
 import 'package:local_config/src/core/storage/key_value_store.dart';
 import 'package:local_config/src/data/data_source/default_key_value_data_source.dart';
+import 'package:local_config/src/data/data_source/key_value_data_source.dart';
+import 'package:local_config/src/data/manager/config_manager.dart';
+import 'package:local_config/src/data/manager/default_config_manager.dart';
 import 'package:local_config/src/data/repository/default_config_repository.dart';
 import 'package:local_config/src/data/repository/no_op_config_repository.dart';
-import 'package:local_config/src/data/data_source/key_value_data_source.dart';
+import 'package:local_config/src/domain/entity/config.dart';
 import 'package:local_config/src/domain/repository/config_repository.dart';
 import 'package:local_config/src/infra/di/get_it_service_locator.dart';
 import 'package:local_config/src/infra/storage/namespaced_key_value_store.dart';
 import 'package:local_config/src/infra/storage/shared_preferences_key_value_store.dart';
-import 'package:local_config/src/common/util/key_namespace.dart';
 import 'package:local_config/src/ui/local_config_entrypoint.dart';
 
 final class LocalConfig {
@@ -31,16 +32,13 @@ final class LocalConfig {
     );
   }
 
-  void initialize({
-    required Map<String, dynamic> parameters,
-    KeyValueStore? keyValueStore,
-  }) {
+  void initialize({required Map<String, Object> params, KeyValueStore? store}) {
     _serviceLocator
       ..registerFactory<KeyValueStore>(
         () => NamespacedKeyValueStore(
           namespace: KeyNamespace(namespace: _namespace),
           inner:
-              keyValueStore ??
+              store ??
               SharedPreferencesKeyValueStore(
                 sharedPreferences: SharedPreferencesAsync(),
               ),
@@ -55,8 +53,14 @@ final class LocalConfig {
         () => DefaultConfigRepository(
           dataSource: _serviceLocator.get(),
           manager: _serviceLocator.get(),
-        )..populate(parameters.stringify()),
+        )..populate(params.mapValues((Object value) => stringify(value))),
       );
+  }
+
+  Future<void> showLocalConfigPage(BuildContext context) async {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => LocalConfig.instance.entrypoint));
   }
 
   Widget get entrypoint {
@@ -66,44 +70,49 @@ final class LocalConfig {
     );
   }
 
-  Stream<Map<String, dynamic>> get onConfigUpdated {
+  Stream<Map<String, Object>> get onConfigUpdated {
     final repo = _serviceLocator.get<ConfigRepository>();
     return repo.configsStream.map((configs) {
-      return configs.map((key, config) => MapEntry(key, config.raw));
+      return configs.map((key, config) => MapEntry(key, config.parsed));
     });
   }
 
-  ConfigValue? getValue(String key) {
+  Map<String, Object> getAll() {
     final repo = _serviceLocator.get<ConfigRepository>();
-    return repo.get(key);
+    return repo.configs.map((key, config) => MapEntry(key, config.parsed));
   }
 
   bool? getBool(String key) {
-    final configValue = getValue(key);
-    if (configValue == null) return null;
-    return bool.tryParse(configValue.raw);
+    final value = _getValue(key);
+    if (value == null) return null;
+    return bool.tryParse(value.raw);
   }
 
   double? getDouble(String key) {
-    final configValue = getValue(key);
-    if (configValue == null) return null;
-    return double.tryParse(configValue.raw);
+    final value = _getValue(key);
+    if (value == null) return null;
+    return double.tryParse(value.raw);
   }
 
   int? getInt(String key) {
-    final configValue = getValue(key);
-    if (configValue == null) return null;
-    return int.tryParse(configValue.raw);
+    final value = _getValue(key);
+    if (value == null) return null;
+    return int.tryParse(value.raw);
   }
 
   String? getString(String key) {
-    final configValue = getValue(key);
-    if (configValue == null) return null;
-    return configValue.raw;
+    final value = _getValue(key);
+    if (value == null) return null;
+    return value.raw;
   }
 
   Future<void> clear() async {
     final repo = _serviceLocator.get<ConfigRepository>();
     await repo.clear();
+  }
+
+  ConfigValue? _getValue(String key) {
+    final repo = _serviceLocator.get<ConfigRepository>();
+    return repo.get(key);
   }
 }

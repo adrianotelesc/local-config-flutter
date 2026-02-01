@@ -1,16 +1,13 @@
-import 'package:local_config/src/common/extension/object_extension.dart';
-
-extension MapExtension<K, V> on Map<K, V> {
-  Map<K, V> where(bool Function(K, V) test) => Map<K, V>.fromEntries(
+extension MapExtension<K1, V1> on Map<K1, V1> {
+  Map<K1, V1> where(bool Function(K1, V1) test) => Map<K1, V1>.fromEntries(
     entries.where((entry) => test(entry.key, entry.value)),
   );
 
-  List<(K, V)> toRecordList() =>
+  List<(K1, V1)> toRecordList() =>
       entries.map((entry) => (entry.key, entry.value)).toList();
 
-  bool anyValue(bool Function(V) test) => values.any((value) => test(value));
+  bool anyValue(bool Function(V1) test) => values.any((value) => test(value));
 
-  Map<String, String> stringify() => map(
-    (key, value) => MapEntry(key?.stringify() ?? '', value?.stringify() ?? ''),
-  ).where((key, value) => key.isNotEmpty);
+  Map<K1, V2> mapValues<V2>(V2 Function(V1) convertValue) =>
+      map((key, value) => MapEntry(key, convertValue(value)));
 }

@@ -8,7 +8,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   LocalConfig.instance.initialize(
-    parameters: {
+    params: {
       'social_login_enabled': false,
       'timeout_ms': 8000,
       'animation_speed': 1.25,
@@ -28,7 +28,7 @@ void main() async {
         },
       },
     },
-    keyValueStore: SecureStorageKeyValueStore(
+    store: SecureStorageKeyValueStore(
       secureStorage: const FlutterSecureStorage(
         aOptions: AndroidOptions(encryptedSharedPreferences: true),
       ),
@@ -39,83 +39,67 @@ void main() async {
 }
 
 class ExampleApp extends StatelessWidget {
-  static const title = 'Local Config Example';
-
   const ExampleApp({super.key});
 
   @override
+  Widget build(BuildContext context) => MaterialApp(home: const ExamplePage());
+}
+
+class ExamplePage extends StatelessWidget {
+  const ExamplePage({super.key});
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: title,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return Scaffold(
+      appBar: AppBar(title: Text('Local Config Example')),
+      floatingActionButton: FloatingActionButton(
+        // todo: find a way to avoid singleton access here, just `showLocalConfigPage` or `LocalConfigPage`.
+        onPressed: () => LocalConfig.instance.showLocalConfigPage(context),
+        child: const Icon(Icons.edit),
       ),
-      debugShowCheckedModeBanner: false,
-      home: const ExamplePage(title: title),
+      body: _ConfigListView(),
     );
   }
 }
 
-class ExamplePage extends StatefulWidget {
-  const ExamplePage({super.key, required this.title});
-
-  final String title;
-
+class _ConfigListView extends StatefulWidget {
   @override
-  State<ExamplePage> createState() => _ExamplePageState();
+  State<StatefulWidget> createState() => _ConfigListViewState();
 }
 
-class _ExamplePageState extends State<ExamplePage> {
-  Map<String, dynamic> _configs = {};
-  StreamSubscription? _configSub;
+class _ConfigListViewState extends State<_ConfigListView> {
+  List<MapEntry<String, Object>> _configEntries = [];
+
+  StreamSubscription? _configUpdateSub;
 
   @override
   void initState() {
     super.initState();
-    _configSub = LocalConfig.instance.onConfigUpdated.listen((configs) {
-      setState(() => _configs = configs);
+
+    _configUpdateSub = LocalConfig.instance.onConfigUpdated.listen((configs) {
+      setState(() => _configEntries = configs.entries.toList());
     });
   }
 
   @override
   void dispose() {
-    _configSub?.cancel();
+    _configUpdateSub?.cancel();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        actionsPadding: EdgeInsets.all(8),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => LocalConfig.instance.entrypoint,
-                ),
-              );
-            },
-            tooltip: 'Local Config',
-            icon: const Icon(Icons.settings),
-          ),
-        ],
-      ),
-      body: ListView.builder(
-        itemCount: _configs.length,
-        itemBuilder: (context, index) {
-          final key = _configs.keys.elementAt(index);
-          final value = _configs[key];
+    return ListView.builder(
+      itemCount: _configEntries.length,
+      itemBuilder: (_, index) {
+        final configEntry = _configEntries[index];
 
-          return ListTile(
-            title: Text(key),
-            subtitle: Text(value?.toString() ?? 'null'),
-          );
-        },
-      ),
+        final key = configEntry.key;
+        final value = configEntry.value;
+
+        return ListTile(title: Text(key), subtitle: Text(value.toString()));
+      },
     );
   }
 }
