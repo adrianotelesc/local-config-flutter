@@ -33,13 +33,39 @@ class KeyNamespace {
 
   String get qualifiedPrefix => _qualifiedPrefix;
 
-  String qualify(String value) => '$_qualifiedPrefix$value';
+  bool matchesBase(String key) => key.startsWith(_basePrefix);
 
-  bool matchesBase(String value) => value.startsWith(_basePrefix);
+  bool matchesQualified(String key) => key.startsWith(_qualifiedPrefix);
 
-  bool matchesQualified(String value) => value.startsWith(_qualifiedPrefix);
+  String qualify(String key) {
+    if (key.isEmpty) {
+      throw ArgumentError.value(key, 'key must not be empty');
+    }
 
-  String strip(String value) => value.replaceFirst(_qualifiedPrefix, '');
+    if (key == _qualifiedPrefix || key == _basePrefix) {
+      throw ArgumentError.value(
+        key,
+        'key must include a leaf name after namespace',
+      );
+    }
+
+    if (key.startsWith(_qualifiedPrefix)) {
+      return key;
+    }
+
+    if (key.startsWith(_basePrefix)) {
+      final rest = key.substring(_basePrefix.length);
+      return '$_qualifiedPrefix$rest';
+    }
+
+    return '$_qualifiedPrefix$key';
+  }
+
+  String strip(String key) {
+    if (matchesQualified(key)) return key.substring(_qualifiedPrefix.length);
+    if (matchesBase(key)) return key.substring(_basePrefix.length);
+    return key;
+  }
 
   @override
   String toString() => _qualifiedPrefix;
