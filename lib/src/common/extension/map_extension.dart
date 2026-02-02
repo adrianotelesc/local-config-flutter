@@ -3,6 +3,9 @@ extension MapExtension<K1, V1> on Map<K1, V1> {
     entries.where((entry) => test(entry.key, entry.value)),
   );
 
+  Map<K1, V1> whereKey(bool Function(K1) test) =>
+      Map<K1, V1>.fromEntries(entries.where((entry) => test(entry.key)));
+
   List<(K1, V1)> toRecordList() =>
       entries.map((entry) => (entry.key, entry.value)).toList();
 
