@@ -5,9 +5,9 @@ abstract class KeyValueDataSource {
 
   Future<String?> get(String key);
 
-  Future<void> prune(Set<String> retainedKeys);
+  Future<void> set(String key, String value);
 
   Future<void> remove(String key);
 
-  Future<void> set(String key, String value);
+  Future<void> prune(Map<String, String> retained);
 }

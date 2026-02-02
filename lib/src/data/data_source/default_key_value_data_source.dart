@@ -1,43 +1,59 @@
+import 'package:local_config/src/common/extension/map_extension.dart';
+import 'package:local_config/src/core/model/key_namespace.dart';
 import 'package:local_config/src/core/storage/key_value_store.dart';
 import 'package:local_config/src/data/data_source/key_value_data_source.dart';
+import 'package:local_config/src/domain/policy/prune_policy.dart';
 
 class DefaultKeyValueDataSource extends KeyValueDataSource {
   final KeyValueStore _store;
+  final KeyNamespace _namespace;
+  final KeyValuePrunePolicy _prunePolicy;
 
-  DefaultKeyValueDataSource({required KeyValueStore store}) : _store = store;
+  DefaultKeyValueDataSource({
+    required KeyNamespace namespace,
+    required KeyValueStore store,
+    required KeyValuePrunePolicy prunePolicy,
+  }) : _namespace = namespace,
+       _store = store,
+       _prunePolicy = prunePolicy;
 
   @override
   Future<Map<String, String>> get all async {
     final all = await _store.all;
-    return all.map((key, value) => MapEntry(key, value));
+    return all.whereKey(_namespace.matchesQualified).mapKeys(_namespace.strip);
   }
 
   @override
   Future<void> clear() async {
-    final existingKeys = (await all).keys;
-
-    for (final key in existingKeys) {
-      await remove(key);
-    }
-  }
-
-  @override
-  Future<String?> get(String key) => _store.getString(key);
-
-  @override
-  Future<void> prune(Set<String> retainedKeys) async {
-    final existingKeys = (await all).keys;
-
-    for (final key in existingKeys) {
-      if (!retainedKeys.contains(key)) {
-        await remove(key);
+    final all = await _store.all;
+    for (final key in all.keys) {
+      if (_namespace.matchesBase(key)) {
+        await _store.remove(key);
       }
     }
   }
 
   @override
-  Future<void> remove(String key) => _store.remove(key);
+  Future<String?> get(String key) => _store.getString(_namespace.qualify(key));
 
   @override
-  Future<void> set(String key, String value) => _store.setString(key, value);
+  Future<void> set(String key, String value) =>
+      _store.setString(_namespace.qualify(key), value);
+
+  @override
+  Future<void> remove(String key) => _store.remove(_namespace.qualify(key));
+
+  @override
+  Future<void> prune(Map<String, String> retained) async {
+    final all = await _store.all;
+    for (final entry in all.whereKey(_namespace.matchesBase).entries) {
+      if (_prunePolicy.shouldRemove(
+        namespace: _namespace,
+        entry: entry,
+        retained: retained,
+      )) {
+        await _store.remove(entry.key);
+      }
+    }
+  }
 }

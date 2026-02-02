@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:local_config/src/domain/policy/baseline_value_prune_policy.dart';
+import 'package:local_config/src/domain/policy/composite_prune_policy.dart';
+import 'package:local_config/src/domain/policy/mismatch_qualified_prefix_prune_policy.dart';
+import 'package:local_config/src/domain/policy/missing_retained_key_prune_policy.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:local_config/src/common/extension/map_extension.dart';
-import 'package:local_config/src/common/util/key_namespace.dart';
+import 'package:local_config/src/core/model/key_namespace.dart';
 import 'package:local_config/src/common/util/stringify.dart';
 import 'package:local_config/src/core/di/service_locator.dart';
 import 'package:local_config/src/core/storage/key_value_store.dart';
@@ -15,7 +19,6 @@ import 'package:local_config/src/data/repository/no_op_config_repository.dart';
 import 'package:local_config/src/domain/entity/config.dart';
 import 'package:local_config/src/domain/repository/config_repository.dart';
 import 'package:local_config/src/infra/di/get_it_service_locator.dart';
-import 'package:local_config/src/infra/storage/namespaced_key_value_store.dart';
 import 'package:local_config/src/infra/storage/shared_preferences_key_value_store.dart';
 import 'package:local_config/src/ui/local_config_entrypoint.dart';
 
@@ -32,20 +35,31 @@ final class LocalConfig {
     );
   }
 
-  void initialize({required Map<String, Object> params, KeyValueStore? store}) {
+  void initialize({
+    required Map<String, Object> params,
+    KeyValueStore? store,
+    List<String> keySegments = const [],
+  }) {
     _serviceLocator
       ..registerFactory<KeyValueStore>(
-        () => NamespacedKeyValueStore(
-          namespace: KeyNamespace(namespace: _namespace),
-          inner:
-              store ??
-              SharedPreferencesKeyValueStore(
-                sharedPreferences: SharedPreferencesAsync(),
-              ),
-        ),
+        () =>
+            store ??
+            SharedPreferencesKeyValueStore(
+              sharedPreferences: SharedPreferencesAsync(),
+            ),
       )
       ..registerFactory<KeyValueDataSource>(
-        () => DefaultKeyValueDataSource(store: _serviceLocator.get()),
+        () => DefaultKeyValueDataSource(
+          namespace: KeyNamespace(base: _namespace, segments: keySegments),
+          store: _serviceLocator.get(),
+          prunePolicy: CompositePrunePolicy(
+            policies: [
+              MismatchQualifiedPrefixPrunePolicy(),
+              MissingRetainedKeyPrunePolicy(),
+              BaselineValuePrunePolicy(),
+            ],
+          ),
+        ),
       )
       ..registerFactory<ConfigManager>(() => DefaultConfigStore())
       ..unregister<ConfigRepository>()
