@@ -25,9 +25,13 @@ class ConfigListPage extends StatefulWidget {
 }
 
 class _ConfigListPageState extends State<ConfigListPage> {
+  static const _backToTopScrollOffsetThreshould = 200.0;
+
   final _focusNode = FocusNode();
 
-  final _controller = TextEditingController();
+  final _textController = TextEditingController();
+
+  final _scrollController = ScrollController();
 
   late final ConfigRepository _repo;
 
@@ -41,13 +45,27 @@ class _ConfigListPageState extends State<ConfigListPage> {
 
   var _hasOverrides = false;
 
+  var _showBackToTop = false;
+
   @override
   void initState() {
     super.initState();
     _repo = context.read<ServiceLocator>().get<ConfigRepository>();
     _updateConfigs(_repo.configs);
-    _controller.addListener(_updateItems);
+    _textController.addListener(_updateItems);
     _sub = _repo.configsStream.listen(_updateConfigs);
+    _scrollController.addListener(_updateBackToTop);
+  }
+
+  void _updateBackToTop() {
+    final shouldShowBackToTop =
+        _scrollController.offset > _backToTopScrollOffsetThreshould;
+
+    if (shouldShowBackToTop && !_showBackToTop) {
+      setState(() => _showBackToTop = true);
+    } else if (!shouldShowBackToTop && _showBackToTop) {
+      setState(() => _showBackToTop = false);
+    }
   }
 
   void _updateConfigs(Map<String, ConfigValue> configs) {
@@ -57,7 +75,7 @@ class _ConfigListPageState extends State<ConfigListPage> {
   }
 
   void _updateItems() {
-    final query = _controller.text;
+    final query = _textController.text;
     final filtered = _configs.where((key, value) {
       return (!showOnlyChanged || value.isOverridden) &&
           (query.isEmpty ||
@@ -78,21 +96,37 @@ class _ConfigListPageState extends State<ConfigListPage> {
   void dispose() {
     _sub?.cancel();
     _sub = null;
-    _controller.removeListener(_updateItems);
+    _textController.removeListener(_updateItems);
+    _scrollController.removeListener(_updateBackToTop);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: AnimatedSlide(
+        offset: _showBackToTop ? Offset.zero : Offset(0, 5),
+        duration: Durations.long1,
+        child: FloatingActionButton.small(
+          onPressed: () {
+            _scrollController.animateTo(
+              0,
+              duration: Durations.medium1,
+              curve: Curves.easeInOut,
+            );
+          },
+          child: const Icon(Icons.keyboard_arrow_up),
+        ),
+      ),
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           _AppBar(hasOverrides: _hasOverrides, repo: _repo),
           if (_configs.isEmpty)
             const _PendingStatusNotice()
           else ...[
             SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
-            _SearchBar(controller: _controller, focusNode: _focusNode),
+            _SearchBar(controller: _textController, focusNode: _focusNode),
             SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
             SliverToBoxAdapter(
               child: SwitchListTile(
@@ -309,7 +343,7 @@ class _List extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsets.only(left: 12, right: 12, bottom: 32),
+      padding: EdgeInsets.only(left: 12, right: 12, bottom: 128),
       sliver: SliverContainer(
         background: ColoredBox(
           color: Theme.of(context).colorScheme.surfaceContainerLow,
