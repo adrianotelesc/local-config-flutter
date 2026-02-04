@@ -51,7 +51,7 @@ abstract final class LocalConfigTheme {
       textStyle: _base.dropdownMenuTheme.textStyle?.copyWith(
         color: _colorScheme.onSurface,
       ),
-      menuStyle: _base.dropdownMenuTheme.menuStyle?.copyWith(
+      menuStyle: MenuStyle(
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
