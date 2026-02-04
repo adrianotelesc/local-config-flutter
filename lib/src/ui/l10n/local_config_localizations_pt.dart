@@ -104,7 +104,7 @@ class LocalConfigLocalizationsPt implements LocalConfigLocalizations {
 
   @override
   String get help =>
-      'Essa é a chave que você vai passar para o SDK da Configuração Local, por exemplo:\n';
+      'Essa é a chave que você vai passar para o SDK do Local Config, por exemplo:\n';
 
   @override
   String get format => 'Formatar';
