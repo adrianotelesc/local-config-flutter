@@ -1,4 +1,5 @@
 import 'package:local_config/src/common/extension/map_extension.dart';
+import 'package:local_config/src/common/util/key_validation.dart';
 import 'package:local_config/src/core/model/key_namespace.dart';
 import 'package:local_config/src/core/storage/key_value_store.dart';
 import 'package:local_config/src/data/data_source/key_value_data_source.dart';
@@ -37,8 +38,11 @@ class DefaultKeyValueDataSource extends KeyValueDataSource {
   Future<String?> get(String key) => _store.getString(_namespace.qualify(key));
 
   @override
-  Future<void> set(String key, String value) =>
-      _store.setString(_namespace.qualify(key), value);
+  Future<void> set(String key, String value) async {
+    keyValidate(key);
+
+    await _store.setString(_namespace.qualify(key), value);
+  }
 
   @override
   Future<void> remove(String key) => _store.remove(_namespace.qualify(key));

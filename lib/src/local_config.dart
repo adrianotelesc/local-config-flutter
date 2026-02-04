@@ -1,3 +1,4 @@
+import 'package:local_config/src/common/util/key_validation.dart';
 import 'package:local_config/src/domain/policy/baseline_value_prune_policy.dart';
 import 'package:local_config/src/domain/policy/composite_prune_policy.dart';
 import 'package:local_config/src/domain/policy/mismatch_qualified_prefix_prune_policy.dart';
@@ -34,6 +35,10 @@ final class LocalConfig {
     KeyValueStore? store,
     List<String> keySegments = const [],
   }) {
+    for (final key in params.keys) {
+      keyValidate(key);
+    }
+
     serviceLocator
       ..registerFactory<KeyValueStore>(
         () =>

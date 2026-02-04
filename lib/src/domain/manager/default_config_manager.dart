@@ -1,3 +1,4 @@
+import 'package:local_config/src/common/util/key_validation.dart';
 import 'package:local_config/src/domain/manager/config_manager.dart';
 import 'package:local_config/src/domain/entity/config.dart';
 
@@ -28,6 +29,10 @@ class DefaultConfigManager implements ConfigManager {
 
   @override
   void populate(Map<String, dynamic> defaults, Map<String, dynamic> overrides) {
+    for (final key in defaults.keys) {
+      keyValidate(key);
+    }
+
     _configs.addAll(
       defaults.map((key, value) {
         return MapEntry(
