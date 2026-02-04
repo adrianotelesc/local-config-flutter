@@ -7,6 +7,14 @@ abstract final class LocalConfigTheme {
     seedColor: Color(0xFF1A73E8),
   );
 
+  static ThemeData get _base => ThemeData(
+    useMaterial3: true,
+    colorScheme: _colorScheme,
+    fontFamily: 'GoogleSans',
+    package: 'local_config',
+    inputDecorationTheme: _inputDecorationTheme,
+  );
+
   static InputDecorationTheme get _inputDecorationTheme => InputDecorationTheme(
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(16),
@@ -34,18 +42,16 @@ abstract final class LocalConfigTheme {
     ),
   );
 
-  static ThemeData get data => ThemeData(
-    useMaterial3: true,
-    colorScheme: _colorScheme,
-    appBarTheme: AppBarTheme(
+  static ThemeData get data => _base.copyWith(
+    appBarTheme: _base.appBarTheme.copyWith(
       backgroundColor: _colorScheme.surface,
       surfaceTintColor: _colorScheme.surface,
     ),
-    inputDecorationTheme: _inputDecorationTheme,
-    dropdownMenuTheme: DropdownMenuThemeData(
-      textStyle: TextStyle(color: _colorScheme.onSurface),
-      inputDecorationTheme: _inputDecorationTheme,
-      menuStyle: MenuStyle(
+    dropdownMenuTheme: _base.dropdownMenuTheme.copyWith(
+      textStyle: _base.dropdownMenuTheme.textStyle?.copyWith(
+        color: _colorScheme.onSurface,
+      ),
+      menuStyle: _base.dropdownMenuTheme.menuStyle?.copyWith(
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
@@ -54,30 +60,30 @@ abstract final class LocalConfigTheme {
         ),
       ),
     ),
-    bottomSheetTheme: const BottomSheetThemeData(
+    bottomSheetTheme: _base.bottomSheetTheme.copyWith(
       shape: RoundedRectangleBorder(),
     ),
-    searchBarTheme: SearchBarThemeData(
+    searchBarTheme: _base.searchBarTheme.copyWith(
       shadowColor: const WidgetStatePropertyAll(Colors.transparent),
       shape: WidgetStatePropertyAll(
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
     ),
     filledButtonTheme: FilledButtonThemeData(
-      style: ButtonStyle(
+      style: _base.filledButtonTheme.style?.copyWith(
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: ButtonStyle(
+      style: _base.filledButtonTheme.style?.copyWith(
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     ),
-    textSelectionTheme: TextSelectionThemeData(
+    textSelectionTheme: _base.textSelectionTheme.copyWith(
       cursorColor: _colorScheme.primary,
       selectionColor: _colorScheme.primary.withAlpha(102),
       selectionHandleColor: _colorScheme.primary,

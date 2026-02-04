@@ -39,3 +39,16 @@ dev_dependencies:
 flutter:
   assets:
     - assets/images/
+    - assets/fonts/
+
+  fonts:
+    - family: GoogleSans
+      fonts:
+        - asset: assets/fonts/GoogleSans/GoogleSans-VariableFont_GRAD,opsz,wght.ttf
+        - asset: assets/fonts/GoogleSans/GoogleSans-Italic-VariableFont_GRAD,opsz,wght.ttf
+          style: italic
+    - family: GoogleSansCode
+      fonts:
+        - asset: assets/fonts/GoogleSansCode/GoogleSansCode-VariableFont_wght.ttf
+        - asset: assets/fonts/GoogleSansCode/GoogleSansCode-Italic-VariableFont_wght.ttf
+          style: italic
