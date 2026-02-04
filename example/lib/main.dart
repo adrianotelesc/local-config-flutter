@@ -42,7 +42,8 @@ class ExampleApp extends StatelessWidget {
   const ExampleApp({super.key});
 
   @override
-  Widget build(BuildContext context) => MaterialApp(home: const ExamplePage());
+  Widget build(BuildContext context) =>
+      MaterialApp(debugShowCheckedModeBanner: false, home: const ExamplePage());
 }
 
 class ExamplePage extends StatelessWidget {
