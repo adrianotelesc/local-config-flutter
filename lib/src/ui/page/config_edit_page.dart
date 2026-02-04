@@ -129,6 +129,10 @@ class _Form extends StatelessWidget {
             children: [
               InputFormField(
                 controller: TextEditingController(text: name),
+                textStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontFamily: 'GoogleSansCode',
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(97),
+                ),
                 label: Tooltip(
                   preferBelow: true,
                   showDuration: const Duration(seconds: 5),

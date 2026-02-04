@@ -378,11 +378,21 @@ class _List extends StatelessWidget {
                         isOverridden
                             ? warningExtendedListTileStyle(context) //
                             : null,
-                    title: Text(name),
+                    title: Text(
+                      name,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontFamily: 'GoogleSansCode',
+                        fontWeight: isOverridden ? FontWeight.bold : null,
+                      ),
+                    ),
                     subtitle: Text(
                       config.getDisplayText(context),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: isOverridden ? FontWeight.bold : null,
+                      ),
                     ),
                     top:
                         isOverridden

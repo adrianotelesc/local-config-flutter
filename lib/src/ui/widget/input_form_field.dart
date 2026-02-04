@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class InputFormField extends StatelessWidget {
+  final TextStyle? textStyle;
+  final MenuStyle? menuStyle;
   final Widget label;
   final TextEditingController controller;
   final List<DropdownMenuEntry<String>> entries;
@@ -14,6 +16,8 @@ class InputFormField extends StatelessWidget {
   InputFormField({
     super.key,
     TextEditingController? controller,
+    this.textStyle,
+    this.menuStyle,
     this.entries = const [],
     this.autofocus = false,
     this.onFieldSubmitted,
@@ -33,11 +37,13 @@ class InputFormField extends StatelessWidget {
         label,
         entries.isNotEmpty
             ? _DropdownMenu(
+              textStyle: textStyle,
               enabled: enabled,
               controller: controller,
               entries: entries,
             )
             : _TextFormField(
+              style: textStyle,
               controller: controller,
               suffixIcon: suffixIcon,
               textInputAction: textInputAction,
@@ -52,6 +58,7 @@ class InputFormField extends StatelessWidget {
 }
 
 class _TextFormField extends StatelessWidget {
+  final TextStyle? style;
   final TextEditingController controller;
   final Widget? suffixIcon;
   final TextInputAction? textInputAction;
@@ -62,6 +69,7 @@ class _TextFormField extends StatelessWidget {
 
   const _TextFormField({
     required this.controller,
+    this.style,
     this.suffixIcon,
     this.textInputAction,
     this.autofocus = false,
@@ -73,6 +81,7 @@ class _TextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      style: style,
       ignorePointers: false,
       scrollPhysics: AlwaysScrollableScrollPhysics(),
       controller: controller,
@@ -91,12 +100,16 @@ class _TextFormField extends StatelessWidget {
 }
 
 class _DropdownMenu extends StatelessWidget {
+  final TextStyle? textStyle;
+  final MenuStyle? menuStyle;
   final bool enabled;
   final TextEditingController controller;
   final List<DropdownMenuEntry<String>> entries;
 
   const _DropdownMenu({
     this.enabled = true,
+    this.textStyle,
+    this.menuStyle,
     required this.controller,
     required this.entries,
   });
@@ -105,13 +118,9 @@ class _DropdownMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownMenu(
       enabled: enabled,
-      textStyle: Theme.of(context).dropdownMenuTheme.textStyle?.copyWith(
-        color:
-            enabled
-                ? null
-                : Theme.of(
-                  context,
-                ).dropdownMenuTheme.textStyle?.color?.withAlpha(87),
+      menuStyle: menuStyle,
+      textStyle: textStyle?.copyWith(
+        color: enabled ? null : textStyle?.color?.withAlpha(87),
       ),
       leadingIcon:
           entries
