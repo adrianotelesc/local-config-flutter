@@ -48,7 +48,7 @@ class LocalConfigLocalizationsEn extends LocalConfigLocalizations {
       'No parameters, values, or conditions matched your search criteria.';
 
   @override
-  String get showChangesOnly => 'Show changes only';
+  String get showOnlyChanged => 'Show only changed';
 
   @override
   String get noConfigsQuestion => 'NO CONFIGS!?';

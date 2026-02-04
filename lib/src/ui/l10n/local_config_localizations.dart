@@ -48,7 +48,7 @@ abstract class LocalConfigLocalizations {
 
   String get noResults;
 
-  String get showChangesOnly;
+  String get showOnlyChanged;
 
   String get noConfigsQuestion;
 
