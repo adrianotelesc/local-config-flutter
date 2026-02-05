@@ -65,9 +65,15 @@ abstract final class LocalConfigTheme {
     ),
     searchBarTheme: _base.searchBarTheme.copyWith(
       shadowColor: const WidgetStatePropertyAll(Colors.transparent),
-      shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
+      shape: WidgetStateProperty.fromMap({
+        WidgetState.focused: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: _colorScheme.primary, width: 2),
+        ),
+        WidgetState.any: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      }),
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: _base.filledButtonTheme.style?.copyWith(
