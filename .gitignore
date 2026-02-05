@@ -69,3 +69,6 @@ pubspec.lock
 
 # FVM Version Cache
 .fvm/
+
+# Coverage Loader
+**/test/*_coverage_loader_test.g.dart

@@ -62,6 +62,9 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Generate coverage loader
+        run: bash ./tool/gen_coverage_loader.sh
+
       - name: Run tests
         run: flutter test --fail-fast --coverage
 
