@@ -1,4 +1,15 @@
+coverage:
+  status:
+    project: false
+    patch: false
+    changes: false
+
 comment:
-  layout: "reach,diff,files"
+  layout: "reach, diff, files"
   behavior: default
   require_changes: false
+
+ignore:
+  - "**/*.g.dart"
+  - "**/*.freezed.dart"
+  - "**/generated/**"
