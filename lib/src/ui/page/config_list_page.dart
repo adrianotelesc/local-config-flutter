@@ -47,6 +47,8 @@ class _ConfigListPageState extends State<ConfigListPage> {
 
   var _showBackToTop = false;
 
+  var _terms = <String>[];
+
   @override
   void initState() {
     super.initState();
@@ -75,18 +77,24 @@ class _ConfigListPageState extends State<ConfigListPage> {
   }
 
   void _updateItems() {
-    final query = _textController.text
-        .split(RegExp(r'\s+'))
-        .map((e) => e.trim())
-        .where((e) => e.isNotEmpty);
+    _terms =
+        _textController.text
+            .split(RegExp(r'\s+'))
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
     final filtered = _configs.where((key, value) {
       return (!showOnlyChanged || value.isOverridden) &&
-          (query.isEmpty ||
-              query.every((q) => key.containsInsensitive(q)) ||
-              query.every((q) => value.raw.containsInsensitive(q)));
+          (_terms.isEmpty ||
+              _terms.every(
+                (q) => [key, value.raw].join().containsInsensitive(q),
+              ));
     });
     final items = filtered.toRecordList();
-    setState(() => _items = items);
+    setState(() {
+      _terms = _terms;
+      _items = items;
+    });
   }
 
   void _updateOverrides() {
@@ -151,7 +159,7 @@ class _ConfigListPageState extends State<ConfigListPage> {
               ),
             ),
             SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
-            _List(items: _items, repo: _repo),
+            _List(items: _items, repo: _repo, terms: _terms),
           ],
         ],
       ),
@@ -338,10 +346,11 @@ class _SearchBar extends StatelessWidget {
 }
 
 class _List extends StatelessWidget {
+  final List<String> terms;
   final List<(String, ConfigValue)> items;
   final ConfigRepository repo;
 
-  const _List({required this.items, required this.repo});
+  const _List({required this.items, required this.repo, this.terms = const []});
 
   @override
   Widget build(BuildContext context) {
@@ -378,15 +387,51 @@ class _List extends StatelessWidget {
                         isOverridden
                             ? warningExtendedListTileStyle(context) //
                             : null,
-                    title: Text(
-                      name,
+                    title: Text.rich(
+                      highlightTerms(
+                        text: name,
+                        terms: terms,
+                        normalStyle: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(
+                          fontFamily: 'GoogleSansCode',
+                          fontWeight: isOverridden ? FontWeight.bold : null,
+                        ),
+                        highlightStyle: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(
+                          fontFamily: 'GoogleSansCode',
+                          fontWeight: isOverridden ? FontWeight.bold : null,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withAlpha(102),
+                        ),
+                      ),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontFamily: 'GoogleSansCode',
                         fontWeight: isOverridden ? FontWeight.bold : null,
                       ),
                     ),
-                    subtitle: Text(
-                      config.getDisplayText(context),
+                    subtitle: Text.rich(
+                      highlightTerms(
+                        text: config.getDisplayText(context),
+                        terms: terms,
+                        normalStyle: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: isOverridden ? FontWeight.bold : null,
+                        ),
+                        highlightStyle: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: isOverridden ? FontWeight.bold : null,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary.withAlpha(102),
+                        ),
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -429,5 +474,50 @@ class _List extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  TextSpan highlightTerms({
+    required String text,
+    required List<String> terms,
+    TextStyle? normalStyle,
+    TextStyle? highlightStyle,
+  }) {
+    if (terms.isEmpty) {
+      return TextSpan(text: text, style: normalStyle);
+    }
+
+    // Escapa termos para regex segura
+    final escaped = terms.map(RegExp.escape);
+    final pattern = RegExp('(${escaped.join('|')})', caseSensitive: false);
+
+    final matches = pattern.allMatches(text);
+
+    if (matches.isEmpty) {
+      return TextSpan(text: text, style: normalStyle);
+    }
+
+    final spans = <TextSpan>[];
+    int start = 0;
+
+    for (final match in matches) {
+      if (match.start > start) {
+        spans.add(
+          TextSpan(
+            text: text.substring(start, match.start),
+            style: normalStyle,
+          ),
+        );
+      }
+
+      spans.add(TextSpan(text: match.group(0), style: highlightStyle));
+
+      start = match.end;
+    }
+
+    if (start < text.length) {
+      spans.add(TextSpan(text: text.substring(start), style: normalStyle));
+    }
+
+    return TextSpan(children: spans);
   }
 }
