@@ -14,7 +14,7 @@
     "close": "Fechar",
     "fullScreenEditor": "Editor de tela cheia",
     "noResults": "Nenhum parâmetro, valor ou condição corresponde aos critérios de pesquisa.",
-    "showChangesOnly": "Mostrar apenas as mudanças",
+    "showOnlyChanged": "Mostrar apenas os alterados",
     "noConfigsQuestion": "SEM CONFIGURAÇÕES?!",
     "possibleCauses": "Isso pode acontecer por alguns motivos:",
     "uninitializedTitle": "• A inicialização não foi feita.",

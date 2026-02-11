@@ -14,7 +14,7 @@
     "close": "Close",
     "fullScreenEditor": "Full screen editor",
     "noResults": "No parameters, values, or conditions matched your search criteria.",
-    "showChangesOnly": "Show changes only",
+    "showOnlyChanged": "Show only changed",
     "noConfigsQuestion": "NO CONFIGS!?",
     "possibleCauses": "This might be happening for a few reasons:",
     "uninitializedTitle": "• The initialization wasn't done.",

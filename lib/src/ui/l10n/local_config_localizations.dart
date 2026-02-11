@@ -191,11 +191,11 @@ abstract class LocalConfigLocalizations {
   /// **'No parameters, values, or conditions matched your search criteria.'**
   String get noResults;
 
-  /// No description provided for @showChangesOnly.
+  /// No description provided for @showOnlyChanged.
   ///
   /// In en, this message translates to:
-  /// **'Show changes only'**
-  String get showChangesOnly;
+  /// **'Show only changed'**
+  String get showOnlyChanged;
 
   /// No description provided for @noConfigsQuestion.
   ///

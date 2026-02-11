@@ -146,7 +146,7 @@ class _ConfigListPageState extends State<ConfigListPage> {
                   vertical: 0,
                 ),
                 title: Text(
-                  LocalConfigLocalizations.of(context)!.showChangesOnly,
+                  LocalConfigLocalizations.of(context)!.showOnlyChanged,
                 ),
                 value: showOnlyChanged,
                 onChanged: (value) {
