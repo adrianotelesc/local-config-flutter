@@ -1,5 +1,4 @@
 import 'package:local_config/src/common/extensions/map_extension.dart';
-import 'package:local_config/src/common/extensions/string_extension.dart';
 import 'package:local_config/src/common/utils/case_validators.dart';
 import 'package:local_config/src/core/model/key_namespace.dart';
 import 'package:local_config/src/core/storage/key_value_store.dart';

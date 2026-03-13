@@ -1,4 +1,3 @@
-import 'package:local_config/src/common/utils/case_validators.dart';
 import 'package:local_config/src/domain/entity/local_config_value.dart';
 import 'package:local_config/src/domain/manager/config_manager.dart';
 
