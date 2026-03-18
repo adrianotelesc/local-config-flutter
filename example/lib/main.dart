@@ -5,7 +5,7 @@ import 'package:local_config/local_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await LocalConfig.instance.initialize();
   await LocalConfig.instance.setDefaults({
     'social_login_enabled': false,
     'timeout_ms': 8000,
@@ -71,11 +71,11 @@ class _ConfigListViewState extends State<_ConfigListView> {
   @override
   void initState() {
     super.initState();
-    _configEntries = LocalConfig.instance.getAll().entries.toList();
+    _configEntries = LocalConfig.instance.all.entries.toList();
 
     _configUpdateSub = LocalConfig.instance.onConfigUpdated.listen((configs) {
       setState(
-        () => _configEntries = LocalConfig.instance.getAll().entries.toList(),
+        () => _configEntries = LocalConfig.instance.all.entries.toList(),
       );
     });
   }

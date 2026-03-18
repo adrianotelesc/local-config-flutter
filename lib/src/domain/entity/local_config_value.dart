@@ -18,16 +18,16 @@ class LocalConfigValue {
   bool get isOverridden =>
       overriddenValue != null && overriddenValue != defaultValue;
 
-  ConfigType get type => ConfigType.inferFromValue(defaultValue);
+  LocalConfigType get type => LocalConfigType.inferFromValue(defaultValue);
 
   String get raw => overriddenValue ?? defaultValue;
 
   Object get parsed {
     return switch (type) {
-      ConfigType.boolean => bool.parse(raw),
-      ConfigType.number => num.parse(raw),
-      ConfigType.string => raw,
-      ConfigType.json => jsonDecode(raw),
+      LocalConfigType.boolean => bool.parse(raw),
+      LocalConfigType.number => num.parse(raw),
+      LocalConfigType.string => raw,
+      LocalConfigType.json => jsonDecode(raw),
     };
   }
 
@@ -50,18 +50,19 @@ class LocalConfigValue {
       'ConfigValue(default: $defaultValue, overridden: $overriddenValue)';
 }
 
-enum ConfigType {
+enum LocalConfigType {
   boolean,
   number,
   string,
   json;
 
-  bool get isText => this == ConfigType.string || this == ConfigType.json;
+  bool get isText =>
+      this == LocalConfigType.string || this == LocalConfigType.json;
 
-  static ConfigType inferFromValue(String source) {
-    if (bool.tryParse(source) != null) return ConfigType.boolean;
-    if (num.tryParse(source) != null) return ConfigType.number;
-    if (tryJsonDecode(source) != null) return ConfigType.json;
-    return ConfigType.string;
+  static LocalConfigType inferFromValue(String source) {
+    if (bool.tryParse(source) != null) return LocalConfigType.boolean;
+    if (num.tryParse(source) != null) return LocalConfigType.number;
+    if (tryJsonDecode(source) != null) return LocalConfigType.json;
+    return LocalConfigType.string;
   }
 }

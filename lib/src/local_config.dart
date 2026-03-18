@@ -1,87 +1,82 @@
-import 'package:local_config/src/common/extensions/map_extension.dart';
 import 'package:local_config/src/common/utils/type_converters.dart';
-import 'package:local_config/src/domain/entity/local_config_settings.dart';
+import 'package:local_config/src/infrastructure/vo/local_config_settings.dart';
 import 'package:local_config/src/domain/entity/local_config_update.dart';
 import 'package:local_config/src/domain/entity/local_config_value.dart';
-import 'package:local_config/src/infra/di/internal_service_locator.dart';
-import 'package:local_config/src/infra/storage/key_namespace.dart';
-import 'package:local_config/src/infra/storage/namespaced_key_value_store.dart';
+import 'package:local_config/src/infrastructure/di/internal_service_locator.dart';
+import 'package:local_config/src/infrastructure/persistence/scoped_key_value_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:local_config/src/core/storage/key_value_store.dart';
-import 'package:local_config/src/data/data_source/default_key_value_data_source.dart';
-import 'package:local_config/src/data/data_source/key_value_data_source.dart';
-import 'package:local_config/src/domain/manager/config_manager.dart';
-import 'package:local_config/src/domain/manager/default_config_manager.dart';
-import 'package:local_config/src/data/repository/default_config_repository.dart';
-import 'package:local_config/src/domain/repository/config_repository.dart';
-import 'package:local_config/src/infra/storage/shared_preferences_key_value_store.dart';
+import 'package:local_config/src/core/persistence/key_value_storage.dart';
+import 'package:local_config/src/data/repository/local_config_repository_impl.dart';
+import 'package:local_config/src/domain/repository/local_config_repository.dart';
+import 'package:local_config/src/infrastructure/persistence/shared_preferences_key_value_storage.dart';
 
 final class LocalConfig {
-  static const _keyNamespace = 'local_config';
+  static const _keyNamespaceBase = 'local_config';
 
   static final instance = LocalConfig._();
 
-  LocalConfig._() {
+  LocalConfig._();
+
+  var _initialized = false;
+
+  Map<String, Object> get all {
+    return _repo.all.map((key, config) => MapEntry(key, config.parsed));
+  }
+
+  LocalConfigRepository get _repo {
+    ensureInitialized();
+    return serviceLocator.get<LocalConfigRepository>();
+  }
+
+  Stream<LocalConfigUpdate> get onConfigUpdated => _repo.onConfigUpdated;
+
+  Future<void> initialize({
+    final LocalConfigSettings configSettings = const LocalConfigSettings(),
+  }) async {
+    if (_initialized) {
+      throw StateError('LocalConfig already initialized');
+    }
+
     serviceLocator
-      ..registerFactory<KeyNamespace>(() => KeyNamespace(base: _keyNamespace))
-      ..registerFactory<KeyValueStore>(
-        () => NamespacedKeyValueStore(
-          keyNamespace: serviceLocator.get(),
-          innerStore: SharedPreferencesKeyValueStore(
-            sharedPreferences: SharedPreferencesAsync(),
+      ..registerFactory<KeyValueStorage>(
+        () => ScopedKeyValueStorage(
+          namespace: KeyNamespace(
+            base: _keyNamespaceBase,
+            segments: configSettings.keyNamespaceSegments,
           ),
+          delegate:
+              configSettings.keyValueStorage ??
+              SharedPreferencesKeyValueStorage(
+                sharedPreferences: SharedPreferencesAsync(),
+              ),
         ),
       )
-      ..registerFactory<KeyValueDataSource>(
-        () => DefaultKeyValueDataSource(store: serviceLocator.get()),
-      )
-      ..registerFactory<ConfigManager>(() => DefaultConfigManager())
-      ..registerLazySingleton<ConfigRepository>(
-        () => DefaultConfigRepository(
-          dataSource: serviceLocator.get(),
-          manager: serviceLocator.get(),
+      ..registerLazySingleton<LocalConfigRepository>(
+        () => LocalConfigRepositoryImpl(
+          storage: serviceLocator.get<KeyValueStorage>(),
         ),
       );
+
+    _initialized = true;
   }
 
-  void setConfigSettings(LocalConfigSettings settings) {
-    final keyStoreValue = settings.keyValueStore;
-    if (keyStoreValue != null) {
-      serviceLocator
-        ..unregister<KeyValueStore>()
-        ..registerFactory<KeyValueStore>(() => keyStoreValue);
-    }
-
-    final keySegments = settings.keySegments;
-    if (keySegments.isNotEmpty) {
-      serviceLocator
-        ..unregister<KeyNamespace>()
-        ..registerFactory<KeyNamespace>(
-          () => KeyNamespace(base: _keyNamespace, segments: keySegments),
-        );
+  void ensureInitialized() {
+    if (!_initialized) {
+      throw StateError('LocalConfig not initialized');
     }
   }
 
-  Future<void> setDefaults(Map<String, Object> defaults) async {
-    final repo = serviceLocator.get<ConfigRepository>();
-    await repo.populate(defaults.mapValues((Object value) => stringify(value)));
-  }
-
-  Stream<LocalConfigUpdate> get onConfigUpdated {
-    final repo = serviceLocator.get<ConfigRepository>();
-    return repo.onConfigUpdated;
-  }
-
-  Map<String, Object> getAll() {
-    final repo = serviceLocator.get<ConfigRepository>();
-    return repo.values.map((key, config) => MapEntry(key, config.parsed));
-  }
+  Future<void> setDefaults(Map<String, Object> defaults) => _repo.setDefaults(
+    defaults.map((key, value) => MapEntry(key, stringify(value))),
+  );
 
   bool? getBool(String key) {
     final value = getValue(key);
     if (value == null) return null;
     return tryParseBool(value.raw);
   }
+
+  LocalConfigValue? getValue(String key) => _repo.get(key);
 
   double? getDouble(String key) {
     final value = getValue(key);
@@ -101,13 +96,5 @@ final class LocalConfig {
     return value.raw;
   }
 
-  Future<void> clear() async {
-    final repo = serviceLocator.get<ConfigRepository>();
-    await repo.clear();
-  }
-
-  LocalConfigValue? getValue(String key) {
-    final repo = serviceLocator.get<ConfigRepository>();
-    return repo.get(key);
-  }
+  Future<void> clear() => _repo.clear();
 }

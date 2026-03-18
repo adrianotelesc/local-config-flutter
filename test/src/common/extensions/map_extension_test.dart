@@ -21,28 +21,6 @@ void main() {
       });
     });
 
-    // ——————————————————————————
-
-    group('whereKey', () {
-      test('filters by key only', () {
-        final map = {'apple': 1, 'banana': 2, 'avocado': 3};
-
-        final result = map.whereKey((k) => k.startsWith('a'));
-
-        expect(result, {'apple': 1, 'avocado': 3});
-      });
-
-      test('returns empty map when no key matches', () {
-        final map = {'a': 1};
-
-        final result = map.whereKey((k) => k == 'z');
-
-        expect(result, isEmpty);
-      });
-    });
-
-    // ——————————————————————————
-
     group('toRecordList', () {
       test('converts to list of records', () {
         final map = {'a': 1, 'b': 2};
@@ -60,8 +38,6 @@ void main() {
         expect(result, isEmpty);
       });
     });
-
-    // ——————————————————————————
 
     group('anyValue', () {
       test('returns true when any value matches', () {
@@ -84,46 +60,6 @@ void main() {
         final result = <String, int>{}.anyValue((v) => true);
 
         expect(result, isFalse);
-      });
-    });
-
-    // ——————————————————————————
-
-    group('mapValues', () {
-      test('maps values keeping keys', () {
-        final map = {'a': 1, 'b': 2};
-
-        final result = map.mapValues((v) => 'num:$v');
-
-        expect(result, {'a': 'num:1', 'b': 'num:2'});
-      });
-
-      test('supports type change', () {
-        final map = {'a': 1};
-
-        final result = map.mapValues((v) => v.toDouble());
-
-        expect(result['a'], 1.0);
-      });
-    });
-
-    // ——————————————————————————
-
-    group('mapKeys', () {
-      test('maps keys keeping values', () {
-        final map = {'a': 1, 'b': 2};
-
-        final result = map.mapKeys((k) => k.toUpperCase());
-
-        expect(result, {'A': 1, 'B': 2});
-      });
-
-      test('supports key type change', () {
-        final map = {'1': 'a', '2': 'b'};
-
-        final result = map.mapKeys(int.parse);
-
-        expect(result, {1: 'a', 2: 'b'});
       });
     });
   });
