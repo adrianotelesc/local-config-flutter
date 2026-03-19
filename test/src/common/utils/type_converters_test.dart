@@ -75,10 +75,10 @@ void main() {
     test('returns map for valid json object', () {
       const json = '{"a":1,"b":"x"}';
 
-      final result = tryJsonDecode(json) as Map<String, dynamic>?;
+      final result = tryJsonDecode(json) as Map<String, dynamic>;
 
-      expect(result?['a'], 1);
-      expect(result?['b'], 'x');
+      expect(result['a'], 1);
+      expect(result['b'], 'x');
     });
 
     test('returns null for invalid json', () {
@@ -97,12 +97,14 @@ void main() {
       expect(result, isNull);
     });
 
-    test('returns null when json is a list (not a map)', () {
+    test('returns list when json is a array', () {
       const json = '[1,2,3]';
 
-      final result = tryJsonDecode(json);
+      final result = tryJsonDecode(json) as List;
 
-      expect(result, isNull);
+      expect(result[0], 1);
+      expect(result[1], 2);
+      expect(result[2], 3);
     });
 
     test('returns null when json is a primitive', () {
