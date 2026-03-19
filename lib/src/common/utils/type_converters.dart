@@ -23,7 +23,7 @@ bool? tryParseBool(Object object) {
   return null;
 }
 
-Map<String, dynamic>? tryJsonDecode(String source) {
+Object? tryJsonDecode(String source) {
   try {
     return jsonDecode(source);
   } catch (_) {

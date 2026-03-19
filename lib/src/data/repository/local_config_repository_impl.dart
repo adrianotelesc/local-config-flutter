@@ -48,8 +48,9 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
           return MapEntry(
             key,
             LocalConfigValue(
+              type: LocalConfigType.infer(value),
               defaultValue: value,
-              overriddenValue: overrides[key],
+              overrideValue: overrides[key],
             ),
           );
         }),
@@ -59,7 +60,7 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
   @override
   Future<void> remove(String key) async {
     _all.update(key, (configValue) {
-      return configValue.copyWith(overriddenValue: null);
+      return configValue.setOverride(null);
     });
 
     await _storage.remove(key);
@@ -70,7 +71,7 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
   @override
   Future<void> clear() async {
     _all.updateAll((_, configValue) {
-      return configValue.copyWith(overriddenValue: null);
+      return configValue.setOverride(null);
     });
 
     await _storage.clear();
@@ -81,10 +82,10 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
   @override
   Future<void> set(String key, String value) async {
     final updated = _all.update(key, (configValue) {
-      return configValue.copyWith(overriddenValue: value);
+      return configValue.setOverride(value);
     });
 
-    if (updated.isOverridden) {
+    if (updated.hasOverride) {
       await _storage.setString(key, value);
     } else {
       await _storage.remove(key);

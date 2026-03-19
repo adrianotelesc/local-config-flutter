@@ -9,7 +9,7 @@ import 'package:local_config/src/domain/repository/local_config_repository.dart'
 import 'package:local_config/src/presentation/l10n/local_config_localizations.dart';
 import 'package:local_config/src/presentation/local_config_routes.dart';
 import 'package:local_config/src/presentation/local_config_theme.dart';
-import 'package:local_config/src/presentation/extension/config_display_extension.dart';
+import 'package:local_config/src/presentation/extensions/config_display_extension.dart';
 import 'package:local_config/src/presentation/widget/callout.dart';
 import 'package:local_config/src/domain/entity/local_config_value.dart';
 import 'package:local_config/src/presentation/widget/extended_list_tile.dart';
@@ -84,10 +84,10 @@ class _ConfigListPageState extends State<ConfigListPage> {
             .where((e) => e.isNotEmpty)
             .toList();
     final filtered = _configs.where((key, value) {
-      return (!showOnlyChanged || value.isOverridden) &&
+      return (!showOnlyChanged || value.hasOverride) &&
           (_terms.isEmpty ||
               _terms.every(
-                (q) => [key, value.raw].join().containsInsensitive(q),
+                (q) => [key, value.asString].join().containsInsensitive(q),
               ));
     });
     final items = filtered.toRecordList();
@@ -98,7 +98,7 @@ class _ConfigListPageState extends State<ConfigListPage> {
   }
 
   void _updateOverrides() {
-    final hasOverrides = _configs.anyValue((config) => config.isOverridden);
+    final hasOverrides = _configs.anyValue((config) => config.hasOverride);
     if (hasOverrides == _hasOverrides) return;
     setState(() => _hasOverrides = hasOverrides);
   }
@@ -379,10 +379,10 @@ class _List extends StatelessWidget {
                 separatorBuilder: (_, __) => const Divider(height: 1),
                 itemBuilder: (_, index) {
                   final (name, config) = items[index];
-                  final isOverridden = config.isOverridden;
+                  final isOverridden = config.hasOverride;
 
                   return ExtendedListTile(
-                    leading: Icon(config.type.icon),
+                    leading: Icon(config.type.displayIcon),
                     style:
                         isOverridden
                             ? warningExtendedListTileStyle(context) //

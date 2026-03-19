@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:local_config/src/core/di/service_locator.dart';
 import 'package:local_config/src/domain/repository/local_config_repository.dart';
-import 'package:local_config/src/presentation/extension/config_display_extension.dart';
+import 'package:local_config/src/presentation/extensions/config_display_extension.dart';
 import 'package:local_config/src/domain/entity/local_config_value.dart';
 import 'package:local_config/src/presentation/l10n/local_config_localizations.dart';
 import 'package:local_config/src/presentation/widget/root_aware_sliver_app_bar.dart';
@@ -32,7 +32,7 @@ class _ConfigEditPageState extends State<ConfigEditPage> {
     super.initState();
     _repo = context.read<ServiceLocator>().get<LocalConfigRepository>();
     configValue = _repo.all[widget.name]!;
-    _controller.text = configValue.raw.toString();
+    _controller.text = configValue.asString;
   }
 
   @override
@@ -160,7 +160,7 @@ class _Form extends StatelessWidget {
                       return DropdownMenuEntry(
                         value: value.getDisplayName(context),
                         label: value.getDisplayName(context),
-                        leadingIcon: Icon(value.icon),
+                        leadingIcon: Icon(value.displayIcon),
                       );
                     }).toList(),
                 validator:
@@ -187,7 +187,7 @@ class _Form extends StatelessWidget {
                     (value) => config.type.validator(context, value ?? ''),
                 textInputAction: TextInputAction.done,
                 suffixIcon:
-                    config.type.isText
+                    config.type.isTextBased
                         ? IconButton(
                           onPressed: () async {
                             final changedText = await Navigator.of(

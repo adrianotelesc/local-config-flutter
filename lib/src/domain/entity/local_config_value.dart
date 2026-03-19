@@ -1,53 +1,59 @@
-import 'dart:convert';
-
 import 'package:local_config/src/common/utils/type_converters.dart';
 
 class LocalConfigValue {
+  final LocalConfigType type;
+
   final String defaultValue;
 
-  final String? overriddenValue;
+  final String? overrideValue;
 
-  const LocalConfigValue({required this.defaultValue, this.overriddenValue});
+  LocalConfigValue({
+    required this.type,
+    required this.defaultValue,
+    this.overrideValue,
+  }) : assert(
+         type == LocalConfigType.infer(defaultValue),
+         'default value type must match the inferred type.',
+       ),
+       assert(
+         overrideValue == null || type == LocalConfigType.infer(overrideValue),
+         'override value type must match the inferred type.',
+       );
+
+  bool get isDefault => overrideValue == null || overrideValue == defaultValue;
+
+  bool get hasOverride =>
+      overrideValue != null && overrideValue != defaultValue;
+
+  String get asString => overrideValue ?? defaultValue;
+
+  bool? get asBool => tryParseBool(asString);
+
+  double? get asDouble => double.tryParse(asString);
+
+  int? get asInt => int.tryParse(asString);
+
+  Object? get asJson => tryJsonDecode(asString);
+
+  LocalConfigValue setOverride(String? value) => LocalConfigValue(
+    type: type,
+    defaultValue: defaultValue,
+    overrideValue: value,
+  );
 
   @override
-  int get hashCode => Object.hash(defaultValue, overriddenValue);
-
-  bool get isDefault =>
-      overriddenValue == null || overriddenValue == defaultValue;
-
-  bool get isOverridden =>
-      overriddenValue != null && overriddenValue != defaultValue;
-
-  LocalConfigType get type => LocalConfigType.inferFromValue(defaultValue);
-
-  String get raw => overriddenValue ?? defaultValue;
-
-  Object get parsed {
-    return switch (type) {
-      LocalConfigType.boolean => bool.parse(raw),
-      LocalConfigType.number => num.parse(raw),
-      LocalConfigType.string => raw,
-      LocalConfigType.json => jsonDecode(raw),
-    };
-  }
+  int get hashCode => Object.hash(defaultValue, overrideValue);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is LocalConfigValue &&
           defaultValue == other.defaultValue &&
-          overriddenValue == other.overriddenValue;
-
-  LocalConfigValue copyWith({String? overriddenValue}) {
-    return LocalConfigValue(
-      defaultValue: defaultValue,
-      overriddenValue: overriddenValue,
-    );
-  }
+          overrideValue == other.overrideValue;
 
   @override
   String toString() =>
-      'ConfigValue(default: $defaultValue, overridden: $overriddenValue)';
+      'ConfigValue(default: $defaultValue, override: $overrideValue)';
 }
 
 enum LocalConfigType {
@@ -56,11 +62,11 @@ enum LocalConfigType {
   string,
   json;
 
-  bool get isText =>
+  bool get isTextBased =>
       this == LocalConfigType.string || this == LocalConfigType.json;
 
-  static LocalConfigType inferFromValue(String source) {
-    if (bool.tryParse(source) != null) return LocalConfigType.boolean;
+  static LocalConfigType infer(String source) {
+    if (tryParseBool(source) != null) return LocalConfigType.boolean;
     if (num.tryParse(source) != null) return LocalConfigType.number;
     if (tryJsonDecode(source) != null) return LocalConfigType.json;
     return LocalConfigType.string;

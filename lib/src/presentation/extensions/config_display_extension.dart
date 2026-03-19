@@ -8,47 +8,39 @@ import 'package:local_config/src/presentation/widget/text_editor/controller/stri
 
 extension ConfigDisplayExtension on LocalConfigValue {
   String getDisplayText(BuildContext context) {
-    return type == LocalConfigType.string && raw.isEmpty
+    return type == LocalConfigType.string && asString.isEmpty
         ? LocalConfigLocalizations.of(context)!.emptyString
-        : raw.toString();
+        : asString;
   }
 }
 
 extension ConfigTypeExtension on LocalConfigType {
-  List<String> get presets {
-    return this == LocalConfigType.boolean ? ['false', 'true'] : [];
-  }
+  List<String> get presets =>
+      this == LocalConfigType.boolean ? ['false', 'true'] : [];
 
-  String getDisplayName(BuildContext context) {
-    return switch (this) {
-      LocalConfigType.boolean => LocalConfigLocalizations.of(context)!.boolean,
-      LocalConfigType.number => LocalConfigLocalizations.of(context)!.number,
-      LocalConfigType.string => 'String',
-      LocalConfigType.json => 'JSON',
-    };
-  }
+  String getDisplayName(BuildContext context) => switch (this) {
+    LocalConfigType.boolean => LocalConfigLocalizations.of(context)!.boolean,
+    LocalConfigType.number => LocalConfigLocalizations.of(context)!.number,
+    LocalConfigType.string => 'String',
+    LocalConfigType.json => 'JSON',
+  };
 
-  IconData get icon {
-    return switch (this) {
-      LocalConfigType.boolean => Icons.toggle_on,
-      LocalConfigType.number => Icons.onetwothree,
-      LocalConfigType.string => Icons.abc,
-      LocalConfigType.json => Icons.data_object,
-    };
-  }
+  IconData get displayIcon => switch (this) {
+    LocalConfigType.boolean => Icons.toggle_on,
+    LocalConfigType.number => Icons.onetwothree,
+    LocalConfigType.string => Icons.abc,
+    LocalConfigType.json => Icons.data_object,
+  };
 
-  String? validator(BuildContext context, String value) {
-    if (this == LocalConfigType.boolean && bool.tryParse(value) == null) {
-      return LocalConfigLocalizations.of(context)!.invalidBoolean;
-    }
-    if (this == LocalConfigType.number && num.tryParse(value) == null) {
-      return LocalConfigLocalizations.of(context)!.invalidNumber;
-    }
-    if (this == LocalConfigType.json && tryJsonDecode(value) == null) {
-      return LocalConfigLocalizations.of(context)!.invalidJson;
-    }
-    return null;
-  }
+  String? validator(BuildContext context, String value) => switch (this) {
+    LocalConfigType.boolean when tryParseBool(value) == null =>
+      LocalConfigLocalizations.of(context)!.invalidBoolean,
+    LocalConfigType.number when num.tryParse(value) == null =>
+      LocalConfigLocalizations.of(context)!.invalidNumber,
+    LocalConfigType.json when tryJsonDecode(value) == null =>
+      LocalConfigLocalizations.of(context)!.invalidJson,
+    _ => null,
+  };
 
   // TODO: Refactor this.
   TextEditorController get textEditorController {
@@ -59,7 +51,7 @@ extension ConfigTypeExtension on LocalConfigType {
   }
 
   TextSpan help(BuildContext context, {String name = 'name'}) {
-    final suffixes = switch (this) {
+    final getterNameSuffixes = switch (this) {
       LocalConfigType.boolean => ['Boolean'],
       LocalConfigType.number => ['Int', 'Double'],
       LocalConfigType.string || LocalConfigType.json => ['String'],
@@ -68,7 +60,7 @@ extension ConfigTypeExtension on LocalConfigType {
     return TextSpan(
       children: [
         TextSpan(text: LocalConfigLocalizations.of(context)!.help),
-        ...suffixes.map((suffix) {
+        ...getterNameSuffixes.map((suffix) {
           return TextSpan(
             children: [
               TextSpan(

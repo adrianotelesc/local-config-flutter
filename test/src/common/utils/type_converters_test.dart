@@ -75,9 +75,8 @@ void main() {
     test('returns map for valid json object', () {
       const json = '{"a":1,"b":"x"}';
 
-      final result = tryJsonDecode(json);
+      final result = tryJsonDecode(json) as Map<String, dynamic>?;
 
-      expect(result, isA<Map<String, dynamic>>());
       expect(result?['a'], 1);
       expect(result?['b'], 'x');
     });

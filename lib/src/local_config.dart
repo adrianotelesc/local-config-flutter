@@ -19,9 +19,8 @@ final class LocalConfig {
 
   var _initialized = false;
 
-  Map<String, Object> get all {
-    return _repo.all.map((key, config) => MapEntry(key, config.parsed));
-  }
+  Map<String, LocalConfigValue> get all =>
+      _repo.all.map((key, value) => MapEntry(key, value));
 
   LocalConfigRepository get _repo {
     ensureInitialized();
@@ -70,31 +69,15 @@ final class LocalConfig {
     defaults.map((key, value) => MapEntry(key, stringify(value))),
   );
 
-  bool? getBool(String key) {
-    final value = getValue(key);
-    if (value == null) return null;
-    return tryParseBool(value.raw);
-  }
+  bool? getBool(String key) => getValue(key)?.asBool;
 
   LocalConfigValue? getValue(String key) => _repo.get(key);
 
-  double? getDouble(String key) {
-    final value = getValue(key);
-    if (value == null) return null;
-    return double.tryParse(value.raw);
-  }
+  double? getDouble(String key) => getValue(key)?.asDouble;
 
-  int? getInt(String key) {
-    final value = getValue(key);
-    if (value == null) return null;
-    return int.tryParse(value.raw);
-  }
+  int? getInt(String key) => getValue(key)?.asInt;
 
-  String? getString(String key) {
-    final value = getValue(key);
-    if (value == null) return null;
-    return value.raw;
-  }
+  String? getString(String key) => getValue(key)?.asString;
 
   Future<void> clear() => _repo.clear();
 }
