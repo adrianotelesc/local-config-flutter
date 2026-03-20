@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:local_config/src/core/di/service_locator.dart';
-import 'package:local_config/src/infrastructure/di/internal_service_locator.dart';
 import 'package:local_config/src/presentation/l10n/generated/local_config_localizations.dart';
 import 'package:local_config/src/presentation/local_config_routes.dart';
 import 'package:local_config/src/presentation/page/config_edit_page.dart';
 import 'package:local_config/src/presentation/page/config_list_page.dart';
 import 'package:local_config/src/presentation/local_config_theme.dart';
-import 'package:provider/provider.dart';
 
 /// The entry point widget for Local Config UI.
 class LocalConfigEntrypoint extends StatelessWidget {
@@ -16,35 +13,31 @@ class LocalConfigEntrypoint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [Provider<ServiceLocator>.value(value: serviceLocator)],
-      child: Localizations(
-        locale: Localizations.maybeLocaleOf(context) ?? const Locale('en'),
-        delegates: const [
-          LocalConfigLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        child: Theme(
-          data: LocalConfigTheme.data,
-          child: Navigator(
-            initialRoute: LocalConfigRoutes.configList,
-            onGenerateRoute: (settings) {
-              return switch (settings.name) {
-                LocalConfigRoutes.configList => MaterialPageRoute(
-                  builder: (_) => const ConfigListPage(),
-                ),
-                LocalConfigRoutes.configEdit => MaterialPageRoute(
-                  fullscreenDialog: true,
-                  builder:
-                      (_) =>
-                          ConfigEditPage(name: settings.arguments.toString()),
-                ),
-                _ => null,
-              };
-            },
-          ),
+    return Localizations(
+      locale: Localizations.maybeLocaleOf(context) ?? const Locale('en'),
+      delegates: const [
+        LocalConfigLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      child: Theme(
+        data: LocalConfigTheme.data,
+        child: Navigator(
+          initialRoute: LocalConfigRoutes.configList,
+          onGenerateRoute: (settings) {
+            return switch (settings.name) {
+              LocalConfigRoutes.configList => MaterialPageRoute(
+                builder: (_) => const ConfigListPage(),
+              ),
+              LocalConfigRoutes.configEdit => MaterialPageRoute(
+                fullscreenDialog: true,
+                builder:
+                    (_) => ConfigEditPage(name: settings.arguments.toString()),
+              ),
+              _ => null,
+            };
+          },
         ),
       ),
     );

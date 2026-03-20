@@ -2,10 +2,9 @@ import 'package:local_config/src/common/utils/type_converters.dart';
 import 'package:local_config/src/infrastructure/vo/local_config_settings.dart';
 import 'package:local_config/src/domain/entity/local_config_update.dart';
 import 'package:local_config/src/domain/entity/local_config_value.dart';
-import 'package:local_config/src/infrastructure/di/internal_service_locator.dart';
 import 'package:local_config/src/infrastructure/persistence/scoped_key_value_storage.dart';
+import 'package:local_config/src/local_config_internal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:local_config/src/core/persistence/key_value_storage.dart';
 import 'package:local_config/src/data/repository/local_config_repository_impl.dart';
 import 'package:local_config/src/domain/repository/local_config_repository.dart';
 import 'package:local_config/src/infrastructure/persistence/shared_preferences_key_value_storage.dart';
@@ -27,7 +26,7 @@ final class LocalConfig {
 
   LocalConfigRepository get _repo {
     _ensureInitialized();
-    return serviceLocator.get<LocalConfigRepository>();
+    return configRepository;
   }
 
   Stream<LocalConfigUpdate> get onConfigUpdated => _repo.onConfigUpdated;
@@ -41,25 +40,19 @@ final class LocalConfig {
       throw StateError('LocalConfig already initialized');
     }
 
-    serviceLocator
-      ..registerFactory<KeyValueStorage>(
-        () => ScopedKeyValueStorage(
-          namespace: KeyNamespace(
-            base: _keyNamespaceBase,
-            segments: configSettings.keyNamespaceSegments,
-          ),
-          delegate:
-              configSettings.keyValueStorage ??
-              SharedPreferencesKeyValueStorage(
-                sharedPreferences: SharedPreferencesAsync(),
-              ),
+    configRepository = LocalConfigRepositoryImpl(
+      storage: ScopedKeyValueStorage(
+        namespace: KeyNamespace(
+          base: _keyNamespaceBase,
+          segments: configSettings.keyNamespaceSegments,
         ),
-      )
-      ..registerLazySingleton<LocalConfigRepository>(
-        () => LocalConfigRepositoryImpl(
-          storage: serviceLocator.get<KeyValueStorage>(),
-        ),
-      );
+        delegate:
+            configSettings.keyValueStorage ??
+            SharedPreferencesKeyValueStorage(
+              sharedPreferences: SharedPreferencesAsync(),
+            ),
+      ),
+    );
 
     _initialized = true;
   }

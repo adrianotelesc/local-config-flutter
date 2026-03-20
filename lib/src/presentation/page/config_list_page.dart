@@ -4,8 +4,8 @@ import 'package:boxy/slivers.dart';
 import 'package:flutter/material.dart';
 import 'package:local_config/src/common/extensions/map_extension.dart';
 import 'package:local_config/src/common/extensions/string_extension.dart';
-import 'package:local_config/src/core/di/service_locator.dart';
 import 'package:local_config/src/domain/repository/local_config_repository.dart';
+import 'package:local_config/src/local_config_internal.dart';
 import 'package:local_config/src/presentation/l10n/generated/local_config_localizations.dart';
 import 'package:local_config/src/presentation/local_config_routes.dart';
 import 'package:local_config/src/presentation/local_config_theme.dart';
@@ -15,7 +15,6 @@ import 'package:local_config/src/domain/entity/local_config_value.dart';
 import 'package:local_config/src/presentation/widget/extended_list_tile.dart';
 import 'package:local_config/src/presentation/widget/clearable_search_bar.dart';
 import 'package:local_config/src/presentation/widget/root_aware_sliver_app_bar.dart';
-import 'package:provider/provider.dart';
 
 class ConfigListPage extends StatefulWidget {
   const ConfigListPage({super.key});
@@ -52,7 +51,7 @@ class _ConfigListPageState extends State<ConfigListPage> {
   @override
   void initState() {
     super.initState();
-    _repo = context.read<ServiceLocator>().get<LocalConfigRepository>();
+    _repo = configRepository;
     _updateConfigs(_repo.all);
     _textController.addListener(_updateItems);
     _sub = _repo.onConfigUpdated.listen((update) => _updateConfigs(_repo.all));
