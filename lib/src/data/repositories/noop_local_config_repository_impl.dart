@@ -4,23 +4,23 @@ import 'package:local_config/src/domain/repositories/local_config_repository.dar
 
 class NoopLocalConfigRepositoryImpl implements LocalConfigRepository {
   @override
-  Map<String, LocalConfigValue> get all => throw UnimplementedError();
-
-  @override
-  Future<void> clear() async {}
-
-  @override
-  LocalConfigValue? get(String key) => null;
+  Map<String, LocalConfigValue> get configs => throw UnimplementedError();
 
   @override
   Stream<LocalConfigUpdate> get onConfigUpdated => Stream.empty();
 
   @override
-  Future<void> remove(String key) async {}
+  Future<void> setDefaults(Map<String, String> defaultParameters) async {}
+
+  @override
+  LocalConfigValue? get(String key) => null;
 
   @override
   Future<void> set(String key, String value) async {}
 
   @override
-  Future<void> setDefaults(Map<String, String> defaultParameters) async {}
+  Future<void> reset(String key) async {}
+
+  @override
+  Future<void> resetAll() async {}
 }

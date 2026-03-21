@@ -7,81 +7,48 @@ import 'package:local_config/src/domain/entities/local_config_value.dart';
 import 'package:local_config/src/domain/repositories/local_config_repository.dart';
 
 class LocalConfigRepositoryImpl implements LocalConfigRepository {
-  final Map<String, LocalConfigValue> _all = {};
-
-  final _controller = StreamController<LocalConfigUpdate>.broadcast();
-
-  final KeyValueStorage _storage;
-
   LocalConfigRepositoryImpl({required KeyValueStorage storage})
     : _storage = storage;
 
+  final KeyValueStorage _storage;
+
   @override
-  Map<String, LocalConfigValue> get all => _all;
+  Map<String, LocalConfigValue> get configs => _configs;
+  var _configs = <String, LocalConfigValue>{};
 
   @override
   Stream<LocalConfigUpdate> get onConfigUpdated => _controller.stream;
-
-  @override
-  LocalConfigValue? get(String key) => _all[key];
+  final _controller = StreamController<LocalConfigUpdate>.broadcast();
 
   @override
   Future<void> setDefaults(Map<String, String> defaults) async {
     final overrides = await _storage.all;
 
-    final retainedKeys =
-        defaults
-            .where((key, value) {
-              return overrides.containsKey(key) && overrides[key] != value;
-            })
-            .keys
-            .toSet();
+    final retainedOverrides = defaults.where((key, value) {
+      final overrideValue = overrides[key];
+      return overrideValue != null && overrideValue != value;
+    });
 
-    overrides.removeWhere((key, _) => !retainedKeys.contains(key));
+    await _storage.prune(retainedOverrides.keys.toSet());
 
-    await _storage.prune(retainedKeys);
-
-    _all
-      ..clear()
-      ..addAll(
-        defaults.map((key, value) {
-          return MapEntry(
-            key,
-            LocalConfigValue(
-              type: LocalConfigType.infer(value),
-              defaultValue: value,
-              overrideValue: overrides[key],
-            ),
-          );
-        }),
+    _configs = defaults.map((key, value) {
+      return MapEntry(
+        key,
+        LocalConfigValue(
+          type: LocalConfigType.infer(value),
+          defaultValue: value,
+          overrideValue: retainedOverrides[key],
+        ),
       );
+    });
   }
 
   @override
-  Future<void> remove(String key) async {
-    _all.update(key, (configValue) {
-      return configValue.setOverride(null);
-    });
-
-    await _storage.remove(key);
-
-    _controller.add(LocalConfigUpdate({key}));
-  }
-
-  @override
-  Future<void> clear() async {
-    _all.updateAll((_, configValue) {
-      return configValue.setOverride(null);
-    });
-
-    await _storage.clear();
-
-    _controller.add(LocalConfigUpdate({..._all.keys}));
-  }
+  LocalConfigValue? get(String key) => _configs[key];
 
   @override
   Future<void> set(String key, String value) async {
-    final updated = _all.update(key, (configValue) {
+    final updated = _configs.update(key, (configValue) {
       return configValue.setOverride(value);
     });
 
@@ -92,5 +59,27 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
     }
 
     _controller.add(LocalConfigUpdate({key}));
+  }
+
+  @override
+  Future<void> reset(String key) async {
+    _configs.update(key, (configValue) {
+      return configValue.setOverride(null);
+    });
+
+    await _storage.remove(key);
+
+    _controller.add(LocalConfigUpdate({key}));
+  }
+
+  @override
+  Future<void> resetAll() async {
+    _configs.updateAll((_, configValue) {
+      return configValue.setOverride(null);
+    });
+
+    await _storage.clear();
+
+    _controller.add(LocalConfigUpdate({..._configs.keys}));
   }
 }

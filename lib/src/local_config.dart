@@ -22,7 +22,7 @@ final class LocalConfig {
 
   /// Returns a Map of all Local Config parameters.
   Map<String, LocalConfigValue> get all =>
-      _repo.all.map((key, value) => MapEntry(key, value));
+      _repo.configs.map((key, value) => MapEntry(key, value));
 
   LocalConfigRepository get _repo {
     _ensureInitialized();
@@ -85,5 +85,5 @@ final class LocalConfig {
   String? getString(final String key) => getValue(key)?.asString;
 
   /// Resets all parameters to the default values.
-  Future<void> clear() => _repo.clear();
+  Future<void> resetAll() => _repo.resetAll();
 }

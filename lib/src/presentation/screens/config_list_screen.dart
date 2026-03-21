@@ -52,9 +52,11 @@ class _ConfigListScreenState extends State<ConfigListScreen> {
   void initState() {
     super.initState();
     _repo = configRepository;
-    _updateConfigs(_repo.all);
+    _updateConfigs(_repo.configs);
     _textController.addListener(_updateItems);
-    _sub = _repo.onConfigUpdated.listen((update) => _updateConfigs(_repo.all));
+    _sub = _repo.onConfigUpdated.listen(
+      (update) => _updateConfigs(_repo.configs),
+    );
     _scrollController.addListener(_updateBackToTop);
   }
 
@@ -196,7 +198,7 @@ class _AppBar extends StatelessWidget {
                     ),
                     text: LocalConfigLocalizations.of(context)!.changesApplied,
                     trailing: TextButton(
-                      onPressed: repo.clear,
+                      onPressed: repo.resetAll,
                       style: warningButtonStyle(context),
                       child: Text(
                         LocalConfigLocalizations.of(context)!.revertAll,
@@ -449,7 +451,7 @@ class _List extends StatelessWidget {
                               text:
                                   LocalConfigLocalizations.of(context)!.changed,
                               trailing: TextButton(
-                                onPressed: () => repo.remove(name),
+                                onPressed: () => repo.reset(name),
                                 style: warningButtonStyle(context),
                                 child: Text(
                                   LocalConfigLocalizations.of(context)!.revert,

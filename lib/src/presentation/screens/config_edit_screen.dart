@@ -30,7 +30,7 @@ class _ConfigEditScreenState extends State<ConfigEditScreen> {
   void initState() {
     super.initState();
     _repo = configRepository;
-    configValue = _repo.all[widget.name]!;
+    configValue = _repo.configs[widget.name]!;
     _controller.text = configValue.asString;
   }
 
