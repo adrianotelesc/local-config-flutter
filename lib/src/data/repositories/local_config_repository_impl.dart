@@ -24,9 +24,9 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
   Future<void> setDefaults(Map<String, String> defaults) async {
     final overrides = await _storage.all;
 
-    final retainedOverrides = defaults.where((key, value) {
-      final overrideValue = overrides[key];
-      return overrideValue != null && overrideValue != value;
+    final retainedOverrides = overrides.where((key, value) {
+      final defaultValue = defaults[key];
+      return defaultValue != null && defaultValue != value;
     });
 
     await _storage.prune(retainedOverrides.keys.toSet());
