@@ -7,6 +7,7 @@ import 'package:local_config/src/presentation/l10n/generated/local_config_locali
 import 'package:local_config/src/presentation/local_config_routes.dart';
 import 'package:local_config/src/presentation/local_config_theme.dart';
 import 'package:local_config/src/presentation/notifiers/config_listing_notifier.dart';
+import 'package:local_config/src/presentation/widgets/back_to_top_fab.dart';
 import 'package:local_config/src/presentation/widgets/callout.dart';
 import 'package:local_config/src/presentation/widgets/clearable_search_bar.dart';
 import 'package:local_config/src/presentation/widgets/extended_list_tile.dart';
@@ -20,13 +21,9 @@ class ConfigListingScreen extends StatefulWidget {
 }
 
 class _ConfigListingScreenState extends State<ConfigListingScreen> {
-  static const _backToTopScrollOffsetThreshould = 600.0;
-
   final _textController = TextEditingController();
 
   final _scrollController = ScrollController();
-
-  var _showBackToTop = false;
 
   final _configNotifier = ConfigListingNotifier(configRepo: configRepository);
 
@@ -34,18 +31,6 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
   void initState() {
     super.initState();
     _textController.addListener(_query);
-    _scrollController.addListener(_updateBackToTop);
-  }
-
-  void _updateBackToTop() {
-    final shouldShowBackToTop =
-        _scrollController.offset > _backToTopScrollOffsetThreshould;
-
-    if (shouldShowBackToTop && !_showBackToTop) {
-      setState(() => _showBackToTop = true);
-    } else if (!shouldShowBackToTop && _showBackToTop) {
-      setState(() => _showBackToTop = false);
-    }
   }
 
   void _query() {
@@ -55,7 +40,6 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
   @override
   void dispose() {
     _textController.removeListener(_query);
-    _scrollController.removeListener(_updateBackToTop);
     super.dispose();
   }
 
@@ -65,20 +49,9 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
       listenable: _configNotifier,
       builder: (context, child) {
         return Scaffold(
-          floatingActionButton: AnimatedSlide(
-            offset: _showBackToTop ? Offset.zero : Offset(0, 5),
-            duration: Durations.long1,
-            child: FloatingActionButton.small(
-              onPressed: () {
-                _scrollController.animateTo(
-                  0,
-                  duration: Durations.medium1,
-                  curve: Curves.easeInOut,
-                );
-              },
-              child: const Icon(Icons.keyboard_arrow_up),
-            ),
-          ),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: BackToTopFab(controller: _scrollController),
           body: CustomScrollView(
             controller: _scrollController,
             slivers: [
