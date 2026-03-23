@@ -45,14 +45,13 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: _configNotifier,
-      builder: (context, child) {
-        return Scaffold(
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: BackToTopFab(controller: _scrollController),
-          body: CustomScrollView(
+    return Scaffold(
+      floatingActionButton: BackToTopFab(controller: _scrollController),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: ListenableBuilder(
+        listenable: _configNotifier,
+        builder: (context, child) {
+          return CustomScrollView(
             controller: _scrollController,
             slivers: [
               _AppBar(
@@ -88,9 +87,9 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
                 ),
               ],
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
