@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:local_config/src/common/extensions/string_extension.dart';
@@ -18,8 +19,10 @@ class ConfigListingNotifier extends ChangeNotifier {
 
   final LocalConfigRepository _configRepo;
 
+  StreamSubscription? _configUpdateSub;
+
   var _configs = <String, LocalConfigValue>{};
-  Map<String, LocalConfigValue> get configs => _configs;
+  Map<String, LocalConfigValue> get configs => UnmodifiableMapView(_configs);
 
   var _items = <MapEntry<String, LocalConfigValue>>[];
   List<MapEntry<String, LocalConfigValue>> get items => _items;
@@ -27,19 +30,16 @@ class ConfigListingNotifier extends ChangeNotifier {
   var _showOnlyOverrides = false;
   bool get showOnlyOverrides => _showOnlyOverrides;
   set showOnlyOverrides(bool value) {
-    if (value != _showOnlyOverrides) {
-      _showOnlyOverrides = value;
-      _applyFilters();
-      notifyListeners();
-    }
+    if (value == _showOnlyOverrides) return;
+    _showOnlyOverrides = value;
+    _applyFilters();
+    notifyListeners();
   }
 
   bool get hasOverrides => _configs.values.any((v) => v.hasOverride);
 
   var _terms = <String>{};
-  Set<String> get terms => _terms;
-
-  StreamSubscription? _configUpdateSub;
+  Set<String> get terms => UnmodifiableSetView(_terms);
 
   @override
   void dispose() {
@@ -49,7 +49,7 @@ class ConfigListingNotifier extends ChangeNotifier {
   }
 
   void query(String query) {
-    _terms = query.split(RegExp(r'\s+')).toSet();
+    _terms = query.split(RegExp(r'\W+')).toSet();
     _applyFilters(query: query);
     notifyListeners();
   }
@@ -76,11 +76,7 @@ class ConfigListingNotifier extends ChangeNotifier {
         return "${entry.key} ${entry.value}".containsInsensitive(term);
       });
 
-  void reset(String key) {
-    _configRepo.reset(key);
-  }
+  Future<void> reset(String key) => _configRepo.reset(key);
 
-  void resetAll() {
-    _configRepo.resetAll();
-  }
+  Future<void> resetAll() => _configRepo.resetAll();
 }

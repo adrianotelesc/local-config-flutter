@@ -22,8 +22,6 @@ class ConfigListingScreen extends StatefulWidget {
 class _ConfigListingScreenState extends State<ConfigListingScreen> {
   static const _backToTopScrollOffsetThreshould = 600.0;
 
-  final _focusNode = FocusNode();
-
   final _textController = TextEditingController();
 
   final _scrollController = ScrollController();
@@ -92,7 +90,7 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
                 const _PendingStatusNotice()
               else ...[
                 SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
-                _SearchBar(controller: _textController, focusNode: _focusNode),
+                _SearchBar(controller: _textController),
                 SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
                 SliverToBoxAdapter(
                   child: SwitchListTile(
@@ -285,10 +283,9 @@ class _PendingStatusNotice extends StatelessWidget {
 }
 
 class _SearchBar extends StatelessWidget {
-  final FocusNode focusNode;
   final TextEditingController controller;
 
-  const _SearchBar({required this.controller, required this.focusNode});
+  const _SearchBar({required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -297,7 +294,6 @@ class _SearchBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: ClearableSearchBar(
           controller: controller,
-          focusNode: focusNode,
           hintText: LocalConfigLocalizations.of(context)!.search,
         ),
       ),
