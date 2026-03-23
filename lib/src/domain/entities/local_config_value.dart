@@ -64,6 +64,9 @@ class LocalConfigValue {
 
   @override
   int get hashCode => Object.hash(type, defaultValue, overrideValue);
+
+  @override
+  String toString() => asString;
 }
 
 enum LocalConfigType {

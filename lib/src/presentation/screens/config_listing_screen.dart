@@ -1,29 +1,25 @@
-import 'dart:async';
-
 import 'package:boxy/slivers.dart';
 import 'package:flutter/material.dart';
-import 'package:local_config/src/common/extensions/map_extension.dart';
-import 'package:local_config/src/common/extensions/string_extension.dart';
 import 'package:local_config/src/domain/entities/local_config_value.dart';
-import 'package:local_config/src/domain/repositories/local_config_repository.dart';
 import 'package:local_config/src/local_config_internals.dart';
 import 'package:local_config/src/presentation/extensions/config_display_extension.dart';
 import 'package:local_config/src/presentation/l10n/generated/local_config_localizations.dart';
 import 'package:local_config/src/presentation/local_config_routes.dart';
 import 'package:local_config/src/presentation/local_config_theme.dart';
+import 'package:local_config/src/presentation/notifiers/config_listing_notifier.dart';
 import 'package:local_config/src/presentation/widgets/callout.dart';
 import 'package:local_config/src/presentation/widgets/clearable_search_bar.dart';
 import 'package:local_config/src/presentation/widgets/extended_list_tile.dart';
 import 'package:local_config/src/presentation/widgets/root_aware_sliver_app_bar.dart';
 
-class ConfigListScreen extends StatefulWidget {
-  const ConfigListScreen({super.key});
+class ConfigListingScreen extends StatefulWidget {
+  const ConfigListingScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() => _ConfigListScreenState();
+  State<StatefulWidget> createState() => _ConfigListingScreenState();
 }
 
-class _ConfigListScreenState extends State<ConfigListScreen> {
+class _ConfigListingScreenState extends State<ConfigListingScreen> {
   static const _backToTopScrollOffsetThreshould = 600.0;
 
   final _focusNode = FocusNode();
@@ -32,30 +28,14 @@ class _ConfigListScreenState extends State<ConfigListScreen> {
 
   final _scrollController = ScrollController();
 
-  final LocalConfigRepository _configRepo = configRepository;
-
-  StreamSubscription? _configUpdatedSub;
-
-  var showOnlyChanged = false;
-
-  var _configs = <String, LocalConfigValue>{};
-
-  var _items = <MapEntry<String, LocalConfigValue>>[];
-
-  var _hasOverrides = false;
-
   var _showBackToTop = false;
 
-  var _terms = <String>[];
+  final _configNotifier = ConfigListingNotifier(configRepo: configRepository);
 
   @override
   void initState() {
     super.initState();
-    _updateConfigs(_configRepo.configs);
-    _textController.addListener(_updateItems);
-    _configUpdatedSub = _configRepo.onConfigUpdated.listen(
-      (update) => _updateConfigs(_configRepo.configs),
-    );
+    _textController.addListener(_query);
     _scrollController.addListener(_updateBackToTop);
   }
 
@@ -70,108 +50,88 @@ class _ConfigListScreenState extends State<ConfigListScreen> {
     }
   }
 
-  void _updateConfigs(Map<String, LocalConfigValue> configs) {
-    _configs = configs;
-    _updateItems();
-    _updateOverrides();
-  }
-
-  void _updateItems() {
-    _terms =
-        _textController.text
-            .split(RegExp(r'\s+'))
-            .map((e) => e.trim())
-            .where((e) => e.isNotEmpty)
-            .toList();
-    final filtered = _configs.where((key, value) {
-      return (!showOnlyChanged || value.hasOverride) &&
-          (_terms.isEmpty ||
-              _terms.every(
-                (q) => [key, value.asString].join().containsInsensitive(q),
-              ));
-    });
-    final items = filtered.entries.toList();
-    setState(() {
-      _terms = _terms;
-      _items = items;
-    });
-  }
-
-  void _updateOverrides() {
-    final hasOverrides = _configs.values.any((value) => value.hasOverride);
-    if (hasOverrides == _hasOverrides) return;
-    setState(() => _hasOverrides = hasOverrides);
+  void _query() {
+    _configNotifier.query(_textController.text);
   }
 
   @override
   void dispose() {
-    _configUpdatedSub?.cancel();
-    _configUpdatedSub = null;
-    _textController.removeListener(_updateItems);
+    _textController.removeListener(_query);
     _scrollController.removeListener(_updateBackToTop);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: AnimatedSlide(
-        offset: _showBackToTop ? Offset.zero : Offset(0, 5),
-        duration: Durations.long1,
-        child: FloatingActionButton.small(
-          onPressed: () {
-            _scrollController.animateTo(
-              0,
-              duration: Durations.medium1,
-              curve: Curves.easeInOut,
-            );
-          },
-          child: const Icon(Icons.keyboard_arrow_up),
-        ),
-      ),
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          _AppBar(hasOverrides: _hasOverrides, repo: _configRepo),
-          if (_configs.isEmpty)
-            const _PendingStatusNotice()
-          else ...[
-            SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
-            _SearchBar(controller: _textController, focusNode: _focusNode),
-            SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
-            SliverToBoxAdapter(
-              child: SwitchListTile(
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 0,
-                ),
-                title: Text(
-                  LocalConfigLocalizations.of(context)!.showOnlyChanged,
-                ),
-                value: showOnlyChanged,
-                onChanged: (value) {
-                  setState(() {
-                    showOnlyChanged = value;
-                  });
-
-                  _updateItems();
-                },
-              ),
+    return ListenableBuilder(
+      listenable: _configNotifier,
+      builder: (context, child) {
+        return Scaffold(
+          floatingActionButton: AnimatedSlide(
+            offset: _showBackToTop ? Offset.zero : Offset(0, 5),
+            duration: Durations.long1,
+            child: FloatingActionButton.small(
+              onPressed: () {
+                _scrollController.animateTo(
+                  0,
+                  duration: Durations.medium1,
+                  curve: Curves.easeInOut,
+                );
+              },
+              child: const Icon(Icons.keyboard_arrow_up),
             ),
-            SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
-            _List(items: _items, repo: _configRepo, terms: _terms),
-          ],
-        ],
-      ),
+          ),
+          body: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              _AppBar(
+                hasOverrides: _configNotifier.hasOverrides,
+                onResetAllTap: _configNotifier.resetAll,
+              ),
+              if (_configNotifier.configs.isEmpty)
+                const _PendingStatusNotice()
+              else ...[
+                SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
+                _SearchBar(controller: _textController, focusNode: _focusNode),
+                SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
+                SliverToBoxAdapter(
+                  child: SwitchListTile(
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 0,
+                    ),
+                    title: Text(
+                      LocalConfigLocalizations.of(context)!.showOnlyChanged,
+                    ),
+                    value: _configNotifier.showOnlyOverrides,
+                    onChanged: (value) {
+                      _configNotifier.showOnlyOverrides = value;
+                    },
+                  ),
+                ),
+                SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
+                _List(
+                  items: _configNotifier.items,
+                  terms: _configNotifier.terms,
+                  onResetTap: _configNotifier.reset,
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
 }
 
 class _AppBar extends StatelessWidget {
   final bool hasOverrides;
-  final LocalConfigRepository repo;
+  final Function()? onResetAllTap;
 
-  const _AppBar({required this.hasOverrides, required this.repo});
+  const _AppBar({
+    required this.hasOverrides,
+    this.onResetAllTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +157,7 @@ class _AppBar extends StatelessWidget {
                     ),
                     text: LocalConfigLocalizations.of(context)!.changesApplied,
                     trailing: TextButton(
-                      onPressed: repo.resetAll,
+                      onPressed: onResetAllTap,
                       style: warningButtonStyle(context),
                       child: Text(
                         LocalConfigLocalizations.of(context)!.revertAll,
@@ -346,11 +306,15 @@ class _SearchBar extends StatelessWidget {
 }
 
 class _List extends StatelessWidget {
-  final List<String> terms;
+  final Set<String> terms;
   final List<MapEntry<String, LocalConfigValue>> items;
-  final LocalConfigRepository repo;
+  final Function(String)? onResetTap;
 
-  const _List({required this.items, required this.repo, this.terms = const []});
+  const _List({
+    required this.items,
+    this.terms = const {},
+    this.onResetTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -445,7 +409,7 @@ class _List extends StatelessWidget {
                               text:
                                   LocalConfigLocalizations.of(context)!.changed,
                               trailing: TextButton(
-                                onPressed: () => repo.reset(name),
+                                onPressed: () => onResetTap?.call(name),
                                 style: warningButtonStyle(context),
                                 child: Text(
                                   LocalConfigLocalizations.of(context)!.revert,
@@ -474,7 +438,7 @@ class _List extends StatelessWidget {
 
   TextSpan highlightTerms({
     required String text,
-    required List<String> terms,
+    required Set<String> terms,
     TextStyle? normalStyle,
     TextStyle? highlightStyle,
   }) {
