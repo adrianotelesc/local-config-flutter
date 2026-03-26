@@ -6,7 +6,7 @@ import 'package:local_config/src/presentation/extensions/config_display_extensio
 import 'package:local_config/src/presentation/l10n/generated/local_config_localizations.dart';
 import 'package:local_config/src/presentation/local_config_routes.dart';
 import 'package:local_config/src/presentation/local_config_theme.dart';
-import 'package:local_config/src/presentation/notifiers/config_listing_notifier.dart';
+import 'package:local_config/src/presentation/notifiers/config_notifier.dart';
 import 'package:local_config/src/presentation/widgets/back_to_top_fab.dart';
 import 'package:local_config/src/presentation/widgets/callout.dart';
 import 'package:local_config/src/presentation/widgets/clearable_search_bar.dart';
@@ -25,7 +25,7 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
 
   final _scrollController = ScrollController();
 
-  final _configNotifier = ConfigListingNotifier(configRepo: configRepository);
+  final _configNotifier = ConfigNotifier(configRepo: configRepository);
 
   @override
   void initState() {

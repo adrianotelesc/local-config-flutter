@@ -6,8 +6,8 @@ import 'package:local_config/src/common/extensions/string_extension.dart';
 import 'package:local_config/src/domain/entities/local_config_value.dart';
 import 'package:local_config/src/domain/repositories/local_config_repository.dart';
 
-class ConfigListingNotifier extends ChangeNotifier {
-  ConfigListingNotifier({
+class ConfigNotifier extends ChangeNotifier {
+  ConfigNotifier({
     required LocalConfigRepository configRepo,
   }) : _configRepo = configRepo {
     refresh();

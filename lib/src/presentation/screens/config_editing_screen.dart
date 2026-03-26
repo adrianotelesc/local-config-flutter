@@ -4,7 +4,7 @@ import 'package:local_config/src/local_config_internals.dart';
 import 'package:local_config/src/presentation/extensions/config_display_extension.dart';
 import 'package:local_config/src/presentation/l10n/generated/local_config_localizations.dart';
 import 'package:local_config/src/presentation/local_config_theme.dart';
-import 'package:local_config/src/presentation/notifiers/config_listing_notifier.dart';
+import 'package:local_config/src/presentation/notifiers/config_notifier.dart';
 import 'package:local_config/src/presentation/widgets/input_form_field.dart';
 import 'package:local_config/src/presentation/widgets/root_aware_sliver_app_bar.dart';
 import 'package:local_config/src/presentation/widgets/text_editor/text_editor.dart';
@@ -23,7 +23,7 @@ class _ConfigEditingScreenState extends State<ConfigEditingScreen> {
 
   final _textController = TextEditingController();
 
-  final _configNotifier = ConfigListingNotifier(configRepo: configRepository);
+  final _configNotifier = ConfigNotifier(configRepo: configRepository);
 
   late LocalConfigValue _configValue;
 
