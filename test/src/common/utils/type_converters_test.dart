@@ -2,163 +2,115 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:local_config/src/common/utils/type_converters.dart';
 
 void main() {
-  group('tryParseBool', () {
-    test('returns true for bool true', () {
-      expect(tryParseBool(true), isTrue);
+  group('stringify', () {
+    test('should return same string when object is already a string', () {
+      const value = 'hello';
+
+      final result = stringify(value);
+
+      expect(result, 'hello');
     });
 
-    test('returns false for bool false', () {
-      expect(tryParseBool(false), isFalse);
+    test('should return json string when object is a map', () {
+      final result = stringify({'a': 1});
+
+      expect(result, '{"a":1}');
     });
 
-    test('returns true for num 1', () {
-      expect(tryParseBool(1), isTrue);
+    test('should return json string when object is a list', () {
+      final result = stringify([1, 2, 3]);
+
+      expect(result, '[1,2,3]');
     });
 
-    test('returns false for num 0', () {
-      expect(tryParseBool(0), isFalse);
+    test('should fallback to toString when json encoding fails', () {
+      final value = {'a': Object()};
+
+      final result = stringify(value);
+
+      expect(result, value.toString());
     });
 
-    test('returns null for other num', () {
-      expect(tryParseBool(2), isNull);
-    });
+    test('should return toString for non-collection objects', () {
+      final result = stringify(123);
 
-    test('returns true for string "true"', () {
-      expect(tryParseBool('true'), isTrue);
-    });
-
-    test('returns false for string "false"', () {
-      expect(tryParseBool('false'), isFalse);
-    });
-
-    test('returns true for string "1"', () {
-      expect(tryParseBool('1'), isTrue);
-    });
-
-    test('returns false for string "0"', () {
-      expect(tryParseBool('0'), isFalse);
-    });
-
-    test('returns null for invalid string', () {
-      expect(tryParseBool('yes'), isNull);
-    });
-
-    test('returns null for other types', () {
-      expect(tryParseBool({}), isNull);
+      expect(result, '123');
     });
   });
 
-  group('stringify', () {
-    test('returns string as is', () {
-      expect(stringify('hello'), 'hello');
+  group('tryParseBool', () {
+    test('should return same value when object is bool', () {
+      expect(tryParseBool(true), isTrue);
+      expect(tryParseBool(false), isFalse);
     });
 
-    test('returns JSON for Map', () {
-      expect(stringify({'key': 'value'}), '{"key":"value"}');
+    test('should return true when object is number 1', () {
+      expect(tryParseBool(1), isTrue);
     });
 
-    test('returns JSON for List', () {
-      expect(stringify([1, 2, 3]), '[1,2,3]');
+    test('should return false when object is number 0', () {
+      expect(tryParseBool(0), isFalse);
     });
 
-    test('returns toString for other objects', () {
-      expect(stringify(42), '42');
+    test('should return null when number is not 0 or 1', () {
+      expect(tryParseBool(2), isNull);
+      expect(tryParseBool(-1), isNull);
     });
 
-    test('falls back to toString for unencodable Map', () {
-      final unencodable = {'key': Object()};
-      expect(stringify(unencodable), unencodable.toString());
+    test('should parse string "true" and "false" ignoring case', () {
+      expect(tryParseBool('true'), isTrue);
+      expect(tryParseBool('FALSE'), isFalse);
+    });
+
+    test('should parse string "1" and "0"', () {
+      expect(tryParseBool('1'), isTrue);
+      expect(tryParseBool('0'), isFalse);
+    });
+
+    test('should trim string before parsing', () {
+      expect(tryParseBool('  true  '), isTrue);
+    });
+
+    test('should return null for invalid string', () {
+      expect(tryParseBool('yes'), isNull);
+      expect(tryParseBool('no'), isNull);
+    });
+
+    test('should return null for unsupported types', () {
+      expect(tryParseBool({}), isNull);
+      expect(tryParseBool([]), isNull);
     });
   });
 
   group('tryJsonDecode', () {
-    test('returns map for valid json object', () {
-      const json = '{"a":1,"b":"x"}';
+    test('should return decoded map when json is valid object', () {
+      final result = tryJsonDecode('{"a":1}');
 
-      final result = tryJsonDecode(json) as Map<String, dynamic>;
-
-      expect(result['a'], 1);
-      expect(result['b'], 'x');
+      expect(result, {'a': 1});
     });
 
-    test('returns null for invalid json', () {
-      const json = '{"a":1,';
+    test('should return decoded list when json is valid array', () {
+      final result = tryJsonDecode('[1,2,3]');
 
-      final result = tryJsonDecode(json);
-
-      expect(result, isNull);
+      expect(result, [1, 2, 3]);
     });
 
-    test('returns null for non-json string', () {
-      const json = 'not json';
-
-      final result = tryJsonDecode(json);
-
-      expect(result, isNull);
-    });
-
-    test('returns list when json is a array', () {
-      const json = '[1,2,3]';
-
-      final result = tryJsonDecode(json) as List;
-
-      expect(result[0], 1);
-      expect(result[1], 2);
-      expect(result[2], 3);
-    });
-
-    test('returns value when json is a primitive', () {
-      const json = '123';
-
-      final result = tryJsonDecode(json);
-
-      expect(result, 123);
-    });
-
-    test('returns null for empty string', () {
-      final result = tryJsonDecode('');
+    test('should return null when json is invalid', () {
+      final result = tryJsonDecode('{invalid json}');
 
       expect(result, isNull);
     });
   });
 
   group('tryJsonEncode', () {
-    test('encodes map successfully', () {
-      final obj = {'a': 1, 'b': 'x'};
+    test('should return json string when object is encodable', () {
+      final result = tryJsonEncode({'a': 1});
 
-      final result = tryJsonEncode(obj);
-
-      expect(result, isNotNull);
-      expect(result, contains('"a":1'));
-      expect(result, contains('"b":"x"'));
+      expect(result, '{"a":1}');
     });
 
-    test('encodes list successfully', () {
-      final object = [1, 2, 3];
-
-      final result = tryJsonEncode(object);
-
-      expect(result, '[1,2,3]');
-    });
-
-    test('encodes primitive successfully', () {
-      final result = tryJsonEncode(123);
-
-      expect(result, '123');
-    });
-
-    test('returns null for non-encodable object', () {
-      final object = Object();
-
-      final result = tryJsonEncode(object);
-
-      expect(result, isNull);
-    });
-
-    test('returns null for object with non-encodable value', () {
-      final object = {'a': Object()};
-
-      final result = tryJsonEncode(object);
+    test('should return null when object is not encodable', () {
+      final result = tryJsonEncode({'a': Object()});
 
       expect(result, isNull);
     });

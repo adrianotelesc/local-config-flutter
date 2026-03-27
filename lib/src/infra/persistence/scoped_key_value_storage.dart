@@ -1,4 +1,4 @@
-import 'package:local_config/src/common/utils/case_validators.dart';
+import 'package:local_config/src/common/utils/key_validators.dart';
 import 'package:local_config/src/core/persistence/key_value_storage.dart';
 import 'package:local_config/src/infra/models/key_namespace.dart';
 
@@ -29,11 +29,11 @@ class ScopedKeyValueStorage implements KeyValueStorage {
 
   @override
   Future<void> setString(String key, String value) {
-    if (!isSnakeCase(key)) {
+    if (!isValidStorageKey(key)) {
       throw ArgumentError.value(
         key,
         'key',
-        'because of namespace requirements, key must be snake_case',
+        'because of namespace requirements, key must contains only [a-z0-9_]',
       );
     }
 
