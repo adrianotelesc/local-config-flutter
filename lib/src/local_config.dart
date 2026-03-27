@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:local_config/src/common/utils/type_converters.dart';
 import 'package:local_config/src/data/repositories/local_config_repository_impl.dart';
+import 'package:local_config/src/data/repositories/noop_local_config_repository_impl.dart';
 import 'package:local_config/src/domain/entities/local_config_update.dart';
 import 'package:local_config/src/domain/entities/local_config_value.dart';
-import 'package:local_config/src/domain/repositories/local_config_repository.dart';
 import 'package:local_config/src/infra/models/key_namespace.dart';
 import 'package:local_config/src/infra/models/local_config_settings.dart';
 import 'package:local_config/src/infra/persistence/scoped_key_value_storage.dart';
@@ -22,20 +23,16 @@ final class LocalConfig {
 
   /// Returns a Map of all Local Config parameters.
   Map<String, LocalConfigValue> get all =>
-      _repo.configs.map((key, value) => MapEntry(key, value));
+      configRepo.configs.map((key, value) => MapEntry(key, value));
 
-  LocalConfigRepository get _repo {
-    return configRepository;
-  }
-
-  Stream<LocalConfigUpdate> get onConfigUpdated => _repo.onConfigUpdated;
+  Stream<LocalConfigUpdate> get onConfigUpdated => configRepo.onConfigUpdated;
 
   /// Initializes the LocalConfig with the provided settings.
   /// This method must be called before accessing any other methods.
   Future<void> initialize({
     required final LocalConfigSettings configSettings,
   }) async {
-    configRepository = LocalConfigRepositoryImpl(
+    configRepo = LocalConfigRepositoryImpl(
       storage: ScopedKeyValueStorage(
         namespace: KeyNamespace(
           base: _keyNamespaceBase,
@@ -50,7 +47,7 @@ final class LocalConfig {
 
   /// Sets the default parameter values.
   Future<void> setDefaults(final Map<String, Object> defaults) =>
-      _repo.setDefaults(
+      configRepo.setDefaults(
         defaults.map((key, value) => MapEntry(key, stringify(value))),
       );
 
@@ -58,7 +55,7 @@ final class LocalConfig {
   bool? getBool(final String key) => getValue(key)?.asBool;
 
   /// Gets the LocalConfigValue for a given key.
-  LocalConfigValue? getValue(final String key) => _repo.get(key);
+  LocalConfigValue? getValue(final String key) => configRepo.get(key);
 
   /// Gets the value for a given key as a double.
   double? getDouble(final String key) => getValue(key)?.asDouble;
@@ -70,5 +67,11 @@ final class LocalConfig {
   String? getString(final String key) => getValue(key)?.asString;
 
   /// Resets all parameters to the default values.
-  Future<void> resetAll() => _repo.resetAll();
+  Future<void> resetAll() => configRepo.resetAll();
+
+  @visibleForTesting
+  void reset() {
+    configRepo = NoopLocalConfigRepositoryImpl();
+    _initialized = false;
+  }
 }

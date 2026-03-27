@@ -26,7 +26,7 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
 
   final _scrollController = ScrollController();
 
-  final _configNotifier = ConfigNotifier(configRepo: configRepository);
+  final _configNotifier = ConfigNotifier(configRepo: configRepo);
 
   @override
   void initState() {

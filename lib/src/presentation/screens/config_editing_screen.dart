@@ -23,7 +23,7 @@ class _ConfigEditingScreenState extends State<ConfigEditingScreen> {
 
   final _textController = TextEditingController();
 
-  final _configNotifier = ConfigNotifier(configRepo: configRepository);
+  final _configNotifier = ConfigNotifier(configRepo: configRepo);
 
   late LocalConfigValue _configValue;
 

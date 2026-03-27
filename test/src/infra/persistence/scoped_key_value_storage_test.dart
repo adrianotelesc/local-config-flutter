@@ -1,11 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:local_config/src/core/persistence/key_value_storage.dart';
 import 'package:local_config/src/infra/models/key_namespace.dart';
 import 'package:local_config/src/infra/persistence/scoped_key_value_storage.dart';
 
 import 'fake_key_value_storage.dart';
 
 void main() {
-  late FakeKeyValueStorage delegate;
+  late KeyValueStorage delegate;
   late ScopedKeyValueStorage storage;
   late KeyNamespace namespace;
 
