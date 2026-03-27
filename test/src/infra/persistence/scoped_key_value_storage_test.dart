@@ -76,8 +76,8 @@ void main() {
 
   group('prune', () {
     test('should remove non-qualified keys within base namespace', () async {
-      await delegate.setString('app_key', '1'); // base-only
-      await delegate.setString('app_user_key', '2'); // qualified
+      await delegate.setString('app_key', '1');
+      await delegate.setString('app_user_key', '2');
 
       await storage.prune({'key'});
 

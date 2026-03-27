@@ -314,7 +314,6 @@ class _List extends StatelessWidget {
       return TextSpan(text: text, style: normalStyle);
     }
 
-    // Escapa termos para regex segura
     final escaped = terms.map(RegExp.escape);
     final pattern = RegExp('(${escaped.join('|')})', caseSensitive: false);
 

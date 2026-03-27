@@ -92,7 +92,6 @@ void main() {
 
       all.remove('a');
 
-      // original não deve ser afetado
       expect(config.all.containsKey('a'), isTrue);
     });
   });

@@ -113,7 +113,7 @@ void main() {
 
       expect(updated.asString, 'override');
       expect(updated.hasOverride, isTrue);
-      expect(value.overrideValue, isNull); // original unchanged
+      expect(value.overrideValue, isNull);
     });
 
     test('should support equality comparison', () {

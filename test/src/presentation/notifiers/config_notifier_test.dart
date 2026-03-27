@@ -33,7 +33,6 @@ void main() {
     test('should update items when repository changes', () async {
       await repo.set('a', '10');
 
-      // aguarda propagação do stream
       await Future.delayed(Duration.zero);
 
       expect(notifier.get('a')?.asString, '10');
