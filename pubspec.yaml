@@ -25,7 +25,7 @@ dependencies:
   intl: any
   shared_preferences: ^2.0.0
   flutter_secure_storage: ^9.0.0
-  re_editor: ^0.8.0
+  re_editor: ^0.10.0
   re_highlight: ^0.0.3
   boxy: ^2.0.0
   collection: ^1.15.0
