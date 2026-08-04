@@ -175,10 +175,9 @@ class _FormattingBar extends StatelessWidget {
             style: ButtonStyle(
               foregroundColor: WidgetStatePropertyAll(actionColor),
             ),
-            child:
-                isValid
-                    ? Text(LocalConfigLocalizations.of(context)!.format)
-                    : const SizedBox.shrink(),
+            child: isValid
+                ? Text(LocalConfigLocalizations.of(context)!.format)
+                : const SizedBox.shrink(),
           ),
         ],
       ),
@@ -204,7 +203,7 @@ class _Editor extends StatelessWidget {
         readOnly: readOnly,
         wordWrap: false,
         autocompleteSymbols: false,
-        sperator: Container(
+        leadingDivider: Container(
           width: 0.5,
           color: Theme.of(context).colorScheme.surfaceBright,
         ),
