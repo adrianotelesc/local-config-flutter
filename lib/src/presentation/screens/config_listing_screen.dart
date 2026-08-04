@@ -7,7 +7,6 @@ import 'package:local_config/src/presentation/local_config_routes.dart';
 import 'package:local_config/src/presentation/local_config_theme.dart';
 import 'package:local_config/src/presentation/models/config_value.dart';
 import 'package:local_config/src/presentation/notifiers/config_notifier.dart';
-import 'package:local_config/src/presentation/widgets/back_to_top_fab.dart';
 import 'package:local_config/src/presentation/widgets/callout.dart';
 import 'package:local_config/src/presentation/widgets/clearable_search_bar.dart';
 import 'package:local_config/src/presentation/widgets/dashed_l_connector.dart';
@@ -48,61 +47,76 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: BackToTopFab(controller: _scrollController),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      body: ListenableBuilder(
-        listenable: _configNotifier,
-        builder: (context, child) {
-          return CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              _AppBar(
-                hasLocalValue: _configNotifier.hasLocalValue,
-                onResetAllTap: _configNotifier.resetAll,
-              ),
-              if (_configNotifier.all.isEmpty)
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: Text(
-                      LocalConfig.instance.initialized
-                          ? LocalConfigLocalizations.of(context)!.noConfigs
-                          : LocalConfigLocalizations.of(context)!.uninitialized,
-                    ),
-                  ),
-                )
-              else ...[
-                SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
-                _SearchBar(controller: _textController),
-                SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
-                SliverToBoxAdapter(
-                  child: SwitchListTile(
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 0,
-                    ),
-                    title: Text(
-                      LocalConfigLocalizations.of(context)!.showOnlyChanged,
-                    ),
-                    value: _configNotifier.showOnlyLocals,
-                    onChanged: (value) {
-                      _configNotifier.showOnlyLocals = value;
-                    },
-                  ),
-                ),
-                SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
-                _List(
-                  items: _configNotifier.filtered,
-                  terms: _configNotifier.terms,
-                  onResetTap: _configNotifier.reset,
-                ),
-              ],
-            ],
-          );
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'local_config_add_parameter_fab',
+        onPressed: () {
+          Navigator.of(context).pushNamed(LocalConfigRoutes.configAdd);
         },
+        tooltip: LocalConfigLocalizations.of(context)!.addParameter,
+        child: const Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      body: RawScrollbar(
+        controller: _scrollController,
+        thumbVisibility: true,
+        interactive: true,
+        radius: const Radius.circular(8),
+        child: ListenableBuilder(
+          listenable: _configNotifier,
+          builder: (context, child) {
+            return CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                _AppBar(
+                  hasLocalValue: _configNotifier.hasLocalValue,
+                  onResetAllTap: _configNotifier.resetAll,
+                ),
+                if (_configNotifier.all.isEmpty)
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                    sliver: SliverToBoxAdapter(
+                      child: Text(
+                        LocalConfig.instance.initialized
+                            ? LocalConfigLocalizations.of(context)!.noConfigs
+                            : LocalConfigLocalizations.of(
+                                context,
+                              )!.uninitialized,
+                      ),
+                    ),
+                  )
+                else ...[
+                  SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
+                  _SearchBar(controller: _textController),
+                  SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
+                  SliverToBoxAdapter(
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 0,
+                      ),
+                      title: Text(
+                        LocalConfigLocalizations.of(context)!.showOnlyChanged,
+                      ),
+                      value: _configNotifier.showOnlyLocals,
+                      onChanged: (value) {
+                        _configNotifier.showOnlyLocals = value;
+                      },
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
+                  _List(
+                    items: _configNotifier.filtered,
+                    terms: _configNotifier.terms,
+                    onResetTap: _configNotifier.reset,
+                  ),
+                ],
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -128,39 +142,40 @@ class _AppBar extends StatelessWidget {
       titleSpacing: 0,
       floating: true,
       pinned: true,
-      bottom:
-          hasLocalValue
-              ? PreferredSize(
-                preferredSize: const Size.fromHeight(Callout.defaultHeight),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: Callout.warning(
-                    icon: Icons.error,
-                    style: CalloutStyle(
-                      borderRadius: BorderRadius.circular(16),
+      centerTitle: true,
+      bottom: hasLocalValue
+          ? PreferredSize(
+              preferredSize: const Size.fromHeight(Callout.defaultHeight),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Callout.warning(
+                  icon: Icons.error,
+                  style: CalloutStyle(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  text: LocalConfigLocalizations.of(context)!.changesApplied,
+                  trailing: TextButton(
+                    onPressed: onResetAllTap,
+                    style: ButtonStyle(
+                      overlayColor: WidgetStatePropertyAll(
+                        Theme.of(
+                          context,
+                        ).extension<ExtendedColorScheme>()?.warningContainer,
+                      ),
+                      foregroundColor: WidgetStatePropertyAll(
+                        Theme.of(context) //
+                            .extension<ExtendedColorScheme>()
+                            ?.warning,
+                      ),
                     ),
-                    text: LocalConfigLocalizations.of(context)!.changesApplied,
-                    trailing: TextButton(
-                      onPressed: onResetAllTap,
-                      style: ButtonStyle(
-                        overlayColor: WidgetStatePropertyAll(
-                          Theme.of(
-                            context,
-                          ).extension<ExtendedColorScheme>()?.warningContainer,
-                        ),
-                        foregroundColor: WidgetStatePropertyAll(
-                          Theme.of(context) //
-                          .extension<ExtendedColorScheme>()?.warning,
-                        ),
-                      ),
-                      child: Text(
-                        LocalConfigLocalizations.of(context)!.revertAll,
-                      ),
+                    child: Text(
+                      LocalConfigLocalizations.of(context)!.revertAll,
                     ),
                   ),
                 ),
-              )
-              : null,
+              ),
+            )
+          : null,
     );
   }
 }
@@ -224,54 +239,57 @@ class _List extends StatelessWidget {
                   final item = items[index];
                   final (name, configValue) = (item.key, item.value);
                   final hasLocalValue = configValue.hasLocalValue;
+                  final isCustom = configValue.isCustom;
+                  // Free entries are just local values with no default to
+                  // compare against, so they're styled identically to
+                  // overridden ones.
+                  final isChanged = hasLocalValue || isCustom;
 
                   return ExtendedListTile(
-                    style:
-                        hasLocalValue
-                            ? ExtendedListTileStyle(
-                              tileColor:
+                    key: ValueKey(name),
+                    style: isChanged
+                        ? ExtendedListTileStyle(
+                            tileColor: Theme.of(context)
+                                .extension<ExtendedColorScheme>()
+                                ?.warningContainer,
+                            titleTextStyle: context
+                                .extendedTextTheme
+                                .codeBodyMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          )
+                        : ExtendedListTileStyle(
+                            titleTextStyle:
+                                context.extendedTextTheme.codeBodyMedium,
+                          ),
+                    top: isChanged
+                        ? Callout.warning(
+                            style: CalloutStyle(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            icon: Icons.error,
+                            text: LocalConfigLocalizations.of(context)!.changed,
+                            trailing: TextButton(
+                              onPressed: () => onResetTap?.call(name),
+                              style: ButtonStyle(
+                                overlayColor: WidgetStatePropertyAll(
                                   Theme.of(context)
                                       .extension<ExtendedColorScheme>()
                                       ?.warningContainer,
-                              titleTextStyle: context
-                                  .extendedTextTheme
-                                  .codeBodyMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            )
-                            : ExtendedListTileStyle(
-                              titleTextStyle:
-                                  context.extendedTextTheme.codeBodyMedium,
+                                ),
+                                foregroundColor: WidgetStatePropertyAll(
+                                  Theme.of(context) //
+                                      .extension<ExtendedColorScheme>()
+                                      ?.warning,
+                                ),
+                              ),
+                              child: Text(
+                                LocalConfigLocalizations.of(context)!.revert,
+                              ),
                             ),
-                    top:
-                        hasLocalValue
-                            ? Callout.warning(
-                              style: CalloutStyle(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              icon: Icons.error,
-                              text:
-                                  LocalConfigLocalizations.of(context)!.changed,
-                              trailing: TextButton(
-                                onPressed: () => onResetTap?.call(name),
-                                style: ButtonStyle(
-                                  overlayColor: WidgetStatePropertyAll(
-                                    Theme.of(context)
-                                        .extension<ExtendedColorScheme>()
-                                        ?.warningContainer,
-                                  ),
-                                  foregroundColor: WidgetStatePropertyAll(
-                                    Theme.of(context) //
-                                    .extension<ExtendedColorScheme>()?.warning,
-                                  ),
-                                ),
-                                child: Text(
-                                  LocalConfigLocalizations.of(context)!.revert,
-                                ),
-                              ),
-                            )
-                            : null,
+                          )
+                        : null,
                     title: Row(
                       spacing: 16,
                       children: [
@@ -284,8 +302,9 @@ class _List extends StatelessWidget {
                               terms: terms,
                               style: context.extendedTextTheme.codeBodyMedium
                                   ?.copyWith(
-                                    fontWeight:
-                                        hasLocalValue ? FontWeight.bold : null,
+                                    fontWeight: isChanged
+                                        ? FontWeight.bold
+                                        : null,
                                   ),
                             ),
                           ),
@@ -306,49 +325,58 @@ class _List extends StatelessWidget {
                     subtitle: DashedLConnector(
                       size: const Size(32, 24),
                       entries: [
-                        if (hasLocalValue)
+                        if (isChanged)
                           DashedLEntry(
                             label: Chip(
                               label: Text(
                                 LocalConfigLocalizations.of(
                                   context,
                                 )!.localValue,
-                                style: TextTheme.of(
-                                  context,
-                                ).bodyMedium?.copyWith(
-                                  fontWeight:
-                                      hasLocalValue ? FontWeight.bold : null,
-                                ),
+                                style:
+                                    TextTheme.of(
+                                      context,
+                                    ).bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                               color: WidgetStatePropertyAll(
                                 Colors.red.withAlpha(80),
                               ),
                             ),
                             value: HighlightText(
-                              text: configValue.getLocalDisplayText(context),
+                              // Free entries store their value in
+                              // defaultValue (there's no default to
+                              // contrast it with).
+                              text: isCustom
+                                  ? configValue.getDefaultDisplayText(context)
+                                  : configValue.getLocalDisplayText(context),
                               terms: terms,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextTheme.of(
-                                context,
-                              ).bodyMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style:
+                                  TextTheme.of(
+                                    context,
+                                  ).bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
-                        DashedLEntry(
-                          label: Text(
-                            LocalConfigLocalizations.of(context)!.defaultValue,
-                            style: TextTheme.of(context).bodyMedium,
+                        if (!isCustom)
+                          DashedLEntry(
+                            label: Text(
+                              LocalConfigLocalizations.of(
+                                context,
+                              )!.defaultValue,
+                              style: TextTheme.of(context).bodyMedium,
+                            ),
+                            value: HighlightText(
+                              text: configValue.getDefaultDisplayText(context),
+                              terms: terms,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextTheme.of(context).bodyMedium,
+                            ),
                           ),
-                          value: HighlightText(
-                            text: configValue.getDefaultDisplayText(context),
-                            terms: terms,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextTheme.of(context).bodyMedium,
-                          ),
-                        ),
                       ],
                     ),
                   );

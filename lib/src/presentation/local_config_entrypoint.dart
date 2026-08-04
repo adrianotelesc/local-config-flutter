@@ -32,10 +32,13 @@ class LocalConfigEntrypoint extends StatelessWidget {
               ),
               LocalConfigRoutes.configEdit => MaterialPageRoute(
                 fullscreenDialog: true,
-                builder:
-                    (_) => ConfigEditingScreen(
-                      name: settings.arguments.toString(),
-                    ),
+                builder: (_) => ConfigEditingScreen(
+                  name: settings.arguments.toString(),
+                ),
+              ),
+              LocalConfigRoutes.configAdd => MaterialPageRoute(
+                fullscreenDialog: true,
+                builder: (_) => const ConfigEditingScreen(),
               ),
               _ => null,
             };

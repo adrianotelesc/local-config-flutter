@@ -106,6 +106,54 @@ void main() {
     });
   });
 
+  group('free-form entries', () {
+    test('should appear in all/filtered once set on the repository', () async {
+      await repo.set('free', 'value');
+      await Future.delayed(Duration.zero);
+
+      expect(notifier.all['free']?.effectiveValue, 'value');
+      expect(notifier.all['free']?.isCustom, isTrue);
+      expect(notifier.filtered.map((e) => e.key), contains('free'));
+    });
+
+    test('should be found by search', () async {
+      await repo.set('free', 'special-value');
+      await Future.delayed(Duration.zero);
+
+      notifier.query('special-value');
+
+      expect(notifier.filtered.map((e) => e.key), ['free']);
+    });
+
+    test('should be removed from all after reset', () async {
+      await repo.set('free', 'value');
+      await Future.delayed(Duration.zero);
+
+      await repo.reset('free');
+      await Future.delayed(Duration.zero);
+
+      expect(notifier.all.containsKey('free'), isFalse);
+    });
+
+    test('should be reflected in hasLocalValue', () async {
+      expect(notifier.hasLocalValue, isFalse);
+
+      await repo.set('free', 'value');
+      await Future.delayed(Duration.zero);
+
+      expect(notifier.hasLocalValue, isTrue);
+    });
+
+    test('should remain visible when showOnlyLocals is enabled', () async {
+      await repo.set('free', 'value');
+      await Future.delayed(Duration.zero);
+
+      notifier.showOnlyLocals = true;
+
+      expect(notifier.filtered.map((e) => e.key), contains('free'));
+    });
+  });
+
   group('listeners', () {
     test('should notify listeners on query change', () {
       var notified = false;

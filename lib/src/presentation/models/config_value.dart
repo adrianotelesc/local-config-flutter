@@ -11,11 +11,15 @@ final class ConfigValue {
 
   final String? localValue;
 
+  /// Whether this entry is an ad-hoc entry with no app-defined default.
+  final bool isCustom;
+
   ConfigValueType get type => ConfigValueType.fromValue(effectiveValue);
 
   ConfigValue({
     required this.defaultValue,
     required this.localValue,
+    this.isCustom = false,
   });
 
   String get effectiveValue => localValue ?? defaultValue;

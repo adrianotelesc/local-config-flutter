@@ -42,12 +42,11 @@ class HighlightText extends StatelessWidget {
     TextStyle? style,
     TextStyle? highlightStyle,
   }) {
-    if (terms.isEmpty) {
+    final pattern = _compiledPatternFor(terms);
+    if (pattern == null) {
       return TextSpan(text: text, style: style);
     }
 
-    final escaped = terms.map(RegExp.escape);
-    final pattern = RegExp('(${escaped.join('|')})', caseSensitive: false);
     final matches = pattern.allMatches(text);
 
     if (matches.isEmpty) {
@@ -75,4 +74,22 @@ class HighlightText extends StatelessWidget {
 
     return TextSpan(children: spans);
   }
+}
+
+// A single search's [terms] Set is reused (by reference) by every
+// HighlightText built during that search — ConfigNotifier only replaces it
+// on a new query — so caching by identity avoids recompiling the same
+// pattern for every visible list item while scrolling a search result.
+Set<String>? _cachedTerms;
+RegExp? _cachedPattern;
+
+RegExp? _compiledPatternFor(Set<String> terms) {
+  if (terms.isEmpty) return null;
+  if (identical(_cachedTerms, terms)) return _cachedPattern;
+
+  final escaped = terms.map(RegExp.escape);
+  final pattern = RegExp('(${escaped.join('|')})', caseSensitive: false);
+  _cachedTerms = terms;
+  _cachedPattern = pattern;
+  return pattern;
 }

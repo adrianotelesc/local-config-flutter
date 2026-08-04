@@ -35,10 +35,9 @@ class RootAwareSliverAppBar extends StatelessWidget
 
     Widget? leading;
     if (canPop) {
-      leading =
-          isFullscreenDialog
-              ? CloseButton(onPressed: () => resolvedNavigator.maybePop())
-              : BackButton(onPressed: () => resolvedNavigator.maybePop());
+      leading = isFullscreenDialog
+          ? CloseButton(onPressed: () => resolvedNavigator.maybePop())
+          : BackButton(onPressed: () => resolvedNavigator.maybePop());
     }
 
     return SliverAppBar(

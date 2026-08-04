@@ -34,7 +34,8 @@ class ConfigNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get hasLocalValue => _all.values.any((config) => config.hasLocalValue);
+  bool get hasLocalValue =>
+      _all.values.any((config) => config.hasLocalValue || config.isCustom);
 
   var _terms = <String>{};
   Set<String> get terms => UnmodifiableSetView(_terms);
@@ -53,9 +54,26 @@ class ConfigNotifier extends ChangeNotifier {
   }
 
   void _update(LocalConfigUpdate configUpdate) {
+    final defaultsMap = _configRepo.defaults;
+    final localsMap = _configRepo.locals;
+
     for (final key in configUpdate.updatedKeys) {
+      if (!defaultsMap.containsKey(key)) {
+        final value = localsMap[key];
+        if (value == null) {
+          _all.remove(key);
+        } else {
+          _all[key] = ConfigValue(
+            defaultValue: value,
+            localValue: null,
+            isCustom: true,
+          );
+        }
+        continue;
+      }
+
       _all.update(key, (configValue) {
-        return configValue.copyWith(overrideValue: _configRepo.locals[key]);
+        return configValue.copyWith(overrideValue: localsMap[key]);
       });
     }
     _applyFilters();
@@ -63,28 +81,35 @@ class ConfigNotifier extends ChangeNotifier {
   }
 
   void _load() {
-    _all = _configRepo.defaults.map((key, value) {
-      return MapEntry(
-        key,
-        ConfigValue(
-          defaultValue: value,
-          localValue: _configRepo.locals[key],
+    final defaultsMap = _configRepo.defaults;
+    final localsMap = _configRepo.locals;
+
+    _all = {
+      for (final entry in defaultsMap.entries)
+        entry.key: ConfigValue(
+          defaultValue: entry.value,
+          localValue: localsMap[entry.key],
         ),
-      );
-    });
+      for (final entry in localsMap.entries)
+        if (!defaultsMap.containsKey(entry.key))
+          entry.key: ConfigValue(
+            defaultValue: entry.value,
+            localValue: null,
+            isCustom: true,
+          ),
+    };
     _applyFilters();
     notifyListeners();
   }
 
   void _applyFilters({String? query}) {
-    _filtered =
-        _all.entries
-            .where((entry) => _overrideFilter(entry) && _termFilter(entry))
-            .toList();
+    _filtered = _all.entries
+        .where((entry) => _overrideFilter(entry) && _termFilter(entry))
+        .toList();
   }
 
   bool _overrideFilter(MapEntry<String, ConfigValue> entry) =>
-      !_showOnlyLocals || entry.value.hasLocalValue;
+      !_showOnlyLocals || entry.value.hasLocalValue || entry.value.isCustom;
 
   bool _termFilter(MapEntry<String, ConfigValue> entry) =>
       _terms.isEmpty ||

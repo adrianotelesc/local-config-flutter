@@ -24,6 +24,15 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
       all[key] = value;
     }
 
+    for (final key in _locals.keys) {
+      if (_defaults.containsKey(key)) continue;
+
+      final value = getValue(key);
+      if (value == null) continue;
+
+      all[key] = value;
+    }
+
     return all;
   }
 
@@ -46,7 +55,9 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
 
     final retainedLocals = locals.where((key, localValue) {
       final defaultValue = defaults[key];
-      if (defaultValue == null) return false;
+      // Keys with no matching default are free-form entries, not tied to
+      // the app's schema, so they're always retained.
+      if (defaultValue == null) return true;
 
       final parsedDefault = parse(defaultValue);
       final parsedLocal = parse(localValue);
@@ -63,7 +74,15 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
   @override
   LocalConfigValue? getValue(String key) {
     final defaultValue = _defaults[key];
-    if (defaultValue == null) return null;
+    if (defaultValue == null) {
+      final localValue = _locals[key];
+      if (localValue == null) return null;
+
+      return LocalConfigValue(
+        value: localValue,
+        source: ValueSource.valueLocal,
+      );
+    }
 
     final localValue = _locals[key];
     if (localValue != null && localValue != defaultValue) {
@@ -82,33 +101,38 @@ class LocalConfigRepositoryImpl implements LocalConfigRepository {
   @override
   Future<void> set(String key, String value) async {
     final defaultValue = _defaults[key];
-    if (defaultValue == null) return;
 
-    if (value != defaultValue) {
+    // Listeners only need the in-memory state, which is already up to date
+    // here, so they're notified before awaiting the storage round-trip
+    // instead of after — otherwise UI updates (e.g. the listing screen
+    // refreshing after a save) are delayed by however long the platform
+    // channel write takes, which is especially noticeable with secure
+    // storage.
+    if (defaultValue == null || value != defaultValue) {
       _locals[key] = value;
+      _controller.add(LocalConfigUpdate({key}));
       await _storage.setString(key, value);
     } else {
       _locals.remove(key);
+      _controller.add(LocalConfigUpdate({key}));
       await _storage.remove(key);
     }
-
-    _controller.add(LocalConfigUpdate({key}));
   }
 
   @override
   Future<void> reset(String key) async {
     _locals.remove(key);
-    await _storage.remove(key);
-
     _controller.add(LocalConfigUpdate({key}));
+
+    await _storage.remove(key);
   }
 
   @override
   Future<void> resetAll() async {
     final updatedKeys = _locals.keys.toSet();
     _locals.clear();
-    await _storage.clear();
-
     _controller.add(LocalConfigUpdate(updatedKeys));
+
+    await Future.wait(updatedKeys.map(_storage.remove));
   }
 }

@@ -42,20 +42,93 @@ void main() {
       expect(repo.getValue('a')?.source, ValueSource.valueDefault);
     });
 
-    test('should prune keys not present in defaults', () async {
-      await storage.setString('obsolete', 'value');
+    test(
+      'should retain keys with no matching default across setDefaults',
+      () async {
+        await storage.setString('free', 'value');
 
-      await repo.setDefaults({'a': '1'});
+        await repo.setDefaults({'a': '1'});
 
-      expect((await storage.all).containsKey('obsolete'), isFalse);
-      expect(repo.defaults.containsKey('obsolete'), isFalse);
-    });
+        expect(repo.getValue('free')?.asString, 'value');
+        expect((await storage.all).containsKey('free'), isTrue);
+      },
+    );
   });
 
   group('get', () {
     test('should return null when key does not exist', () {
       expect(repo.getValue('unknown'), isNull);
     });
+  });
+
+  group('free-form entries (no matching default)', () {
+    test('should persist a key that has no default', () async {
+      await repo.setDefaults({'a': '1'});
+
+      await repo.set('free', 'value');
+
+      expect(repo.getValue('free')?.asString, 'value');
+      expect(repo.getValue('free')?.source, ValueSource.valueLocal);
+      expect(await storage.all, containsPair('free', 'value'));
+    });
+
+    test('should be included in all', () async {
+      await repo.setDefaults({'a': '1'});
+      await repo.set('free', 'value');
+
+      expect(repo.all.keys, {'a', 'free'});
+      expect(repo.all['free']?.source, ValueSource.valueLocal);
+    });
+
+    test('should be fully removed on reset', () async {
+      await repo.setDefaults({'a': '1'});
+      await repo.set('free', 'value');
+
+      await repo.reset('free');
+
+      expect(repo.getValue('free'), isNull);
+      expect((await storage.all).containsKey('free'), isFalse);
+    });
+
+    test(
+      'should be included in resetAll',
+      () async {
+        await repo.setDefaults({'a': '1'});
+        await repo.set('free', 'value');
+
+        await repo.resetAll();
+
+        expect(repo.getValue('free'), isNull);
+        expect(await storage.all, isEmpty);
+      },
+    );
+
+    test(
+      'should become a regular override once a default is added for it',
+      () async {
+        await repo.setDefaults({});
+        await repo.set('free', 'value');
+
+        await repo.setDefaults({'free': 'default'});
+
+        expect(repo.getValue('free')?.asString, 'value');
+        expect(repo.getValue('free')?.source, ValueSource.valueLocal);
+        expect(repo.defaults.containsKey('free'), isTrue);
+      },
+    );
+
+    test(
+      'should discard a free entry if its value matches the newly-added default',
+      () async {
+        await storage.setString('free', 'same');
+
+        await repo.setDefaults({'free': 'same'});
+
+        expect(repo.getValue('free')?.asString, 'same');
+        expect(repo.getValue('free')?.source, ValueSource.valueDefault);
+        expect((await storage.all).containsKey('free'), isFalse);
+      },
+    );
   });
 
   group('set', () {

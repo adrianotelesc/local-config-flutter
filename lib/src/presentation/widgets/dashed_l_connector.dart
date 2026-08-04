@@ -112,11 +112,10 @@ class _LShapePainter extends CustomPainter {
   bool shouldRepaint(_LShapePainter old) => old.isLast != isLast;
 }
 
-Paint _linePaint() =>
-    Paint()
-      ..color = Colors.grey.shade600
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
+Paint _linePaint() => Paint()
+  ..color = Colors.grey.shade600
+  ..strokeWidth = 1.5
+  ..style = PaintingStyle.stroke;
 
 void _drawDashedLine(
   Canvas canvas,

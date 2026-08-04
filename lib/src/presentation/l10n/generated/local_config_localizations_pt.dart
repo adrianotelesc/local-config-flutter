@@ -100,4 +100,13 @@ class LocalConfigLocalizationsPt extends LocalConfigLocalizations {
   String editorOf(Object type) {
     return 'Editor de $type';
   }
+
+  @override
+  String get addParameter => 'Adicionar parâmetro';
+
+  @override
+  String get invalidParameterName => 'Nome de parâmetro inválido';
+
+  @override
+  String get parameterNameAlreadyExists => 'Esse nome de parâmetro já existe';
 }

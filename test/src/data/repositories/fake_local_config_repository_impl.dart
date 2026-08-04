@@ -25,16 +25,23 @@ class FakeLocalConfigRepositoryImpl implements LocalConfigRepository {
   @override
   LocalConfigValue? getValue(String key) {
     final defaultValue = _defaults[key];
-    if (defaultValue == null) return null;
+    if (defaultValue == null) {
+      final localValue = _locals[key];
+      if (localValue == null) return null;
+
+      return LocalConfigValue(
+        value: localValue,
+        source: ValueSource.valueLocal,
+      );
+    }
 
     final localValue = _locals[key];
 
     return LocalConfigValue(
       value: localValue ?? defaultValue,
-      source:
-          localValue != null && localValue != defaultValue
-              ? ValueSource.valueLocal
-              : ValueSource.valueDefault,
+      source: localValue != null && localValue != defaultValue
+          ? ValueSource.valueLocal
+          : ValueSource.valueDefault,
     );
   }
 

@@ -100,4 +100,13 @@ class LocalConfigLocalizationsEn extends LocalConfigLocalizations {
   String editorOf(Object type) {
     return '$type Editor';
   }
+
+  @override
+  String get addParameter => 'Add parameter';
+
+  @override
+  String get invalidParameterName => 'Invalid parameter name';
+
+  @override
+  String get parameterNameAlreadyExists => 'This parameter name already exists';
 }

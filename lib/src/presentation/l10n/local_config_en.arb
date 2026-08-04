@@ -27,5 +27,8 @@
     "validJson": "Valid JSON",
     "help": "This is the key you'll pass to the Local Config SDK,\nfor example:\n",
     "format": "Format",
-    "editorOf": "{type} Editor"
+    "editorOf": "{type} Editor",
+    "addParameter": "Add parameter",
+    "invalidParameterName": "Invalid parameter name",
+    "parameterNameAlreadyExists": "This parameter name already exists"
 }

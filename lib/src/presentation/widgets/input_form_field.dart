@@ -5,6 +5,7 @@ class InputFormField extends StatelessWidget {
   final MenuStyle? menuStyle;
   final Widget label;
   final TextEditingController controller;
+  final FocusNode? focusNode;
   final List<DropdownMenuEntry<String>> entries;
   final TextInputAction? textInputAction;
   final bool autofocus;
@@ -18,6 +19,7 @@ class InputFormField extends StatelessWidget {
     TextEditingController? controller,
     this.textStyle,
     this.menuStyle,
+    this.focusNode,
     this.entries = const [],
     this.autofocus = false,
     this.onFieldSubmitted,
@@ -37,21 +39,23 @@ class InputFormField extends StatelessWidget {
         label,
         entries.isNotEmpty
             ? _DropdownMenu(
-              textStyle: textStyle,
-              enabled: enabled,
-              controller: controller,
-              entries: entries,
-            )
+                textStyle: textStyle,
+                enabled: enabled,
+                controller: controller,
+                focusNode: focusNode,
+                entries: entries,
+              )
             : _TextFormField(
-              style: textStyle,
-              controller: controller,
-              suffixIcon: suffixIcon,
-              textInputAction: textInputAction,
-              autofocus: autofocus,
-              onFieldSubmitted: onFieldSubmitted,
-              validator: validator,
-              enabled: enabled,
-            ),
+                style: textStyle,
+                controller: controller,
+                focusNode: focusNode,
+                suffixIcon: suffixIcon,
+                textInputAction: textInputAction,
+                autofocus: autofocus,
+                onFieldSubmitted: onFieldSubmitted,
+                validator: validator,
+                enabled: enabled,
+              ),
       ],
     );
   }
@@ -60,6 +64,7 @@ class InputFormField extends StatelessWidget {
 class _TextFormField extends StatelessWidget {
   final TextStyle? style;
   final TextEditingController controller;
+  final FocusNode? focusNode;
   final Widget? suffixIcon;
   final TextInputAction? textInputAction;
   final bool autofocus;
@@ -70,6 +75,7 @@ class _TextFormField extends StatelessWidget {
   const _TextFormField({
     required this.controller,
     this.style,
+    this.focusNode,
     this.suffixIcon,
     this.textInputAction,
     this.autofocus = false,
@@ -85,6 +91,7 @@ class _TextFormField extends StatelessWidget {
       ignorePointers: false,
       scrollPhysics: AlwaysScrollableScrollPhysics(),
       controller: controller,
+      focusNode: focusNode,
       decoration: InputDecoration(
         border: const OutlineInputBorder(),
         suffixIcon: suffixIcon,
@@ -94,7 +101,7 @@ class _TextFormField extends StatelessWidget {
       onFieldSubmitted: onFieldSubmitted,
       validator: validator,
       enabled: enabled,
-      autovalidateMode: AutovalidateMode.always,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
     );
   }
 }
@@ -103,12 +110,14 @@ class _DropdownMenu extends StatelessWidget {
   final TextStyle? textStyle;
   final bool enabled;
   final TextEditingController controller;
+  final FocusNode? focusNode;
   final List<DropdownMenuEntry<String>> entries;
 
   const _DropdownMenu({
     this.enabled = true,
     this.textStyle,
     required this.controller,
+    this.focusNode,
     required this.entries,
   });
 
@@ -116,15 +125,16 @@ class _DropdownMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownMenu(
       enabled: enabled,
+      requestFocusOnTap: false,
       textStyle: textStyle?.copyWith(
         color: enabled ? null : textStyle?.color?.withAlpha(87),
       ),
-      leadingIcon:
-          entries
-              .where((item) => item.value == controller.text)
-              .firstOrNull
-              ?.leadingIcon,
+      leadingIcon: entries
+          .where((item) => item.value == controller.text)
+          .firstOrNull
+          ?.leadingIcon,
       controller: controller,
+      focusNode: focusNode,
       expandedInsets: EdgeInsets.zero,
       dropdownMenuEntries: entries,
     );

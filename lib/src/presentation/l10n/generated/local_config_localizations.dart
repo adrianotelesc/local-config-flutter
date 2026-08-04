@@ -274,6 +274,24 @@ abstract class LocalConfigLocalizations {
   /// In en, this message translates to:
   /// **'{type} Editor'**
   String editorOf(Object type);
+
+  /// No description provided for @addParameter.
+  ///
+  /// In en, this message translates to:
+  /// **'Add parameter'**
+  String get addParameter;
+
+  /// No description provided for @invalidParameterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid parameter name'**
+  String get invalidParameterName;
+
+  /// No description provided for @parameterNameAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This parameter name already exists'**
+  String get parameterNameAlreadyExists;
 }
 
 class _LocalConfigLocalizationsDelegate

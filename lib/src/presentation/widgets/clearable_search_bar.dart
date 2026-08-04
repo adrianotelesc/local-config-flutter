@@ -60,10 +60,9 @@ class _SearchBarState extends State<ClearableSearchBar> {
       ],
       backgroundColor: WidgetStateColor.fromMap({
         WidgetState.focused: Theme.of(context).colorScheme.surfaceContainer,
-        WidgetState.any:
-            _showClearButton
-                ? Theme.of(context).colorScheme.primaryContainer
-                : Theme.of(context).colorScheme.surfaceContainer,
+        WidgetState.any: _showClearButton
+            ? Theme.of(context).colorScheme.primaryContainer
+            : Theme.of(context).colorScheme.surfaceContainer,
       }),
       onTapOutside: (event) => _focusNode.unfocus(),
       leading: const Icon(Icons.search),

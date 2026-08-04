@@ -27,5 +27,8 @@
     "validJson": "JSON Válido",
     "help": "Essa é a chave que você vai passar para o SDK da Configuração Local, por exemplo:\n",
     "format": "Formatar",
-    "editorOf": "Editor de {type}"
+    "editorOf": "Editor de {type}",
+    "addParameter": "Adicionar parâmetro",
+    "invalidParameterName": "Nome de parâmetro inválido",
+    "parameterNameAlreadyExists": "Esse nome de parâmetro já existe"
 }
