@@ -126,6 +126,7 @@ class _DropdownMenu extends StatelessWidget {
     return DropdownMenu(
       enabled: enabled,
       requestFocusOnTap: false,
+      enableSearch: false,
       textStyle: textStyle?.copyWith(
         color: enabled ? null : textStyle?.color?.withAlpha(87),
       ),
@@ -134,7 +135,6 @@ class _DropdownMenu extends StatelessWidget {
           .firstOrNull
           ?.leadingIcon,
       controller: controller,
-      focusNode: focusNode,
       expandedInsets: EdgeInsets.zero,
       dropdownMenuEntries: entries,
     );
