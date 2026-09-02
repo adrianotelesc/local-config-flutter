@@ -32,5 +32,6 @@
     "invalidParameterName": "Invalid parameter name",
     "parameterNameAlreadyExists": "This parameter name already exists",
     "diff": "Diff",
-    "noDifferences": "No differences"
+    "noDifferences": "No differences",
+    "backToTop": "Back to top"
 }

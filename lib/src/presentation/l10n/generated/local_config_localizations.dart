@@ -304,6 +304,12 @@ abstract class LocalConfigLocalizations {
   /// In en, this message translates to:
   /// **'No differences'**
   String get noDifferences;
+
+  /// No description provided for @backToTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to top'**
+  String get backToTop;
 }
 
 class _LocalConfigLocalizationsDelegate

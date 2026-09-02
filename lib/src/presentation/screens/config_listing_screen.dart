@@ -28,19 +28,59 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
 
   final _configNotifier = ConfigNotifier(configRepo: configRepo);
 
+  static const _backToTopScrollOffsetThreshold = 600.0;
+
+  var _showBackToTop = false;
+  var _isScrollingToTop = false;
+
   @override
   void initState() {
     super.initState();
     _textController.addListener(_query);
+    _scrollController.addListener(_onScroll);
   }
 
   void _query() {
     _configNotifier.query(_textController.text);
   }
 
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final showBackToTop =
+        !_isScrollingToTop &&
+        _scrollController.offset > _backToTopScrollOffsetThreshold;
+    if (showBackToTop != _showBackToTop) {
+      setState(() => _showBackToTop = showBackToTop);
+    }
+  }
+
+  void _scrollToTop() {
+    if (!_scrollController.hasClients) return;
+
+    setState(() {
+      _isScrollingToTop = true;
+      _showBackToTop = false;
+    });
+
+    _scrollController
+        .animateTo(
+          0,
+          duration: Durations.medium1,
+          curve: Curves.easeInOut,
+        )
+        .whenComplete(() {
+          if (!mounted) return;
+
+          _isScrollingToTop = false;
+          _onScroll();
+        });
+  }
+
   @override
   void dispose() {
     _textController.removeListener(_query);
+    _scrollController.removeListener(_onScroll);
     super.dispose();
   }
 
@@ -56,80 +96,93 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      body: RawScrollbar(
-        controller: _scrollController,
-        thumbVisibility: true,
-        interactive: true,
-        radius: const Radius.circular(8),
-        child: ListenableBuilder(
-          listenable: _configNotifier,
-          builder: (context, child) {
-            return CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                _AppBar(
-                  hasLocalValue: _configNotifier.hasLocalValue,
-                  onResetAllTap: _configNotifier.resetAll,
+      body: ListenableBuilder(
+        listenable: _configNotifier,
+        builder: (context, child) {
+          final hasLocalValue = _configNotifier.hasLocalValue;
+
+          return Stack(
+            children: [
+              RawScrollbar(
+                controller: _scrollController,
+                thumbVisibility: true,
+                interactive: true,
+                radius: const Radius.circular(8),
+                child: CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    const _AppBar(),
+                    if (hasLocalValue)
+                      const SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: _TopOverlay.reservedCalloutHeight,
+                        ),
+                      ),
+                    if (_configNotifier.all.isEmpty)
+                      SliverPadding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        sliver: SliverToBoxAdapter(
+                          child: Text(
+                            LocalConfig.instance.initialized
+                                ? LocalConfigLocalizations.of(
+                                    context,
+                                  )!.noConfigs
+                                : LocalConfigLocalizations.of(
+                                    context,
+                                  )!.uninitialized,
+                          ),
+                        ),
+                      )
+                    else ...[
+                      SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
+                      _SearchBar(controller: _textController),
+                      SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
+                      SliverToBoxAdapter(
+                        child: SwitchListTile(
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 0,
+                          ),
+                          title: Text(
+                            LocalConfigLocalizations.of(
+                              context,
+                            )!.showOnlyChanged,
+                          ),
+                          value: _configNotifier.showOnlyLocals,
+                          onChanged: (value) {
+                            _configNotifier.showOnlyLocals = value;
+                          },
+                        ),
+                      ),
+                      SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
+                      _List(
+                        items: _configNotifier.filtered,
+                        terms: _configNotifier.terms,
+                        onResetTap: _configNotifier.reset,
+                      ),
+                    ],
+                  ],
                 ),
-                if (_configNotifier.all.isEmpty)
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
-                    sliver: SliverToBoxAdapter(
-                      child: Text(
-                        LocalConfig.instance.initialized
-                            ? LocalConfigLocalizations.of(context)!.noConfigs
-                            : LocalConfigLocalizations.of(
-                                context,
-                              )!.uninitialized,
-                      ),
-                    ),
-                  )
-                else ...[
-                  SliverToBoxAdapter(child: SizedBox.square(dimension: 16)),
-                  _SearchBar(controller: _textController),
-                  SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
-                  SliverToBoxAdapter(
-                    child: SwitchListTile(
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 0,
-                      ),
-                      title: Text(
-                        LocalConfigLocalizations.of(context)!.showOnlyChanged,
-                      ),
-                      value: _configNotifier.showOnlyLocals,
-                      onChanged: (value) {
-                        _configNotifier.showOnlyLocals = value;
-                      },
-                    ),
-                  ),
-                  SliverToBoxAdapter(child: SizedBox.square(dimension: 8)),
-                  _List(
-                    items: _configNotifier.filtered,
-                    terms: _configNotifier.terms,
-                    onResetTap: _configNotifier.reset,
-                  ),
-                ],
-              ],
-            );
-          },
-        ),
+              ),
+              _TopOverlay(
+                showCallout: hasLocalValue,
+                showBackToTop: _showBackToTop,
+                onResetAllTap: _configNotifier.resetAll,
+                onBackToTopTap: _scrollToTop,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
 class _AppBar extends StatelessWidget {
-  final bool hasLocalValue;
-  final Function()? onResetAllTap;
-
-  const _AppBar({
-    required this.hasLocalValue,
-    this.onResetAllTap,
-  });
+  const _AppBar();
 
   @override
   Widget build(BuildContext context) {
@@ -142,40 +195,148 @@ class _AppBar extends StatelessWidget {
       titleSpacing: 0,
       floating: true,
       pinned: true,
-      centerTitle: true,
-      bottom: hasLocalValue
-          ? PreferredSize(
-              preferredSize: const Size.fromHeight(Callout.defaultHeight),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Callout.warning(
-                  icon: Icons.error,
-                  style: CalloutStyle(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  text: LocalConfigLocalizations.of(context)!.changesApplied,
-                  trailing: TextButton(
-                    onPressed: onResetAllTap,
-                    style: ButtonStyle(
-                      overlayColor: WidgetStatePropertyAll(
-                        Theme.of(
-                          context,
-                        ).extension<ExtendedColorScheme>()?.warningContainer,
-                      ),
-                      foregroundColor: WidgetStatePropertyAll(
-                        Theme.of(context) //
-                            .extension<ExtendedColorScheme>()
-                            ?.warning,
-                      ),
-                    ),
-                    child: Text(
-                      LocalConfigLocalizations.of(context)!.revertAll,
-                    ),
-                  ),
+      centerTitle: false,
+    );
+  }
+}
+
+class _TopOverlay extends StatelessWidget {
+  static const calloutHeight = Callout.defaultHeight;
+  static const itemGap = 8.0;
+  static const reservedCalloutHeight = calloutHeight + itemGap;
+  static const _buttonHeight = 40.0;
+
+  final bool showCallout;
+  final bool showBackToTop;
+  final Function()? onResetAllTap;
+  final Function()? onBackToTopTap;
+
+  const _TopOverlay({
+    required this.showCallout,
+    required this.showBackToTop,
+    this.onResetAllTap,
+    this.onBackToTopTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final appBarHeight = MediaQuery.paddingOf(context).top + kToolbarHeight;
+    final visibleButtonTop = showCallout ? calloutHeight + itemGap : itemGap;
+    const hiddenCalloutTop = -calloutHeight - itemGap;
+    const hiddenButtonTop = -_buttonHeight - itemGap;
+
+    return Positioned.fill(
+      top: appBarHeight,
+      child: ClipRect(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            AnimatedPositioned(
+              duration: Durations.medium1,
+              curve: Curves.easeInOutCubic,
+              top: showBackToTop ? visibleButtonTop : hiddenButtonTop,
+              left: 0,
+              right: 0,
+              height: _buttonHeight,
+              child: Center(
+                child: IgnorePointer(
+                  ignoring: !showBackToTop,
+                  child: _BackToTopButton(onTap: onBackToTopTap),
                 ),
               ),
-            )
-          : null,
+            ),
+            AnimatedPositioned(
+              duration: Durations.medium1,
+              curve: Curves.easeInOutCubic,
+              top: showCallout ? 0 : hiddenCalloutTop,
+              left: 16,
+              right: 16,
+              height: calloutHeight,
+              child: IgnorePointer(
+                ignoring: !showCallout,
+                child: _ChangesAppliedCallout(onResetAllTap: onResetAllTap),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ChangesAppliedCallout extends StatelessWidget {
+  final Function()? onResetAllTap;
+
+  const _ChangesAppliedCallout({this.onResetAllTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final extendedColorScheme = context.extendedColorScheme;
+    final backgroundColor = Color.alphaBlend(
+      extendedColorScheme.warningContainer,
+      colorScheme.surface,
+    );
+    final borderColor = Color.alphaBlend(
+      extendedColorScheme.onWarningContainer,
+      colorScheme.surface,
+    );
+
+    return Callout.warning(
+      icon: Icons.error,
+      style: CalloutStyle(
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      text: LocalConfigLocalizations.of(context)!.changesApplied,
+      trailing: TextButton(
+        onPressed: onResetAllTap,
+        style: ButtonStyle(
+          overlayColor: WidgetStatePropertyAll(
+            Theme.of(
+              context,
+            ).extension<ExtendedColorScheme>()?.warningContainer,
+          ),
+          foregroundColor: WidgetStatePropertyAll(
+            Theme.of(context) //
+                .extension<ExtendedColorScheme>()
+                ?.warning,
+          ),
+        ),
+        child: Text(
+          LocalConfigLocalizations.of(context)!.revertAll,
+        ),
+      ),
+    );
+  }
+}
+
+class _BackToTopButton extends StatelessWidget {
+  final Function()? onTap;
+
+  const _BackToTopButton({this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: LocalConfigLocalizations.of(context)!.backToTop,
+      child: Material(
+        color: Theme.of(context).colorScheme.primary,
+        shape: const StadiumBorder(),
+        elevation: 4,
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Icon(
+              Icons.keyboard_arrow_up,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

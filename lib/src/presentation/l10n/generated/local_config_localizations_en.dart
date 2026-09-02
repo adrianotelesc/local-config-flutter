@@ -115,4 +115,7 @@ class LocalConfigLocalizationsEn extends LocalConfigLocalizations {
 
   @override
   String get noDifferences => 'No differences';
+
+  @override
+  String get backToTop => 'Back to top';
 }
