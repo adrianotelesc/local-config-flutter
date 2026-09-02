@@ -31,7 +31,7 @@ The main goal is to provide the ability to manage configs locally for any purpos
 
 ```yaml
 dependencies:
-  local_config: ^0.4.9
+  local_config: ^0.5.0
 ```
 
 #### Initialize with your parameters
@@ -104,6 +104,7 @@ void main() async {
 }
 
 ```
+
 > **⚠️ Warning**: When using [`RemoteConfigValue.asString()`](https://pub.dev/documentation/firebase_remote_config/latest/firebase_remote_config/RemoteConfigValue/asString.html) from the [firebase_remote_config](https://pub.dev/packages/firebase_remote_config) package, the returned value may not always match the expected logical type. For example, boolean values may sometimes come as numeric strings (`"0"` or `"1"`) instead of `"true"` or `"false"`.
 
 #### Navigate to built-in entrypoint widget
@@ -146,5 +147,5 @@ For a full demo, check the [`example`](https://github.com/adrianotelesc/local-co
 
 ## Additional Information
 
-- Report issues or request features in the [GitHub Issues](https://github.com/adrianotelesc/local-config-flutter/issues)  
+- Report issues or request features in the [GitHub Issues](https://github.com/adrianotelesc/local-config-flutter/issues)
 - Contributions are welcome! Feel free to open pull requests.
