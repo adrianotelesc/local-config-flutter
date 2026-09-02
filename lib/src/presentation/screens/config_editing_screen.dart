@@ -8,6 +8,7 @@ import 'package:local_config/src/presentation/models/config_value.dart';
 import 'package:local_config/src/presentation/notifiers/config_editing_notifier.dart';
 import 'package:local_config/src/presentation/widgets/config_value_field.dart';
 import 'package:local_config/src/presentation/widgets/dashed_l_connector.dart';
+import 'package:local_config/src/presentation/widgets/diff_viewer.dart';
 import 'package:local_config/src/presentation/widgets/input_form_field.dart';
 import 'package:local_config/src/presentation/widgets/root_aware_sliver_app_bar.dart';
 
@@ -168,14 +169,15 @@ class _ConfigEditingScreenState extends State<ConfigEditingScreen> {
   }
 
   void _submit() {
-    if (_formKey.currentState?.validate() == false &&
-        !_configEditingNotifier.shouldResetToDefault) {
-      return;
-    }
+    final isValid = _formKey.currentState?.validate() ?? false;
 
     if (_isAdding) {
+      // Adding always needs a valid name — there's no "revert" concept for
+      // an entry that doesn't exist yet.
+      if (!isValid) return;
       _configEditingNotifier.add(_nameController.text, _textController.text);
     } else {
+      if (!isValid && !_configEditingNotifier.shouldResetToDefault) return;
       _configEditingNotifier.save(_nameController.text, _textController.text);
     }
 
@@ -341,11 +343,16 @@ class _Form extends StatelessWidget {
                             deleteIcon: shouldResetToDefault
                                 ? Icon(Icons.add)
                                 : Icon(Icons.close),
-                            onDeleted: () {
-                              setShouldResetToDefault?.call(
-                                !shouldResetToDefault,
-                              );
-                            },
+                            // There's nothing to revert to while adding a
+                            // brand-new entry, so the delete affordance
+                            // only makes sense once configValue exists.
+                            onDeleted: configValue == null
+                                ? null
+                                : () {
+                                    setShouldResetToDefault?.call(
+                                      !shouldResetToDefault,
+                                    );
+                                  },
                             onSelected: (_) {},
                             label: Text(
                               LocalConfigLocalizations.of(context)!.localValue,
@@ -363,6 +370,14 @@ class _Form extends StatelessWidget {
                               Colors.red.withAlpha(80),
                             ),
                           ),
+                          if (_hasDefault)
+                            IconButton(
+                              onPressed: () => _openDiff(context),
+                              icon: const Icon(Icons.difference_outlined),
+                              tooltip: LocalConfigLocalizations.of(
+                                context,
+                              )!.diff,
+                            ),
                         ],
                       ),
                       value: ConfigValueField(
@@ -400,6 +415,21 @@ class _Form extends StatelessWidget {
                 ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _openDiff(BuildContext context) {
+    final controller = type.textEditorController;
+
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (_) => DiffViewer(
+          title: LocalConfigLocalizations.of(context)!.diff,
+          oldValue: controller.prettify(configValue!.defaultValue),
+          newValue: controller.prettify(fieldTextController.text),
         ),
       ),
     );

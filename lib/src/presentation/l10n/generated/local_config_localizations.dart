@@ -292,6 +292,18 @@ abstract class LocalConfigLocalizations {
   /// In en, this message translates to:
   /// **'This parameter name already exists'**
   String get parameterNameAlreadyExists;
+
+  /// No description provided for @diff.
+  ///
+  /// In en, this message translates to:
+  /// **'Diff'**
+  String get diff;
+
+  /// No description provided for @noDifferences.
+  ///
+  /// In en, this message translates to:
+  /// **'No differences'**
+  String get noDifferences;
 }
 
 class _LocalConfigLocalizationsDelegate

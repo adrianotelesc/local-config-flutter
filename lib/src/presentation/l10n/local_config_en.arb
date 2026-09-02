@@ -30,5 +30,7 @@
     "editorOf": "{type} Editor",
     "addParameter": "Add parameter",
     "invalidParameterName": "Invalid parameter name",
-    "parameterNameAlreadyExists": "This parameter name already exists"
+    "parameterNameAlreadyExists": "This parameter name already exists",
+    "diff": "Diff",
+    "noDifferences": "No differences"
 }

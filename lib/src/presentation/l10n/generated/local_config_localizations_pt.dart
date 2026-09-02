@@ -109,4 +109,10 @@ class LocalConfigLocalizationsPt extends LocalConfigLocalizations {
 
   @override
   String get parameterNameAlreadyExists => 'Esse nome de parâmetro já existe';
+
+  @override
+  String get diff => 'Diferença';
+
+  @override
+  String get noDifferences => 'Nenhuma diferença';
 }
