@@ -36,14 +36,20 @@ class ExtendedListTile extends StatelessWidget {
               padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
               child: top,
             ),
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            leading: leading,
-            title: title,
-            titleTextStyle: style?.titleTextStyle,
-            subtitle: subtitle,
-            subtitleTextStyle: style?.subtitleTextStyle,
-            trailing: trailing,
+          // ListTile paints its ink splashes on the nearest Material
+          // ancestor. Without this, the Container's tileColor above sits
+          // between that ancestor and the tile, hiding the splashes.
+          Material(
+            type: MaterialType.transparency,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              leading: leading,
+              title: title,
+              titleTextStyle: style?.titleTextStyle,
+              subtitle: subtitle,
+              subtitleTextStyle: style?.subtitleTextStyle,
+              trailing: trailing,
+            ),
           ),
         ],
       ),

@@ -338,7 +338,16 @@ class _TopOverlay extends StatelessWidget {
               child: Center(
                 child: IgnorePointer(
                   ignoring: !showBackToTop,
-                  child: _BackToTopButton(onTap: onBackToTopTap),
+                  // The button's own elevation shadow can bleed past the
+                  // ClipRect above while it's tucked behind the app bar;
+                  // fading it out in step with the slide keeps the shadow
+                  // for the visible state without that phantom sliver.
+                  child: AnimatedOpacity(
+                    duration: Durations.medium1,
+                    curve: Curves.easeInOutCubic,
+                    opacity: showBackToTop ? 1 : 0,
+                    child: _BackToTopButton(onTap: onBackToTopTap),
+                  ),
                 ),
               ),
             ),
