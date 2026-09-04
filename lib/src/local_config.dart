@@ -12,6 +12,12 @@ import 'package:local_config/src/local_config_internals.dart';
 /// The entry point for accessing Local Config.
 final class LocalConfig {
   static const _keyNamespaceBase = 'local_config';
+  // Deliberately doesn't start with "local_config_": ScopedKeyValueStorage's
+  // prune/clear match by string prefix on the raw, shared delegate storage,
+  // so a base like "local_config_ui" would be swept up by the config
+  // namespace's own prune (it starts with "local_config_") and the
+  // preference would be silently deleted on the next setDefaults call.
+  static const _uiKeyNamespaceBase = 'lc_ui';
 
   /// Returns the singleton instance of LocalConfig.
   static final instance = LocalConfig._();
@@ -39,6 +45,10 @@ final class LocalConfig {
         ),
         delegate: configSettings.keyValueStorage,
       ),
+    );
+    uiPreferencesStorage = ScopedKeyValueStorage(
+      namespace: KeyNamespace(base: _uiKeyNamespaceBase),
+      delegate: configSettings.keyValueStorage,
     );
 
     _initialized = true;
@@ -71,6 +81,7 @@ final class LocalConfig {
   @visibleForTesting
   void reset() {
     configRepo = NoopLocalConfigRepositoryImpl();
+    uiPreferencesStorage = null;
     _initialized = false;
   }
 }

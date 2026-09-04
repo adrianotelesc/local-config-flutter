@@ -33,5 +33,8 @@
     "parameterNameAlreadyExists": "This parameter name already exists",
     "diff": "Diff",
     "noDifferences": "No differences",
-    "backToTop": "Back to top"
+    "backToTop": "Back to top",
+    "themeModeSystem": "Device Theme",
+    "themeModeLight": "Light Theme",
+    "themeModeDark": "Dark Theme"
 }

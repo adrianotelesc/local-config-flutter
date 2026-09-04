@@ -7,6 +7,7 @@ import 'package:local_config/src/presentation/local_config_routes.dart';
 import 'package:local_config/src/presentation/local_config_theme.dart';
 import 'package:local_config/src/presentation/models/config_value.dart';
 import 'package:local_config/src/presentation/notifiers/config_notifier.dart';
+import 'package:local_config/src/presentation/theme_mode_scope.dart';
 import 'package:local_config/src/presentation/widgets/callout.dart';
 import 'package:local_config/src/presentation/widgets/clearable_search_bar.dart';
 import 'package:local_config/src/presentation/widgets/dashed_l_connector.dart';
@@ -103,7 +104,7 @@ class _ConfigListingScreenState extends State<ConfigListingScreen> {
 
           return Stack(
             children: [
-              RawScrollbar(
+              Scrollbar(
                 controller: _scrollController,
                 thumbVisibility: true,
                 interactive: true,
@@ -187,15 +188,111 @@ class _AppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RootAwareSliverAppBar(
-      title: Image.asset(
-        'assets/images/logo.png',
-        package: 'local_config',
-        height: 24,
+      // The full wordmark (assets/images/logo.png) bakes its "Local Config"
+      // text in a near-white color meant for a dark app bar, so it's
+      // unreadable in light mode. Only the icon mark is theme-agnostic;
+      // the label is rendered as real text so it follows onSurface.
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 8,
+        children: [
+          Image.asset(
+            'assets/images/mark.png',
+            package: 'local_config',
+            height: 24,
+          ),
+          Text(
+            LocalConfigLocalizations.of(context)!.localConfig,
+            style: TextTheme.of(
+              context,
+            ).titleLarge?.copyWith(fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
-      titleSpacing: 0,
+
       floating: true,
       pinned: true,
-      centerTitle: false,
+      centerTitle: true,
+      actionsPadding: EdgeInsets.only(right: 8),
+      actions: const [_ThemeModeButton()],
+    );
+  }
+}
+
+class _ThemeModeButton extends StatelessWidget {
+  const _ThemeModeButton();
+
+  IconData _iconFor(ThemeMode mode, Brightness platformBrightness) {
+    return switch (mode) {
+      ThemeMode.light => Icons.light_mode_outlined,
+      ThemeMode.dark => Icons.dark_mode_outlined,
+      ThemeMode.system =>
+        platformBrightness == Brightness.dark
+            ? Icons.dark_mode_outlined
+            : Icons.light_mode_outlined,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final themeModeNotifier = ThemeModeScope.of(context);
+    final platformBrightness = MediaQuery.platformBrightnessOf(context);
+
+    return ListenableBuilder(
+      listenable: themeModeNotifier,
+      builder: (context, _) {
+        final mode = themeModeNotifier.themeMode;
+        final localizations = LocalConfigLocalizations.of(context)!;
+
+        return PopupMenuButton<ThemeMode>(
+          tooltip: switch (mode) {
+            ThemeMode.system => localizations.themeModeSystem,
+            ThemeMode.light => localizations.themeModeLight,
+            ThemeMode.dark => localizations.themeModeDark,
+          },
+          icon: Icon(_iconFor(mode, platformBrightness)),
+          onSelected: themeModeNotifier.setThemeMode,
+          itemBuilder: (context) => [
+            _buildItem(
+              value: ThemeMode.light,
+              current: mode,
+              icon: Icons.light_mode_outlined,
+              label: localizations.themeModeLight,
+            ),
+            _buildItem(
+              value: ThemeMode.dark,
+              current: mode,
+              icon: Icons.dark_mode_outlined,
+              label: localizations.themeModeDark,
+            ),
+            _buildItem(
+              value: ThemeMode.system,
+              current: mode,
+              icon: _iconFor(ThemeMode.system, platformBrightness),
+              label: localizations.themeModeSystem,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  PopupMenuItem<ThemeMode> _buildItem({
+    required ThemeMode value,
+    required ThemeMode current,
+    required IconData icon,
+    required String label,
+  }) {
+    return PopupMenuItem(
+      value: value,
+      child: Row(
+        spacing: 16,
+        children: [
+          Icon(icon),
+          Expanded(child: Text(label)),
+          if (value == current) const Icon(Icons.check),
+        ],
+      ),
     );
   }
 }
@@ -319,24 +416,11 @@ class _BackToTopButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      message: LocalConfigLocalizations.of(context)!.backToTop,
-      child: Material(
-        color: Theme.of(context).colorScheme.primary,
-        shape: const StadiumBorder(),
-        elevation: 4,
-        child: InkWell(
-          customBorder: const StadiumBorder(),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Icon(
-              Icons.keyboard_arrow_up,
-              color: Theme.of(context).colorScheme.onPrimary,
-            ),
-          ),
-        ),
-      ),
+    return FloatingActionButton.small(
+      heroTag: 'local_config_back_to_top_fab',
+      tooltip: LocalConfigLocalizations.of(context)!.backToTop,
+      onPressed: onTap,
+      child: const Icon(Icons.keyboard_arrow_up),
     );
   }
 }
@@ -501,7 +585,7 @@ class _List extends StatelessWidget {
                                     ),
                               ),
                               color: WidgetStatePropertyAll(
-                                Colors.red.withAlpha(80),
+                                context.extendedColorScheme.warningContainer,
                               ),
                             ),
                             value: HighlightText(

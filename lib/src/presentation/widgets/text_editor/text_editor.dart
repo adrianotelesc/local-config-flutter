@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_config/src/presentation/l10n/generated/local_config_localizations.dart';
+import 'package:local_config/src/presentation/local_config_theme.dart';
 import 'package:local_config/src/presentation/widgets/text_editor/controller/text_editor_controller.dart';
 import 'package:re_editor/re_editor.dart';
 
@@ -135,27 +136,33 @@ class _FormattingBar extends StatelessWidget {
   final bool isValid;
   final Function()? onFormatClick;
 
-  Color get primaryColor {
-    return isValid ? Colors.greenAccent : Colors.orangeAccent;
+  Color _primaryColor(BuildContext context) {
+    final extendedColors = context.extendedColorScheme;
+    return isValid ? extendedColors.success : extendedColors.warning;
   }
 
-  Color get secondaryColor {
+  Color _secondaryColor(BuildContext context) {
+    final extendedColors = context.extendedColorScheme;
     return isValid
-        ? const Color.fromARGB(37, 76, 175, 79)
-        : const Color.fromARGB(36, 175, 165, 76);
+        ? extendedColors.successContainer
+        : extendedColors.warningContainer;
   }
 
-  Color get actionColor {
-    return isValid ? Colors.greenAccent : Colors.grey;
+  Color _actionColor(BuildContext context) {
+    return isValid
+        ? context.extendedColorScheme.success
+        : Theme.of(context).colorScheme.onSurfaceVariant;
   }
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = _primaryColor(context);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
       decoration: BoxDecoration(
         border: Border.all(color: primaryColor),
-        color: secondaryColor,
+        color: _secondaryColor(context),
       ),
       child: Row(
         children: [
@@ -173,7 +180,7 @@ class _FormattingBar extends StatelessWidget {
           TextButton(
             onPressed: isValid ? onFormatClick : null,
             style: ButtonStyle(
-              foregroundColor: WidgetStatePropertyAll(actionColor),
+              foregroundColor: WidgetStatePropertyAll(_actionColor(context)),
             ),
             child: isValid
                 ? Text(LocalConfigLocalizations.of(context)!.format)
@@ -226,7 +233,9 @@ class _Editor extends StatelessWidget {
             ],
           );
         },
-        style: textEditorController.editorStyle,
+        style: textEditorController.editorStyle(
+          Theme.of(context).brightness,
+        ),
       ),
     );
   }

@@ -27,6 +27,17 @@ void main() {
     test('should set initialized to true after initialization', () {
       expect(config.initialized, isTrue);
     });
+
+    test('uiPreferencesStorage is isolated from setDefaults pruning', () async {
+      await uiPreferencesStorage!.setString('theme_mode', 'dark');
+
+      // setDefaults prunes stale keys from the config namespace; the UI
+      // preferences namespace shares the same underlying storage and must
+      // not be swept up by that prune.
+      await config.setDefaults({'a': '1'});
+
+      expect(await uiPreferencesStorage!.getString('theme_mode'), 'dark');
+    });
   });
 
   group('setDefaults', () {

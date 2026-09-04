@@ -310,6 +310,24 @@ abstract class LocalConfigLocalizations {
   /// In en, this message translates to:
   /// **'Back to top'**
   String get backToTop;
+
+  /// No description provided for @themeModeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Device Theme'**
+  String get themeModeSystem;
+
+  /// No description provided for @themeModeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light Theme'**
+  String get themeModeLight;
+
+  /// No description provided for @themeModeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Theme'**
+  String get themeModeDark;
 }
 
 class _LocalConfigLocalizationsDelegate

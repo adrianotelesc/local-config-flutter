@@ -118,4 +118,13 @@ class LocalConfigLocalizationsEn extends LocalConfigLocalizations {
 
   @override
   String get backToTop => 'Back to top';
+
+  @override
+  String get themeModeSystem => 'Device Theme';
+
+  @override
+  String get themeModeLight => 'Light Theme';
+
+  @override
+  String get themeModeDark => 'Dark Theme';
 }

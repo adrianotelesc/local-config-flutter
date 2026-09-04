@@ -67,6 +67,7 @@ class _LEntry extends StatelessWidget {
                 size: size,
                 painter: _LShapePainter(
                   isLast: isLast,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               const SizedBox(width: 8),
@@ -81,16 +82,18 @@ class _LEntry extends StatelessWidget {
 
 class _LShapePainter extends CustomPainter {
   final bool isLast;
+  final Color color;
 
   const _LShapePainter({
     required this.isLast,
+    required this.color,
   });
 
   static const double _railX = 4.0;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = _linePaint();
+    final paint = _linePaint(color);
     final horizontalY = size.height / 2;
 
     _drawDashedLine(
@@ -109,11 +112,12 @@ class _LShapePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_LShapePainter old) => old.isLast != isLast;
+  bool shouldRepaint(_LShapePainter old) =>
+      old.isLast != isLast || old.color != color;
 }
 
-Paint _linePaint() => Paint()
-  ..color = Colors.grey.shade600
+Paint _linePaint(Color color) => Paint()
+  ..color = color
   ..strokeWidth = 1.5
   ..style = PaintingStyle.stroke;
 

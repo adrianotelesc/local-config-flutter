@@ -1,19 +1,23 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:local_config/src/common/utils/type_converters.dart';
 import 'package:local_config/src/presentation/widgets/text_editor/controller/text_editor_controller.dart';
 import 'package:re_editor/re_editor.dart';
 import 'package:re_highlight/languages/json.dart';
 import 'package:re_highlight/styles/atom-one-dark.dart';
+import 'package:re_highlight/styles/atom-one-light.dart';
 
 class JsonEditorController implements TextEditorController {
   JsonEditorController();
 
   @override
-  CodeEditorStyle? editorStyle = CodeEditorStyle(
+  CodeEditorStyle editorStyle(Brightness brightness) => CodeEditorStyle(
     codeTheme: CodeHighlightTheme(
       languages: {'json': CodeHighlightThemeMode(mode: langJson)},
-      theme: atomOneDarkTheme,
+      theme: brightness == Brightness.dark
+          ? atomOneDarkTheme
+          : atomOneLightTheme,
     ),
   );
 

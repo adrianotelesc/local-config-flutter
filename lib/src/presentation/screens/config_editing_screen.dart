@@ -339,7 +339,7 @@ class _Form extends StatelessWidget {
                       label: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          FilterChip(
+                          Chip(
                             deleteIcon: shouldResetToDefault
                                 ? Icon(Icons.add)
                                 : Icon(Icons.close),
@@ -353,7 +353,6 @@ class _Form extends StatelessWidget {
                                       !shouldResetToDefault,
                                     );
                                   },
-                            onSelected: (_) {},
                             label: Text(
                               LocalConfigLocalizations.of(context)!.localValue,
                               style:
@@ -367,7 +366,7 @@ class _Form extends StatelessWidget {
                                   ),
                             ),
                             color: WidgetStatePropertyAll(
-                              Colors.red.withAlpha(80),
+                              context.extendedColorScheme.warningContainer,
                             ),
                           ),
                           if (_hasDefault)
