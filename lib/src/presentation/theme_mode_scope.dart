@@ -11,8 +11,7 @@ class ThemeModeScope extends InheritedNotifier<ThemeModeNotifier> {
   }) : super(notifier: themeModeNotifier);
 
   static ThemeModeNotifier of(BuildContext context) {
-    final scope = context
-        .dependOnInheritedWidgetOfExactType<ThemeModeScope>();
+    final scope = context.dependOnInheritedWidgetOfExactType<ThemeModeScope>();
     if (scope == null) {
       throw StateError('ThemeModeScope not found in context.');
     }
