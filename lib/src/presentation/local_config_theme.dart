@@ -1,6 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:local_config/src/local_config_internals.dart';
 
 abstract final class LocalConfigTheme {
+  // Palette the "local value" chip picks its accent from — one of the 11
+  // condition colors Firebase Remote Config offers when you create a
+  // condition. The hue is the same across light/dark; only the alpha
+  // blended into the chip background (see [sessionConditionAccent]) reads
+  // differently per theme.
+  static const List<Color> conditionAccentPalette = [
+    Color(0xFF1E88E5), // blue
+    Color(0xFF6D4C41), // brown
+    Color(0xFF00ACC1), // cyan
+    Color(0xFFF4511E), // deep orange
+    Color(0xFF43A047), // green
+    Color(0xFF3949AB), // indigo
+    Color(0xFF7CB342), // lime
+    Color(0xFFFB8C00), // orange
+    Color(0xFFD81B60), // pink
+    Color(0xFF8E24AA), // purple
+    Color(0xFF00897B), // teal
+  ];
+
+  /// The accent picked for this session from [conditionAccentPalette],
+  /// chosen once in [LocalConfig.initialize]. Falls back to the first
+  /// entry before initialization has run.
+  static Color get sessionConditionAccent {
+    final seed = sessionConditionSeed ?? 0.0;
+    final index = (seed * conditionAccentPalette.length).floor();
+    return conditionAccentPalette[index];
+  }
+
   // Palette transposed straight from Firebase Console's own `--mat-sys-*`
   // Material 3 tokens (light-dark(claro, escuro) pairs copied literally,
   // not generated from a seed color).
@@ -310,9 +339,11 @@ abstract final class LocalConfigTheme {
     );
   }
 
-  static ThemeData get light => _buildData(_lightColorScheme, _lightExtendedColors);
+  static ThemeData get light =>
+      _buildData(_lightColorScheme, _lightExtendedColors);
 
-  static ThemeData get dark => _buildData(_darkColorScheme, _darkExtendedColors);
+  static ThemeData get dark =>
+      _buildData(_darkColorScheme, _darkExtendedColors);
 
   /// Resolves the theme matching [brightness], mirroring the light/dark
   /// modes Firebase Console itself supports.

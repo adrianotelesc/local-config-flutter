@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:local_config/src/common/utils/type_converters.dart';
 import 'package:local_config/src/data/repositories/local_config_repository_impl.dart';
@@ -50,6 +52,7 @@ final class LocalConfig {
       namespace: KeyNamespace(base: _uiKeyNamespaceBase),
       delegate: configSettings.keyValueStorage,
     );
+    sessionConditionSeed = Random().nextDouble();
 
     _initialized = true;
   }
@@ -82,6 +85,7 @@ final class LocalConfig {
   void reset() {
     configRepo = NoopLocalConfigRepositoryImpl();
     uiPreferencesStorage = null;
+    sessionConditionSeed = null;
     _initialized = false;
   }
 }

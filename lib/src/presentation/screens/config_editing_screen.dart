@@ -366,7 +366,9 @@ class _Form extends StatelessWidget {
                                   ),
                             ),
                             color: WidgetStatePropertyAll(
-                              context.extendedColorScheme.warningContainer,
+                              LocalConfigTheme.sessionConditionAccent.withAlpha(
+                                0x14,
+                              ),
                             ),
                           ),
                           if (_hasDefault)

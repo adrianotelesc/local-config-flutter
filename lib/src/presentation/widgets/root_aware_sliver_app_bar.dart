@@ -38,6 +38,15 @@ class RootAwareSliverAppBar extends StatelessWidget
       leading = isFullscreenDialog
           ? CloseButton(onPressed: () => resolvedNavigator.maybePop())
           : BackButton(onPressed: () => resolvedNavigator.maybePop());
+    } else if (centerTitle) {
+      // AppBar only reserves the standard leading width when `leading` is
+      // non-null, and its centering math positions the title against the
+      // full toolbar width rather than the space between leading and
+      // trailing. Without a leading widget here, a non-empty `actions`
+      // list makes the "centered" title visually drift toward it. This
+      // invisible placeholder reserves the same width a back/close button
+      // would, keeping the title balanced either way.
+      leading = const SizedBox.shrink();
     }
 
     return SliverAppBar(

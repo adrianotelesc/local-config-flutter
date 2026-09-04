@@ -585,7 +585,8 @@ class _List extends StatelessWidget {
                                     ),
                               ),
                               color: WidgetStatePropertyAll(
-                                context.extendedColorScheme.warningContainer,
+                                LocalConfigTheme.sessionConditionAccent
+                                    .withAlpha(0x14),
                               ),
                             ),
                             value: HighlightText(
