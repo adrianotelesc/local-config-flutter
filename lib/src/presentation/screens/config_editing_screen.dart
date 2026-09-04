@@ -372,12 +372,27 @@ class _Form extends StatelessWidget {
                             ),
                           ),
                           if (_hasDefault)
-                            IconButton(
-                              onPressed: () => _openDiff(context),
-                              icon: const Icon(Icons.difference_outlined),
-                              tooltip: LocalConfigLocalizations.of(
-                                context,
-                              )!.diff,
+                            ValueListenableBuilder<TextEditingValue>(
+                              valueListenable: fieldTextController,
+                              builder: (_, value, _) {
+                                final editorController =
+                                    type.textEditorController;
+                                final hasDiff =
+                                    editorController.prettify(
+                                      configValue!.defaultValue,
+                                    ) !=
+                                    editorController.prettify(value.text);
+
+                                if (!hasDiff) return const SizedBox.shrink();
+
+                                return IconButton(
+                                  onPressed: () => _openDiff(context),
+                                  icon: const Icon(Icons.difference_outlined),
+                                  tooltip: LocalConfigLocalizations.of(
+                                    context,
+                                  )!.diff,
+                                );
+                              },
                             ),
                         ],
                       ),
