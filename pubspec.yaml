@@ -14,7 +14,7 @@ repository: https://github.com/adrianotelesc/local_config
 issue_tracker: https://github.com/adrianotelesc/local_config/issues
 
 environment:
-  sdk: ^3.10.0
+  sdk: ">=3.10.0"
   flutter: ">=3.38.0"
 
 dependencies:
