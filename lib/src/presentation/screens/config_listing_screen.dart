@@ -202,7 +202,7 @@ class _AppBar extends StatelessWidget {
             height: 24,
           ),
           Text(
-            LocalConfigLocalizations.of(context)!.localConfig,
+            'Local Config',
             style: TextTheme.of(
               context,
             ).titleLarge?.copyWith(fontWeight: FontWeight.w500),
