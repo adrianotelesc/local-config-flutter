@@ -43,8 +43,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "3.38.0"
-            flutter-version: "3.38.0"
+          - name: "3.38.1"
+            flutter-version: "3.38.1"
             channel: stable
           - name: stable
             flutter-version: ""
